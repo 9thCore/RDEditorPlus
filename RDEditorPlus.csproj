@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net47</TargetFramework>
+    <AssemblyName>RDEditorPlus</AssemblyName>
+    <Product>RDEditorPlus</Product>
+    <Version>0.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+    <RootNamespace>RDEditorPlus</RootNamespace>
+    <Configurations>Release</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" IncludeAssets="compile" />
+    <Reference Include="lib/*" IncludeAssets="compile" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="CopyPlugin" AfterTargets="PostBuildEvent">
+    <!-- RHYTHM_DOCTOR_PATH is a system environment variable, pointing to the game. -->
+    <CombinePath Condition="'$(Configuration)' == 'Release'" BasePath="$(RHYTHM_DOCTOR_PATH)\BepInEx\plugins" Paths="$(ProjectName)">
+      <Output TaskParameter="CombinedPaths" ItemName="PluginOutputs" />
+    </CombinePath>
+
+    <PropertyGroup>
+      <PluginOutput>%(PluginOutputs.Identity)</PluginOutput>
+    </PropertyGroup>
+
+    <!-- Assembly -->
+    <MakeDir Directories="$(PluginOutput)"></MakeDir>
+    <Copy SourceFiles="$(OutDir)\$(ProjectName).dll" DestinationFolder="$(PluginOutput)" />
+
+    <!-- Prepare release -->
+    <MakeDir Directories="$(ProjectDir)..\_Releases\$(ProjectName)"></MakeDir>
+    <ZipDirectory SourceDirectory="$(PluginOutput)" DestinationFile="$(ProjectDir)..\_Releases\$(ProjectName)\$(ProjectName)_v$(Version).zip" Overwrite="true" />
+  </Target>
+</Project>
