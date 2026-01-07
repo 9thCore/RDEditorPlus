@@ -8,6 +8,7 @@ namespace RDEditorPlus
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
+        public static Plugin Instance;
         internal static new ManualLogSource Logger;
 
         public static void LogWarn(object message)
@@ -28,7 +29,10 @@ namespace RDEditorPlus
         private void Awake()
         {
             // Plugin startup logic
+            Instance = this;
             Logger = base.Logger;
+            PluginConfig.Instance.Noop();
+
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
 
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
