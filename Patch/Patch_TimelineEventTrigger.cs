@@ -56,8 +56,6 @@ namespace RDEditorPlus.Patch
                     return originalIndex;
                 }
 
-                Plugin.LogInfo($"Originally at {originalIndex}, found better match at {SpriteHeader.GetSpriteDataIndex(id)}");
-
                 return SpriteHeader.GetSpriteDataIndex(id);
             }
         }
