@@ -10,9 +10,9 @@ namespace RDEditorPlus.Patch
         [HarmonyPatch(typeof(TabSection_Sprites), nameof(TabSection_Sprites.UpdateHeadersToPage))]
         private static class UpdateHeadersToPage
         {
-            private static void Postfix(TabSection_Sprites __instance)
+            private static void Postfix()
             {
-                SubRowStorage.Holder.UpdateSpriteHeaders(__instance);
+                SubRowStorage.Holder.UpdateSpriteHeaders();
             }
         }
     }

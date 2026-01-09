@@ -1,4 +1,5 @@
 ﻿using RDLevelEditor;
+using System.Collections.Generic;
 
 namespace RDEditorPlus.Util
 {
@@ -20,10 +21,10 @@ namespace RDEditorPlus.Util
             return levelEvent.isClassicRowEvent || levelEvent.isOneshotRowEvent;
         }
 
-        // Dummy
         public static bool IsRoomEvent(this LevelEvent_Base levelEvent)
         {
-            return false;
+            return RDEditorConstants.levelEventTabs.TryGetValue(Tab.Rooms, out List<LevelEventType> list)
+                && list.Contains(levelEvent.type);
         }
 
         // Dummy
@@ -36,6 +37,27 @@ namespace RDEditorPlus.Util
         public static bool IsWindowEvent(this LevelEvent_Base levelEvent)
         {
             return false;
+        }
+
+        public static bool IsPreCreationEvent(this LevelEvent_Base levelEvent)
+        {
+            return levelEvent.type == LevelEventType.None
+                && scnEditor.instance.selectedControl.levelEvent == levelEvent;
+        }
+
+        public static int GetYValueAsValidRoom(this LevelEvent_Base levelEvent)
+        {
+            if (levelEvent.y < 0)
+            {
+                return 0;
+            }
+
+            if (levelEvent.y > RDEditorConstants.RoomCount - 1)
+            {
+                return RDEditorConstants.RoomCount - 1;
+            }
+
+            return levelEvent.y;
         }
     }
 }

@@ -14,9 +14,24 @@ namespace RDEditorPlus.Util
             return gameObject.AddComponent<C>();
         }
 
+        public static C EnsureComponent<C>(this Component component) where C : Component
+        {
+            return EnsureComponent<C>(component.gameObject);
+        }
+
         public static void AnchorRelativeY(this RectTransform transform, float delta)
         {
             transform.AnchorPosY(transform.anchoredPosition.y + delta);
+        }
+
+        public static void OffsetMinY(this RectTransform transform, float value)
+        {
+            transform.offsetMin = new Vector2(transform.offsetMin.x, value);
+        }
+
+        public static void OffsetMaxY(this RectTransform transform, float value)
+        {
+            transform.offsetMax = new Vector2(transform.offsetMax.x, value);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace RDEditorPlus.Patch
             {
                 while (__result.MoveNext())
                 {
-                    SubRowStorage.Holder.UpdateSpriteHeaders(scnEditor.instance.tabSection_sprites);
+                    SubRowStorage.Holder.UpdateHeaders();
                     yield return __result.Current;
                 }
             }
@@ -48,9 +48,9 @@ namespace RDEditorPlus.Patch
         [HarmonyPatch(typeof(Timeline), nameof(Timeline.UpdateTimelineHeight))]
         private static class UpdateTimelineHeight
         {
-            private static void Postfix(Timeline __instance)
+            private static void Postfix()
             {
-                SubRowStorage.Holder.UpdateSpriteHeaders(__instance.tabSection_sprites);
+                SubRowStorage.Holder.UpdateHeaders();
             }
         }
 
@@ -80,6 +80,13 @@ namespace RDEditorPlus.Patch
                         }
 
                         return Mathf.Min(scnEditor.instance.timeline.maxUsedY, scnEditor.instance.timeline.scaledRowCellCount - 2);
+                    case Tab.Rooms:
+                        if (!PluginConfig.RoomSubRowsEnabled)
+                        {
+                            return currentValue;
+                        }
+
+                        return scnEditor.instance.timeline.maxUsedY;
                     default:
                         return currentValue;
                 }
@@ -92,6 +99,15 @@ namespace RDEditorPlus.Patch
             private static void Prefix()
             {
                 SubRowStorage.Holder.CorrectMaxUsedY();
+            }
+        }
+
+        [HarmonyPatch(typeof(Timeline), $"get_{nameof(Timeline.usedRowCount)}")]
+        private static class get_usedRowCount
+        {
+            private static void Postfix(ref int __result)
+            {
+                SubRowStorage.Holder.OverrideUsedRowCount(ref __result);
             }
         }
     }

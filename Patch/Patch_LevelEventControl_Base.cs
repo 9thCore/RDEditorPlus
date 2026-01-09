@@ -12,7 +12,7 @@ namespace RDEditorPlus.Patch
         {
             private static void Postfix(LevelEventControl_Base __instance)
             {
-                SubRowStorage.Holder.OffsetLevelEvent(__instance);
+                SubRowStorage.Holder.OffsetLevelEventPosition(__instance);
             }
         }
     }

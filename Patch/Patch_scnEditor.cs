@@ -58,24 +58,37 @@ namespace RDEditorPlus.Patch
                 MethodInfo fixSprite = typeof(SetLevelEventControlType)
                     .GetMethod(nameof(FixSprite), BindingFlags.NonPublic | BindingFlags.Static);
 
+                MethodInfo fixEvent = typeof(SetLevelEventControlType)
+                    .GetMethod(nameof(FixEvent), BindingFlags.NonPublic | BindingFlags.Static);
+
                 CodeMatch matchSpriteDataIndex = new(
                     code => code.opcode == OpCodes.Stloc_S
                     && code.operand is LocalBuilder { LocalIndex: makeSpriteIndex });
 
                 return new CodeMatcher(instructions)
-                    .MatchForward(false, matchSpriteDataIndex)
-                    .ThrowIfInvalid("og")
-                    .MatchBack(false, new CodeMatch(OpCodes.Ldarg_0))
+                    //.MatchForward(false, matchSpriteDataIndex)
+                    //.ThrowIfInvalid("og")
+                    //.MatchBack(false, new CodeMatch(OpCodes.Ldarg_0))
+                    //.InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
+                    //.InsertAndAdvance(new CodeInstruction(OpCodes.Call, fixSprite))
+
+                    .MatchForward(false, new CodeMatch(OpCodes.Stloc_3))
+                    .Advance(1)
                     .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
-                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, fixSprite))
+                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, fixEvent))
 
                     .InstructionEnumeration();
+            }
+
+            private static void FixEvent(LevelEvent_Base levelEvent)
+            {
+                SubRowStorage.Holder.SetupEvent(levelEvent);
             }
 
             private static void FixSprite(LevelEvent_Base levelEvent)
             {
                 if (!PluginConfig.SpriteSubRowsEnabled
-                    || !SubRowStorage.Holder.TryFindSpriteForRow(levelEvent.y, out string id, out int subRow))
+                    || !SubRowStorage.Holder.TryFindSpriteForRow(levelEvent.y, out string id, out int roomPosition, out int subRow))
                 {
                     return;
                 }
@@ -84,18 +97,16 @@ namespace RDEditorPlus.Patch
                 // levelEvent.target = id;
                 SubRowStorage.EventInfo info = SubRowStorage.Holder.GetOrCreateEventData(levelEvent);
                 info.subRow = subRow;
+                levelEvent.y = roomPosition;
+            }
+        }
 
-                int idx = 0;
-                foreach (LevelEvent_MakeSprite sprite in scnEditor.instance.currentPageSpritesData)
-                {
-                    if (sprite.spriteId == id)
-                    {
-                        levelEvent.y = idx;
-                        return;
-                    }
-
-                    idx++;
-                }
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.ShowTabSection))]
+        private static class ShowTabSection
+        {
+            private static void Postfix()
+            {
+                SubRowStorage.Holder.UpdateCurrentTabSubRowUI(force: true);
             }
         }
     }

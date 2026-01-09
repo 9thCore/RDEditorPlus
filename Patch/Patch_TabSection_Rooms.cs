@@ -1,0 +1,33 @@
+﻿using HarmonyLib;
+using RDEditorPlus.ExtraData;
+using RDLevelEditor;
+
+namespace RDEditorPlus.Patch
+{
+    [HarmonyPatch]
+    internal static class Patch_TabSection_Base
+    {
+        [HarmonyPatch(typeof(TabSection_Rooms), nameof(TabSection_Rooms.Setup))]
+        private static class Setup
+        {
+            private static void Postfix(TabSection_Rooms __instance)
+            {
+                if (!PluginConfig.RoomSubRowsEnabled)
+                {
+                    return;
+                }
+
+                SubRowStorage.Holder.SetupWithScrollMask(__instance.listRect);
+            }
+        }
+
+        [HarmonyPatch(typeof(TabSection_Rooms), nameof(TabSection_Rooms.Update))]
+        private static class Update
+        {
+            private static void Postfix(TabSection_Rooms __instance)
+            {
+                SubRowStorage.Holder.UpdateRoomTabScroll(__instance);
+            }
+        }
+    }
+}

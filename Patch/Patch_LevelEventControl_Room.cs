@@ -1,0 +1,19 @@
+﻿using HarmonyLib;
+using RDEditorPlus.ExtraData;
+using RDLevelEditor;
+
+namespace RDEditorPlus.Patch
+{
+    [HarmonyPatch]
+    internal class Patch_LevelEventControl_Room
+    {
+        [HarmonyPatch(typeof(LevelEventControl_Room), nameof(LevelEventControl_Room.UpdateUIInternal))]
+        private static class UpdateUIInternal
+        {
+            private static void Postfix(LevelEventControl_Room __instance)
+            {
+                SubRowStorage.Holder.OffsetLevelEventPosition(__instance);
+            }
+        }
+    }
+}

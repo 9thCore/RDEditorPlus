@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RDLevelEditor;
+using System.Collections.Generic;
 
 namespace RDEditorPlus.ExtraData
 {
@@ -18,11 +19,24 @@ namespace RDEditorPlus.ExtraData
         {
             base.Clear();
             spriteData.Clear();
+
+            for (int i = 0; i < RDEditorConstants.RoomCount; i++)
+            {
+                roomData[i] = new();
+            }
+        }
+
+        public PagedStorage()
+        {
+            for (int i = 0; i < RDEditorConstants.RoomCount; i++)
+            {
+                roomData[i] = new();
+            }
         }
 
         // protected readonly PageData[,] rowData = new PageData[RDEditorConstants.RoomCount * RDEditorConstants.MaxRowsPerPage];
         protected readonly Dictionary<string, HeaderData> spriteData = new Dictionary<string, HeaderData>();
-        // protected readonly List<PageData>[] roomData = new List<PageData>[RDEditorConstants.RoomCount];
+        protected readonly HeaderData[] roomData = new HeaderData[RDEditorConstants.RoomCount];
         // protected readonly List<PageData>[] windowData = new List<PageData>[RDEditorConstants.WindowCount];
     }
 }
