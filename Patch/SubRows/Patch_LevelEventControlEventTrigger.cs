@@ -6,10 +6,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace RDEditorPlus.Patch
+namespace RDEditorPlus.Patch.SubRows
 {
-    [HarmonyPatch]
-    internal class Patch_LevelEventControlEventTrigger
+    internal static class Patch_LevelEventControlEventTrigger
     {
         [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.OnDrag))]
         private static class OnDrag

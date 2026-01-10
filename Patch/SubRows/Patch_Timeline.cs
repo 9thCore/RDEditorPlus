@@ -7,9 +7,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 
-namespace RDEditorPlus.Patch
+namespace RDEditorPlus.Patch.SubRows
 {
-    [HarmonyPatch]
     internal static class Patch_Timeline
     {
         [HarmonyPatch(typeof(Timeline), nameof(Timeline.UpdateUIInternalCo))]

@@ -3,10 +3,9 @@ using RDEditorPlus.ExtraData;
 using RDLevelEditor;
 using UnityEngine;
 
-namespace RDEditorPlus.Patch
+namespace RDEditorPlus.Patch.SubRows
 {
-    [HarmonyPatch]
-    internal static class Patch_TabSection_Base
+    internal static class Patch_TabSection_Rooms
     {
         [HarmonyPatch(typeof(TabSection_Rooms), nameof(TabSection_Rooms.Setup))]
         private static class Setup

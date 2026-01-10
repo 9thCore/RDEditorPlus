@@ -1,7 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using System.Reflection;
+using RDEditorPlus.Patch;
+using RDEditorPlus.Util;
 
 namespace RDEditorPlus
 {
@@ -33,9 +34,11 @@ namespace RDEditorPlus
             Logger = base.Logger;
             PluginConfig.Instance.Noop();
 
-            Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
+            Harmony harmony = new(MyPluginInfo.PLUGIN_GUID);
+            PatchUtil.PatchNested(harmony, typeof(Patch_LevelEvent_Base)); // We want this patching regardless
+            Patch.SubRows.PatchHandler.Patch(harmony);
 
-            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+            Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
         }
     }
 }

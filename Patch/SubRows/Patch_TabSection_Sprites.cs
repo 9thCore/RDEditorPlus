@@ -2,9 +2,8 @@
 using RDEditorPlus.ExtraData;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch
+namespace RDEditorPlus.Patch.SubRows
 {
-    [HarmonyPatch]
     internal static class Patch_TabSection_Sprites
     {
         [HarmonyPatch(typeof(TabSection_Sprites), nameof(TabSection_Sprites.UpdateHeadersToPage))]

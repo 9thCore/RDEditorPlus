@@ -2,10 +2,9 @@
 using RDEditorPlus.ExtraData;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch
+namespace RDEditorPlus.Patch.SubRows
 {
-    [HarmonyPatch]
-    internal class Patch_LevelEventControl_Room
+    internal static class Patch_LevelEventControl_Room
     {
         [HarmonyPatch(typeof(LevelEventControl_Room), nameof(LevelEventControl_Room.UpdateUIInternal))]
         private static class UpdateUIInternal

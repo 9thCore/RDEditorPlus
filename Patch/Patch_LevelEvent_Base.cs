@@ -6,7 +6,6 @@ using System.Text;
 
 namespace RDEditorPlus.Patch
 {
-    [HarmonyPatch]
     internal static class Patch_LevelEvent_Base
     {
         [HarmonyPatch(typeof(LevelEvent_Base), nameof(LevelEvent_Base.Decode))]
@@ -14,7 +13,10 @@ namespace RDEditorPlus.Patch
         {
             private static void Postfix(LevelEvent_Base __instance, Dictionary<string, object> dict)
             {
-                SubRowStorage.Holder.DecodeEvent(__instance, dict);
+                if (PluginConfig.SubRowsEnabled)
+                {
+                    SubRowStorage.Holder.DecodeEvent(__instance, dict);
+                }
             }
         }
 
@@ -25,7 +27,8 @@ namespace RDEditorPlus.Patch
             {
                 StringBuilder builder = null;
 
-                if (SubRowStorage.Holder.TryConstructJSONData(__instance, out string subRowData))
+                if (PluginConfig.SubRowsEnabled
+                    && SubRowStorage.Holder.TryConstructJSONData(__instance, out string subRowData))
                 {
                     (builder ??= new()).Append(subRowData);
                 }

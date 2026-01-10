@@ -2,10 +2,9 @@
 using RDEditorPlus.ExtraData;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch
+namespace RDEditorPlus.Patch.SubRows
 {
-    [HarmonyPatch]
-    internal class Patch_LevelEventControl_Base
+    internal static class Patch_LevelEventControl_Base
     {
         [HarmonyPatch(typeof(LevelEventControl_Base), nameof(LevelEventControl_Base.SetPosWithSpriteTarget))]
         private static class SetPosWithSpriteTarget

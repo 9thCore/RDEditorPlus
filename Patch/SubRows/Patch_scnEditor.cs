@@ -1,14 +1,12 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.ExtraData;
 using RDLevelEditor;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace RDEditorPlus.Patch
+namespace RDEditorPlus.Patch.SubRows
 {
-    [HarmonyPatch]
     internal static class Patch_scnEditor
     {
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.DeleteAllData))]
