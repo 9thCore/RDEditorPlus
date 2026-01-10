@@ -598,19 +598,22 @@ namespace RDEditorPlus.ExtraData
 
             foreach (LevelEventControl_Base control in scnEditor.instance.eventControls_rooms)
             {
-                if (BlacklistedFromSubRowSystem(control.levelEvent))
+                LevelEvent_Base levelEvent = control.levelEvent;
+
+                if (BlacklistedFromSubRowSystem(levelEvent)
+                    || levelEvent.IsPreCreationEvent())
                 {
                     continue;
                 }
 
                 int num = 1;
 
-                if (TryRetrieveEventData(control.levelEvent, out EventInfo info))
+                if (TryRetrieveEventData(levelEvent, out EventInfo info))
                 {
                     num = info.subRow + 1;
                 }
 
-                int room = control.levelEvent.GetYValueAsValidRoom();
+                int room = levelEvent.GetYValueAsValidRoom();
                 usedSubRowCounts[room] = Math.Max(usedSubRowCounts[room], num);
             }
 
