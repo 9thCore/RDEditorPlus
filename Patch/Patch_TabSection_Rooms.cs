@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.ExtraData;
 using RDLevelEditor;
+using UnityEngine;
 
 namespace RDEditorPlus.Patch
 {
@@ -17,7 +18,9 @@ namespace RDEditorPlus.Patch
                     return;
                 }
 
-                SubRowStorage.Holder.SetupWithScrollMask(__instance.listRect);
+                SubRowStorage.Holder.SetupWithScrollMaskIntermediary(__instance.listRect, "Rooms");
+                __instance.listRect.offsetMin = Vector2.zero;
+                __instance.listRect.offsetMax = Vector2.zero;
             }
         }
 
