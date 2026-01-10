@@ -64,12 +64,6 @@ namespace RDEditorPlus.Patch.SubRows
                     && code.operand is LocalBuilder { LocalIndex: makeSpriteIndex });
 
                 return new CodeMatcher(instructions)
-                    //.MatchForward(false, matchSpriteDataIndex)
-                    //.ThrowIfInvalid("og")
-                    //.MatchBack(false, new CodeMatch(OpCodes.Ldarg_0))
-                    //.InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
-                    //.InsertAndAdvance(new CodeInstruction(OpCodes.Call, fixSprite))
-
                     .MatchForward(false, new CodeMatch(OpCodes.Stloc_3))
                     .Advance(1)
                     .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
@@ -86,7 +80,7 @@ namespace RDEditorPlus.Patch.SubRows
             private static void FixSprite(LevelEvent_Base levelEvent)
             {
                 if (!PluginConfig.SpriteSubRowsEnabled
-                    || !SubRowStorage.Holder.TryFindSpriteForRow(levelEvent.y, out string id, out int roomPosition, out int subRow))
+                    || !SubRowStorage.Holder.TryFindSpriteForRow(levelEvent.y, out _, out int roomPosition, out int subRow))
                 {
                     return;
                 }
