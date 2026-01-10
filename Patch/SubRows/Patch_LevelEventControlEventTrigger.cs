@@ -100,7 +100,7 @@ namespace RDEditorPlus.Patch.SubRows
             {
                 LevelEvent_Base levelEvent = control.levelEvent;
 
-                if (SubRowStorage.BlacklistedFromSubRowSystem(levelEvent))
+                if (levelEvent.IsFullTimelineHeight())
                 {
                     return control;
                 }

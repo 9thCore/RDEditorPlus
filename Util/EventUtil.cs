@@ -61,5 +61,12 @@ namespace RDEditorPlus.Util
 
             return levelEvent.y;
         }
+
+        public static bool IsFullTimelineHeight(this LevelEvent_Base levelEvent)
+        {
+            return levelEvent.type == LevelEventType.ReorderRooms
+                || levelEvent.type == LevelEventType.ShowRooms
+                || levelEvent.type == LevelEventType.ReorderWindows;
+        }
     }
 }

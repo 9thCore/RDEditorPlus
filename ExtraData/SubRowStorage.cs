@@ -22,7 +22,7 @@ namespace RDEditorPlus.ExtraData
 
         public override void DecodeEvent(LevelEvent_Base levelEvent, Dictionary<string, object> properties)
         {
-            if (BlacklistedFromSubRowSystem(levelEvent)
+            if (levelEvent.IsFullTimelineHeight()
                 || (levelEvent.IsSpriteEvent() && !PluginConfig.SpriteSubRowsEnabled)
                 || (levelEvent.IsRoomEvent() && !PluginConfig.RoomSubRowsEnabled)
                 || storage.ContainsKey(levelEvent.uid))
@@ -41,7 +41,7 @@ namespace RDEditorPlus.ExtraData
 
         public override bool TryConstructJSONData(LevelEvent_Base levelEvent, out string data)
         {
-            if (BlacklistedFromSubRowSystem(levelEvent))
+            if (levelEvent.IsFullTimelineHeight())
             {
                 data = string.Empty;
                 return false;
@@ -91,7 +91,7 @@ namespace RDEditorPlus.ExtraData
         {
             LevelEvent_Base levelEvent = eventControl.levelEvent;
 
-            if (BlacklistedFromSubRowSystem(levelEvent))
+            if (levelEvent.IsFullTimelineHeight())
             {
                 return;
             }
@@ -341,7 +341,7 @@ namespace RDEditorPlus.ExtraData
 
         private float GetLevelEventOffset(LevelEvent_Base levelEvent)
         {
-            if (BlacklistedFromSubRowSystem(levelEvent))
+            if (levelEvent.IsFullTimelineHeight())
             {
                 return 0f;
             }
@@ -621,7 +621,7 @@ namespace RDEditorPlus.ExtraData
             {
                 LevelEvent_Base levelEvent = control.levelEvent;
 
-                if (BlacklistedFromSubRowSystem(levelEvent)
+                if (levelEvent.IsFullTimelineHeight()
                     || levelEvent.IsPreCreationEvent())
                 {
                     continue;
@@ -712,13 +712,6 @@ namespace RDEditorPlus.ExtraData
             }
 
             UpdateSpriteHeaders();
-        }
-
-        public static bool BlacklistedFromSubRowSystem(LevelEvent_Base levelEvent)
-        {
-            return levelEvent.type == LevelEventType.ReorderRooms
-                || levelEvent.type == LevelEventType.ShowRooms
-                || levelEvent.type == LevelEventType.ReorderWindows;
         }
 
         public class EventInfo(int subRow)
