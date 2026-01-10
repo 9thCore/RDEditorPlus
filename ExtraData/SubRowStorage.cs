@@ -617,18 +617,18 @@ namespace RDEditorPlus.ExtraData
                 usedSubRowCounts[room] = Math.Max(usedSubRowCounts[room], num);
             }
 
-            int indexToStartUpdatingEventsFrom = -1;
+            int firstRoomThatUpdated = -1;
 
             if (!force)
             {
-                indexToStartUpdatingEventsFrom = RDEditorConstants.RoomCount;
+                firstRoomThatUpdated = RDEditorConstants.RoomCount;
 
                 for (int i = RDEditorConstants.RoomCount - 1; i >= 0; i--)
                 {
                     if (usedSubRowCounts[i] != roomData[i].usedSubRowCount)
                     {
                         roomData[i].usedSubRowCount = usedSubRowCounts[i];
-                        indexToStartUpdatingEventsFrom = i;
+                        firstRoomThatUpdated = i;
                     }
                 }
             }
@@ -636,7 +636,7 @@ namespace RDEditorPlus.ExtraData
             foreach (LevelEventControl_Base control in scnEditor.instance.eventControls_rooms)
             {
                 int room = control.levelEvent.GetYValueAsValidRoom();
-                if (room > indexToStartUpdatingEventsFrom)
+                if (room > firstRoomThatUpdated)
                 {
                     control.UpdateUI();
                 }
