@@ -7,7 +7,8 @@ namespace RDEditorPlus.Util
     {
         public static bool IsSpriteEvent(this LevelEvent_Base levelEvent)
         {
-            return levelEvent.isSpriteTabEvent;
+            return levelEvent.isSpriteTabEvent
+                && levelEvent.target != null;
         }
 
         // Dummy
