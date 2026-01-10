@@ -108,7 +108,7 @@ namespace RDEditorPlus.Patch
 
                 if (levelEvent.IsPreCreationEvent())
                 {
-                    SubRowStorage.Holder.FixPreCreationEventY(control);
+                    SubRowStorage.Holder.FixPreCreationEventData(control);
                     return control;
                 }
 

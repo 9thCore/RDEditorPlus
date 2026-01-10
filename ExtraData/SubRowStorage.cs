@@ -269,19 +269,28 @@ namespace RDEditorPlus.ExtraData
             {
                 case Tab.Sprites:
                     if (!PluginConfig.SpriteSubRowsEnabled
-                        || !TryFindSpriteForRow(y, out _, out int roomPosition, out int subRow))
+                        || !TryFindSpriteForRow(y, out _, out int spritePositionInRoom, out int spriteSubRow))
                     {
                         return y;
                     }
 
-                    preCreationEventSubRow = subRow;
-                    return roomPosition;
+                    preCreationEventSubRow = spriteSubRow;
+                    return spritePositionInRoom;
+                case Tab.Rooms:
+                    if (!PluginConfig.RoomSubRowsEnabled
+                        || !TryFindRoomForRow(y, out int room, out int roomSubRow))
+                    {
+                        return y;
+                    }
+
+                    preCreationEventSubRow = roomSubRow;
+                    return room;
                 default:
                     return y;
             }
         }
 
-        public void FixPreCreationEventY(LevelEventControl_Base control)
+        public void FixPreCreationEventData(LevelEventControl_Base control)
         {
             LevelEvent_Base levelEvent = control.levelEvent;
 
@@ -289,21 +298,33 @@ namespace RDEditorPlus.ExtraData
             {
                 case Tab.Sprites:
                     if (!PluginConfig.SpriteSubRowsEnabled
-                        || !TryFindSpriteForRow(levelEvent.y, out _, out int roomPosition, out int subRow))
+                        || !TryFindSpriteForRow(levelEvent.y, out _, out int spritePositionInRoom, out int spriteSubRow))
                     {
                         return;
                     }
 
-                    if (levelEvent.row != roomPosition)
+                    if (levelEvent.row != spritePositionInRoom)
                     {
                         // i got no clue why its sometimes added multiple times dude
                         while (control.container.Remove(control)) ;
-                        levelEvent.row = roomPosition;
+                        levelEvent.row = spritePositionInRoom;
                         control.container.Add(control);
                     }
 
-                    preCreationEventSubRow = subRow;
-                    levelEvent.y = roomPosition;
+                    preCreationEventSubRow = spriteSubRow;
+                    levelEvent.y = spritePositionInRoom;
+                    return;
+                case Tab.Rooms:
+                    // Dragging the room event feels weird, but it's weird in vanilla too, so it's mostly fine
+
+                    if (!PluginConfig.RoomSubRowsEnabled
+                        || !TryFindRoomForRow(levelEvent.y, out int room, out int roomSubRow))
+                    {
+                        return;
+                    }
+
+                    preCreationEventSubRow = roomSubRow;
+                    levelEvent.y = room;
                     return;
             }
         }
