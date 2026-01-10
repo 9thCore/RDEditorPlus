@@ -42,7 +42,8 @@ namespace RDEditorPlus.Util
         public static bool IsPreCreationEvent(this LevelEvent_Base levelEvent)
         {
             return levelEvent.type == LevelEventType.None
-                && scnEditor.instance.selectedControl.levelEvent == levelEvent;
+                && (scnEditor.instance.selectedControl == null
+                || scnEditor.instance.selectedControl.levelEvent == levelEvent);
         }
 
         public static int GetYValueAsValidRoom(this LevelEvent_Base levelEvent)
