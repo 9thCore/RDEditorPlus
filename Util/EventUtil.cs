@@ -66,7 +66,8 @@ namespace RDEditorPlus.Util
         {
             return levelEvent.type == LevelEventType.ReorderRooms
                 || levelEvent.type == LevelEventType.ShowRooms
-                || levelEvent.type == LevelEventType.ReorderWindows;
+                || levelEvent.type == LevelEventType.ReorderWindows
+                || levelEvent.type == LevelEventType.DesktopColor;
         }
     }
 }
