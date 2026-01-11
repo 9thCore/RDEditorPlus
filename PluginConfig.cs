@@ -29,8 +29,8 @@ namespace RDEditorPlus
         public const string PATCH_SUB_ROWS_ROOM = PATCH_SUB_ROWS_BASE_LEFT + "rooms" + PATCH_SUB_ROWS_BASE_RIGHT;
         public const string PATCH_SUB_ROWS_WINDOW = PATCH_SUB_ROWS_BASE_LEFT + "windows" + PATCH_SUB_ROWS_BASE_RIGHT;
         public const string PATCH_SUB_ROWS_TALL_EVENTS = "What to do in the case of a tall event, like Show Rooms or Reorder Windows.\n" +
-            "Will only take effect if there is a tall event in the selected tabs.\n";
-            // nameof(SubRowTallEventBehaviour.KeepInSpecialRow) + " will add a special, non-expandable row at the top of the timeline where they will be put, scaled down to fit on a single row.";
+            "Will only take effect if there is a tall event in the selected tabs.\n" +
+            nameof(SubRowTallEventBehaviour.KeepInSpecialRow) + " will add a special, non-expandable row at the top of the timeline where they will be put, scaled down to fit on a single row.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -94,7 +94,7 @@ namespace RDEditorPlus
         {
             KeepFourRowsHigh,
             ExpandToTimelineHeight,
-            // KeepInSpecialRow
+            KeepInSpecialRow
         }
     }
 }

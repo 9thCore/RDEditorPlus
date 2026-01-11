@@ -123,25 +123,36 @@ namespace RDEditorPlus.ExtraData
 
         public void UpdateFullTimelineHeightRoomEvent(LevelEventControl_ShowRooms control)
         {
-            if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepFourRowsHigh)
+            if (!control.levelEvent.IsPreCreationEvent())
             {
-                return;
+                if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepFourRowsHigh)
+                {
+                    return;
+                }
+                else if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow)
+                {
+                    control.GetComponent<RectTransform>().OffsetMinY(-scnEditor.instance.cellHeight);
+
+                    for (int i = 1; i < RDEditorConstants.RoomCount; i++)
+                    {
+                        control.orderIcons[i].gameObject.SetActive(false);
+                        control.roomIcons[i].gameObject.SetActive(false);
+                    }
+
+                    control.orderIcons[0].sprite = control.orderSprites[0];
+
+                    RectTransform order = control.orderIcons[0].GetComponent<RectTransform>();
+                    order.anchorMin = new Vector2(order.anchorMin.x, order.anchorMin.x);
+                    order.anchorMax = new Vector2(order.anchorMax.x, order.anchorMax.x);
+
+                    if (control.roomIcons[0].gameObject.activeSelf)
+                    {
+                        control.roomIcons[0].Show(RoomTransitionType.Show, control.timeline.zoomVertFactor);
+                    }
+
+                    return;
+                }
             }
-            //else if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow)
-            //{
-            //    control.GetComponent<RectTransform>().OffsetMinY(-scnEditor.instance.cellHeight);
-
-            //    for (int i = 1; i < RDEditorConstants.RoomCount; i++)
-            //    {
-            //        control.orderIcons[i].gameObject.SetActive(false);
-            //        control.roomIcons[i].gameObject.SetActive(false);
-            //    }
-
-            //    control.orderIcons[0].sprite = control.orderSprites[0];
-            //    control.roomIcons[0].Show(RoomTransitionType.Show, control.timeline.zoomVertFactor);
-
-            //    return;
-            //}
 
             int horizontalPadding = (int)(scnEditor.instance.timeline.zoomFactor * 2.0f);
             int verticalPadding = (int)(scnEditor.instance.timeline.zoomVertFactor * 2.0f);
@@ -151,7 +162,7 @@ namespace RDEditorPlus.ExtraData
             orderGroup.childScaleHeight = true;
             orderGroup.padding = new RectOffset(horizontalPadding, horizontalPadding, verticalPadding, verticalPadding);
 
-            float offset = 0f;
+            float offset = GetRoomTabExtraOffset();
 
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
@@ -225,6 +236,7 @@ namespace RDEditorPlus.ExtraData
                         return;
                     }
 
+                    maxUsedY = GetRoomTabExtraRowOffset();
                     for (int i = 0; i < RDEditorConstants.RoomCount; i++)
                     {
                         maxUsedY += GetRoomExtraRowCount(i) + 1;
@@ -244,22 +256,10 @@ namespace RDEditorPlus.ExtraData
                 return;
             }
 
-            TabSection_Rooms tab = scnEditor.instance.tabSection_rooms;
-
-            //if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow)
-            //{
-            //    if (roomExtraOffsetLayoutElement == null)
-            //    {
-            //        GameObject offset = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_RoomExtraOffset");
-            //        roomExtraOffsetLayoutElement = offset.EnsureComponent<LayoutElement>();
-            //        roomExtraOffsetLayoutElement.transform.SetParent(tab.labels[0].transform.parent);
-            //    }
-
-            //    roomExtraOffsetLayoutElement.preferredHeight = scnEditor.instance.cellHeight;
-            //}
-
+            float roomTabOffset = GetRoomTabExtraOffset();
             float extraOffset = 0f;
 
+            TabSection_Rooms tab = scnEditor.instance.tabSection_rooms;
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
                 LayoutElement element = tab.labels[i].EnsureComponent<LayoutElement>();
@@ -297,8 +297,8 @@ namespace RDEditorPlus.ExtraData
 
             float scroll = float.IsNaN(roomScrollViewVertContentLastPosition) ? 0 : roomScrollViewVertContentLastPosition;
 
-            roomLayoutGroupCache.OffsetMinY(-extraOffset + scroll);
-            roomLayoutGroupCache.OffsetMaxY(scroll);
+            roomLayoutGroupCache.OffsetMinY(-roomTabOffset  - extraOffset + scroll);
+            roomLayoutGroupCache.OffsetMaxY(-roomTabOffset + scroll);
         }
 
         public void UpdateSpriteHeaders()
@@ -444,7 +444,20 @@ namespace RDEditorPlus.ExtraData
             switch (scnEditor.instance.currentTab)
             {
                 case Tab.Sprites:
+                    if (!PluginConfig.SpriteSubRowsEnabled)
+                    {
+                        return 0f;
+                    }
+
                     return GetFirstSpritesInTabOffset(levelEvent.y) + preCreationEventSubRow * scnEditor.instance.cellHeight;
+                case Tab.Rooms:
+                    if (!PluginConfig.RoomSubRowsEnabled
+                        || PluginConfig.TallEventSubRowsBehaviour != PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow)
+                    {
+                        return 0f;
+                    }
+
+                    return GetFirstRoomsInTabOffset(levelEvent.y) + preCreationEventSubRow * scnEditor.instance.cellHeight;
                 default:
                     return 0f;
             }
@@ -452,11 +465,11 @@ namespace RDEditorPlus.ExtraData
 
         private float GetRoomEventOffset(LevelEvent_Base levelEvent)
         {
-            float offset = 0f;
+            float offset = GetRoomTabExtraOffset();
 
             if (TryRetrieveEventData(levelEvent, out EventInfo info))
             {
-                offset = info.subRow * scnEditor.instance.cellHeight;
+                offset += info.subRow * scnEditor.instance.cellHeight;
             }
 
             for (int i = 0; i < levelEvent.y; i++)
@@ -527,6 +540,18 @@ namespace RDEditorPlus.ExtraData
             return extraRows * scnEditor.instance.cellHeight;
         }
 
+        private float GetFirstRoomsInTabOffset(int limit)
+        {
+            int extraRows = 0;
+
+            for (int i = 0; i < limit; i++)
+            {
+                extraRows += GetRoomExtraRowCount(i);
+            }
+
+            return extraRows * scnEditor.instance.cellHeight;
+        }
+
         private int GetSpriteExtraRowCount(string target)
         {
             if (spriteData.TryGetValue(target, out PageInfo info))
@@ -574,6 +599,12 @@ namespace RDEditorPlus.ExtraData
 
         public bool TryFindRoomForRow(int row, out int room, out int subRow)
         {
+            row -= GetRoomTabExtraRowOffset();
+            if (row < 0)
+            {
+                row = 0;
+            }
+
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
                 int rowCount = GetRoomExtraRowCount(i) + 1;
@@ -788,6 +819,16 @@ namespace RDEditorPlus.ExtraData
             UpdateSpriteHeaders();
         }
 
+        private int GetRoomTabExtraRowOffset()
+        {
+            return PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow ? 1 : 0;
+        }
+        
+        private float GetRoomTabExtraOffset()
+        {
+            return GetRoomTabExtraRowOffset() * scnEditor.instance.cellHeight;
+        }
+
         public class EventInfo(int subRow)
         {
             public int subRow = subRow;
@@ -798,7 +839,6 @@ namespace RDEditorPlus.ExtraData
             public int usedSubRowCount = 0;
         }
 
-        private LayoutElement roomExtraOffsetLayoutElement = null;
         private RectTransform roomLayoutGroupCache = null;
         private float roomScrollViewVertContentLastPosition = float.NaN;
 
