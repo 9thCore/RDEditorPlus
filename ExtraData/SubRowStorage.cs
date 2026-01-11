@@ -117,7 +117,71 @@ namespace RDEditorPlus.ExtraData
         public void OffsetLevelEventPosition(LevelEventControl_Base control)
         {
             float delta = GetLevelEventOffset(control.levelEvent);
+
             control.GetComponent<RectTransform>().AnchorRelativeY(-delta);
+        }
+
+        public void UpdateFullTimelineHeightRoomEvent(LevelEventControl_ShowRooms control)
+        {
+            if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepFourRowsHigh)
+            {
+                return;
+            }
+            //else if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow)
+            //{
+            //    control.GetComponent<RectTransform>().OffsetMinY(-scnEditor.instance.cellHeight);
+
+            //    for (int i = 1; i < RDEditorConstants.RoomCount; i++)
+            //    {
+            //        control.orderIcons[i].gameObject.SetActive(false);
+            //        control.roomIcons[i].gameObject.SetActive(false);
+            //    }
+
+            //    control.orderIcons[0].sprite = control.orderSprites[0];
+            //    control.roomIcons[0].Show(RoomTransitionType.Show, control.timeline.zoomVertFactor);
+
+            //    return;
+            //}
+
+            int horizontalPadding = (int)(scnEditor.instance.timeline.zoomFactor * 2.0f);
+            int verticalPadding = (int)(scnEditor.instance.timeline.zoomVertFactor * 2.0f);
+
+            VerticalLayoutGroup orderGroup = control.orderIcons[0].transform.parent.EnsureComponent<VerticalLayoutGroup>();
+            orderGroup.reverseArrangement = true;
+            orderGroup.childScaleHeight = true;
+            orderGroup.padding = new RectOffset(horizontalPadding, horizontalPadding, verticalPadding, verticalPadding);
+
+            float offset = 0f;
+
+            for (int i = 0; i < RDEditorConstants.RoomCount; i++)
+            {
+                LayoutElement orderElement = control.orderIcons[i].EnsureComponent<LayoutElement>();
+                orderElement.layoutPriority = 99;
+
+                LayoutElement roomElement = control.roomIcons[i].EnsureComponent<LayoutElement>();
+                roomElement.layoutPriority = 99;
+
+                int extraRowCount = GetRoomExtraRowCount(i);
+
+                if (extraRowCount > 0)
+                {
+                    float heightOffset = scnEditor.instance.cellHeight * extraRowCount;
+
+                    orderElement.preferredHeight = control.orderIcons[i].preferredHeight * (extraRowCount + 1);
+                    roomElement.preferredHeight = heightOffset;
+                    offset += heightOffset;
+
+                    orderElement.enabled = true;
+                    roomElement.enabled = true;
+                }
+                else
+                {
+                    orderElement.enabled = false;
+                    roomElement.enabled = false;
+                }
+            }
+            
+            control.GetComponent<RectTransform>().OffsetMinRelativeY(-offset);
         }
 
         public void UpdateHeaders()
@@ -180,9 +244,22 @@ namespace RDEditorPlus.ExtraData
                 return;
             }
 
-            float extraOffset = 0;
-
             TabSection_Rooms tab = scnEditor.instance.tabSection_rooms;
+
+            //if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow)
+            //{
+            //    if (roomExtraOffsetLayoutElement == null)
+            //    {
+            //        GameObject offset = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_RoomExtraOffset");
+            //        roomExtraOffsetLayoutElement = offset.EnsureComponent<LayoutElement>();
+            //        roomExtraOffsetLayoutElement.transform.SetParent(tab.labels[0].transform.parent);
+            //    }
+
+            //    roomExtraOffsetLayoutElement.preferredHeight = scnEditor.instance.cellHeight;
+            //}
+
+            float extraOffset = 0f;
+
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
                 LayoutElement element = tab.labels[i].EnsureComponent<LayoutElement>();
@@ -577,10 +654,6 @@ namespace RDEditorPlus.ExtraData
             UpdateRoomHeaders();
         }
 
-        public void SetupWithScrollMask(RectTransform rect)
-        {
-        }
-
         public void SetupWithScrollMaskIntermediary(RectTransform rectTransform, string nameSuffix)
         {
             GameObject mask = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameSuffix}");
@@ -657,7 +730,8 @@ namespace RDEditorPlus.ExtraData
             foreach (LevelEventControl_Base control in scnEditor.instance.eventControls_rooms)
             {
                 int room = control.levelEvent.GetYValueAsValidRoom();
-                if (room > firstRoomThatUpdated)
+                if (control.levelEvent.IsFullTimelineHeight()
+                    || room > firstRoomThatUpdated)
                 {
                     control.UpdateUI();
                 }
@@ -724,6 +798,7 @@ namespace RDEditorPlus.ExtraData
             public int usedSubRowCount = 0;
         }
 
+        private LayoutElement roomExtraOffsetLayoutElement = null;
         private RectTransform roomLayoutGroupCache = null;
         private float roomScrollViewVertContentLastPosition = float.NaN;
 

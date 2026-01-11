@@ -29,6 +29,11 @@ namespace RDEditorPlus.Util
             transform.offsetMin = new Vector2(transform.offsetMin.x, value);
         }
 
+        public static void OffsetMinRelativeY(this RectTransform transform, float delta)
+        {
+            transform.OffsetMinY(transform.offsetMin.y + delta);
+        }
+
         public static void OffsetMaxY(this RectTransform transform, float value)
         {
             transform.offsetMax = new Vector2(transform.offsetMax.x, value);
