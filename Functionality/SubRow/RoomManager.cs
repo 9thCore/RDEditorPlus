@@ -66,7 +66,7 @@ namespace RDEditorPlus.Functionality.SubRow
             orderGroup.childScaleHeight = true;
             orderGroup.padding = new RectOffset(horizontalPadding, horizontalPadding, verticalPadding, verticalPadding);
 
-            float offset = 0f; // GetRoomTabExtraOffset();
+            float offset = GetTimelineCellOffset();
 
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
@@ -76,7 +76,7 @@ namespace RDEditorPlus.Functionality.SubRow
                 LayoutElement roomElement = eventControl.roomIcons[i].EnsureComponent<LayoutElement>();
                 roomElement.layoutPriority = 99;
 
-                int extraRowCount = GetVisualRowCount(i);
+                int extraRowCount = SubRowStorage.Instance.GetRoomExtraVisualRowCount(i);
 
                 if (extraRowCount > 0)
                 {
@@ -99,38 +99,54 @@ namespace RDEditorPlus.Functionality.SubRow
             eventControl.GetComponent<RectTransform>().OffsetMinRelativeY(-offset);
         }
 
-        public override void UpdateUI(LevelEventControl_Base eventControl)
-        {
-            if (eventControl.levelEvent.IsFullTimelineHeight())
-            {
-                return;
-            }
-        }
-
         public override bool CanAllSelectedEventsBeDragged(int offset)
         {
-            throw new NotImplementedException();
+            foreach (LevelEventControl_Base control in scnEditor.instance.selectedControls)
+            {
+                int row = SubRowStorage.Instance.GetEventCorrectedRow(control.levelEvent);
+                int newRow = row + offset;
+
+                if (!TryFindRoomForRow(newRow, out _))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public override int GetDraggedEventYPosition(LevelEventControl_Base eventControl, int oldY)
         {
-            throw new NotImplementedException();
+            if (!TryFindRoomForRow(oldY, out int room))
+            {
+                return -(RDEditorConstants.RoomCount - 1);
+            }
+
+            if (!eventControl.levelEvent.IsPreCreationEvent())
+            {
+                SubRowStorage.Instance.SetLevelEventRow(eventControl, room);
+            }
+
+            eventControl.levelEvent.y = room;
+
+            return room;
         }
 
         public override int GetCurrentTabMaxUsedY()
         {
-            int maxUsedY = 0; // GetRoomTabExtraRowOffset();
+            int maxUsedY = GetTimelineRowOffset();
+
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
-                maxUsedY += GetVisualRowCount(i) + 1;
+                maxUsedY += SubRowStorage.Instance.GetRoomVisualRowCount(i);
             }
 
-            return 0;
+            return maxUsedY;
         }
 
         public override void UpdateTabPanelOnly()
         {
-            float roomTabOffset = 0f; // GetRoomTabExtraOffset();
+            float roomTabOffset = GetTimelineCellOffset();
             float extraOffset = 0f;
 
             TabSection_Rooms tab = scnEditor.instance.tabSection_rooms;
@@ -139,7 +155,7 @@ namespace RDEditorPlus.Functionality.SubRow
                 LayoutElement element = tab.labels[i].EnsureComponent<LayoutElement>();
                 element.layoutPriority = 99;
 
-                int extraRowCount = GetVisualRowCount(i);
+                int extraRowCount = SubRowStorage.Instance.GetRoomExtraVisualRowCount(i);
 
                 if (extraRowCount > 0)
                 {
@@ -227,56 +243,60 @@ namespace RDEditorPlus.Functionality.SubRow
             UpdateTabPanelOnly();
         }
 
-        public override void OverrideUsedRowCount(ref int usedRowCount)
-        {
-            usedRowCount = Math.Max(usedRowCount, scnEditor.instance.timeline.maxUsedY);
-        }
-
         public override bool TryGetPreCreationEventData(int y, out int realY, out int realRow, out int visualRow)
         {
-            throw new NotImplementedException();
+            if (!TryFindRoomForRow(y, out int room))
+            {
+                realY = 0;
+                realRow = 0;
+                visualRow = 0;
+                return false;
+            }
+
+            realY = room;
+            realRow = room;
+            visualRow = y;
+            return true;
         }
 
         public override void SetupJustCreatedEvent(LevelEvent_Base levelEvent)
         {
-            throw new NotImplementedException();
+            // Nothing special
         }
 
-        private bool TryFindRoomForRow(int row, out int room, out int subRow)
+        public int GetTimelineRowOffset()
         {
-            //row -= GetRoomTabExtraRowOffset();
-            //if (row < 0)
-            //{
-            //    row = 0;
-            //}
+            return PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow ? 1 : 0;
+        }
+
+        public float GetTimelineCellOffset()
+        {
+            return GetTimelineRowOffset() * scnEditor.instance.cellHeight;
+        }
+
+        private bool TryFindRoomForRow(int row, out int room)
+        {
+            row -= GetTimelineRowOffset();
+            if (row < 0)
+            {
+                room = 0;
+                return false;
+            }
 
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
-                int rowCount = GetVisualRowCount(i) + 1;
+                int rowCount = SubRowStorage.Instance.GetRoomVisualRowCount(i);
                 row -= rowCount;
 
                 if (row < 0)
                 {
                     room = i;
-                    subRow = rowCount + row;
                     return true;
                 }
             }
 
             room = 0;
-            subRow = 0;
             return false;
-        }
-
-        private int GetVisualRowCount(int room)
-        {
-            if (room >= RDEditorConstants.RoomCount
-               || room < 0)
-            {
-                return 0;
-            }
-
-            return SubRowStorage.Instance.GetRoomUsedSubRowCount(room);
         }
 
         private RectTransform roomLayoutGroupCache = null;

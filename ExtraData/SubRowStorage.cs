@@ -88,9 +88,14 @@ namespace RDEditorPlus.ExtraData
             roomData[room] = new(usedSubRowCount);
         }
 
-        public int GetRoomUsedSubRowCount(int room)
+        public int GetRoomExtraVisualRowCount(int room)
         {
             return roomData[room].usedSubRowCount;
+        }
+
+        public int GetRoomVisualRowCount(int room)
+        {
+            return GetRoomExtraVisualRowCount(room) + 1;
         }
 
         public bool UpdateRoomUsedSubRowCountIfRequired(int room, int usedSubRowCount)
@@ -177,6 +182,18 @@ namespace RDEditorPlus.ExtraData
             return 0;
         }
 
+        public int GetNumberOfRowsAboveRoom(int room)
+        {
+            int accumulated = 0;
+
+            for (int i = 0; i < room; i++)
+            {
+                accumulated += GetRoomVisualRowCount(i);
+            }
+
+            return accumulated;
+        }
+
         public int GetEventCorrectedRow(LevelEvent_Base levelEvent)
         {
             if (levelEvent.IsFullTimelineHeight())
@@ -199,6 +216,11 @@ namespace RDEditorPlus.ExtraData
         {
             eventControl.levelEvent.target = target;
             eventControl.SetRow(SpriteHeader.GetSpriteDataIndex(target));
+        }
+
+        public void SetLevelEventRow(LevelEventControl_Base eventControl, int row)
+        {
+            eventControl.SetRow(row);
         }
 
         public void SetupWithScrollMaskIntermediary(RectTransform rectTransform, string nameSuffix)
@@ -229,65 +251,12 @@ namespace RDEditorPlus.ExtraData
             {
                 case Tab.Sprites:
                     return GetNumberOfRowsAboveSprite(levelEvent.target);
+                case Tab.Rooms:
+                    return GetNumberOfRowsAboveRoom(levelEvent.y) + RoomManager.Instance.GetTimelineRowOffset();
                 default:
                     return 0;
             }
         }
-
-        //private EventInfo GetEventInfo(LevelEvent_Base levelEvent)
-        //{
-        //    return levelEvent.GetTab() switch
-        //    {
-        //        Tab.Sprites => new SpriteEventInfo(levelEvent),
-        //        _ => null
-        //    };
-        //}
-
-        //public abstract class EventInfo
-        //{
-        //    public int visualRow, subRow;
-
-        //    public abstract void SetRow(int row);
-        //    public abstract void UpdateVisualRow();
-        //    public abstract void UpdateSubRow();
-        //    public abstract void UpdateSubRowData();
-        //}
-
-        //public class SpriteEventInfo(LevelEvent_Base levelEvent) : EventInfo
-        //{
-        //    public string spriteID = !string.IsNullOrEmpty(levelEvent.target)
-        //        ? levelEvent.target
-        //        : scnEditor.instance.spritesData[levelEvent.row].spriteId;
-
-        //    public override void SetRow(int row)
-        //    {
-        //        spriteID = scnEditor.instance.spritesData[row].spriteId;
-        //    }
-
-        //    public override void UpdateVisualRow()
-        //    {
-        //        PageInfo info = Holder.GetOrCreatePageDataForSprite(spriteID);
-        //        visualRow = info.rowsAbove + subRow;
-        //    }
-
-        //    public override void UpdateSubRow()
-        //    {
-        //        PageInfo info = Holder.GetOrCreatePageDataForSprite(spriteID);
-        //        subRow = visualRow - info.rowsAbove;
-        //    }
-
-        //    public override void UpdateSubRowData()
-        //    {
-        //        PageInfo info = Holder.GetOrCreatePageDataForSprite(spriteID);
-        //        info.usedSubRowCount = Math.Max(info.usedSubRowCount, subRow);
-        //    }
-        //}
-
-        //public class PageInfo
-        //{
-        //    public int usedSubRowCount = 0;
-        //    public int rowsAbove = 0;
-        //}
 
         private class EventData(int subRow)
         {

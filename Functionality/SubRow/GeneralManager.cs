@@ -133,34 +133,37 @@ namespace RDEditorPlus.Functionality.SubRow
             currentTabController = tab switch
             {
                 Tab.Sprites => PluginConfig.SpriteSubRowsEnabled ? spriteController : null,
-                // Tab.Rooms => PluginConfig.RoomSubRowsEnabled ? roomController : null,
+                Tab.Rooms => PluginConfig.RoomSubRowsEnabled ? roomController : null,
                 _ => null,
             };
 
-            // UpdateTab(force: false);
+            if (tab != Tab.Sprites)
+            {
+                UpdateTab(force: false);
+            }
         }
 
-        private void FixPreCreationEventControl(LevelEventControl_Base eventControl)
-        {
-            LevelEvent_Base levelEvent = eventControl.levelEvent;
+        //private void FixPreCreationEventControl(LevelEventControl_Base eventControl)
+        //{
+        //    LevelEvent_Base levelEvent = eventControl.levelEvent;
 
-            if (currentTabController == null
-                || !currentTabController.TryGetPreCreationEventData(levelEvent.y, out int realY, out int realRow, out int visualRow))
-            {
-                return;
-            }
+        //    if (currentTabController == null
+        //        || !currentTabController.TryGetPreCreationEventData(levelEvent.y, out int realY, out int realRow, out int visualRow))
+        //    {
+        //        return;
+        //    }
 
-            if (levelEvent.row != realRow)
-            {
-                // i got no clue why its sometimes added multiple times
-                while (eventControl.container.Remove(eventControl)) ;
-                levelEvent.row = realRow;
-                eventControl.container.Add(eventControl);
-            }
+        //    if (levelEvent.row != realRow)
+        //    {
+        //        // i got no clue why its sometimes added multiple times
+        //        while (eventControl.container.Remove(eventControl)) ;
+        //        levelEvent.row = realRow;
+        //        eventControl.container.Add(eventControl);
+        //    }
 
-            preCreationEventVisualRow = visualRow;
-            levelEvent.y = realY;
-        }
+        //    preCreationEventVisualRow = visualRow;
+        //    levelEvent.y = realY;
+        //}
 
         public int PreCreationEventVisualRow => preCreationEventVisualRow;
 
