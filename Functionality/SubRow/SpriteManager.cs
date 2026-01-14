@@ -42,16 +42,16 @@ namespace RDEditorPlus.Functionality.SubRow
             return true;
         }
 
-        public override int GetDraggedEventYPosition(LevelEvent_Base levelEvent, int oldY)
+        public override int GetDraggedEventYPosition(LevelEventControl_Base eventControl, int oldY)
         {
             if (!TryFindSpriteForRow(oldY, out string id, out int roomPosition))
             {
                 return -(roomPosition - 1);
             }
 
-            if (!levelEvent.IsPreCreationEvent())
+            if (!eventControl.levelEvent.IsPreCreationEvent())
             {
-                SubRowStorage.Instance.SetLevelEventTarget(levelEvent, id);
+                SubRowStorage.Instance.SetLevelEventTarget(eventControl, id);
             }
 
             return roomPosition;

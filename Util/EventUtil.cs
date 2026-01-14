@@ -84,5 +84,17 @@ namespace RDEditorPlus.Util
 
             return levelEvent.defaultTab;
         }
+
+        public static void SetRow(this LevelEventControl_Base eventControl, int row)
+        {
+            if (eventControl.levelEvent.row == row)
+            {
+                return;
+            }
+
+            while (eventControl.container.Remove(eventControl)) ;
+            eventControl.levelEvent.row = row;
+            eventControl.container.Add(eventControl);
+        }
     }
 }

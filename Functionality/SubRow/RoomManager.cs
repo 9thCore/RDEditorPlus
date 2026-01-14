@@ -112,7 +112,7 @@ namespace RDEditorPlus.Functionality.SubRow
             throw new NotImplementedException();
         }
 
-        public override int GetDraggedEventYPosition(LevelEvent_Base levelEvent, int oldY)
+        public override int GetDraggedEventYPosition(LevelEventControl_Base eventControl, int oldY)
         {
             throw new NotImplementedException();
         }
@@ -276,7 +276,6 @@ namespace RDEditorPlus.Functionality.SubRow
                 return 0;
             }
 
-            //return SubRowStorage.Holder.roomData[room].usedSubRowCount;
             return SubRowStorage.Instance.GetRoomUsedSubRowCount(room);
         }
 

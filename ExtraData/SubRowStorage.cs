@@ -195,9 +195,10 @@ namespace RDEditorPlus.ExtraData
             return GetRowsAbove(levelEvent);
         }
 
-        public void SetLevelEventTarget(LevelEvent_Base levelEvent, string target)
+        public void SetLevelEventTarget(LevelEventControl_Base eventControl, string target)
         {
-            levelEvent.target = target;
+            eventControl.levelEvent.target = target;
+            eventControl.SetRow(SpriteHeader.GetSpriteDataIndex(target));
         }
 
         public void SetupWithScrollMaskIntermediary(RectTransform rectTransform, string nameSuffix)

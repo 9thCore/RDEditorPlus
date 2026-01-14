@@ -23,27 +23,27 @@ namespace RDEditorPlus.Functionality.SubRow
             throw new InvalidOperationException();
         }
 
-        public override int GetDraggedEventYPosition(LevelEvent_Base levelEvent, int oldY)
+        public override int GetDraggedEventYPosition(LevelEventControl_Base eventControl, int oldY)
         {
             if (currentTabController == null)
             {
                 return oldY;
             }
 
-            int newY = currentTabController.GetDraggedEventYPosition(levelEvent, oldY);
+            int newY = currentTabController.GetDraggedEventYPosition(eventControl, oldY);
 
             if (newY < 0)
             {
                 return oldY < 0 ? 0 : -newY;
             }
 
-            if (levelEvent.IsPreCreationEvent())
+            if (eventControl.levelEvent.IsPreCreationEvent())
             {
                 preCreationEventVisualRow = oldY;
             }
             else
             {
-                SubRowStorage.Instance.SetVisualRow(levelEvent, oldY);
+                SubRowStorage.Instance.SetVisualRow(eventControl.levelEvent, oldY);
             }
 
             return newY;

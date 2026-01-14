@@ -10,7 +10,7 @@ namespace RDEditorPlus.Functionality.SubRow
         public abstract void UpdateFullTimelineHeightEvent(LevelEventControl_Base eventControl);
 
         public abstract bool CanAllSelectedEventsBeDragged(int offset);
-        public abstract int GetDraggedEventYPosition(LevelEvent_Base levelEvent, int oldY);
+        public abstract int GetDraggedEventYPosition(LevelEventControl_Base eventControl, int oldY);
 
         public abstract void UpdateTab(bool force);
         public abstract void UpdateTabPanelOnly();
