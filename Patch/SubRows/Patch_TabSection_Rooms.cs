@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace RDEditorPlus.Patch.SubRows
                     return;
                 }
 
-                SubRowStorage.Holder.SetupWithScrollMaskIntermediary(__instance.listRect, "Rooms");
+                SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.listRect, "Rooms");
                 __instance.listRect.offsetMin = Vector2.zero;
                 __instance.listRect.offsetMax = Vector2.zero;
             }
@@ -28,7 +29,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(TabSection_Rooms __instance)
             {
-                SubRowStorage.Holder.UpdateRoomTabScroll(__instance);
+                RoomManager.Instance.UpdateTabScroll();
             }
         }
     }

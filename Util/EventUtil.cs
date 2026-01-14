@@ -69,5 +69,20 @@ namespace RDEditorPlus.Util
                 || levelEvent.type == LevelEventType.ReorderWindows
                 || levelEvent.type == LevelEventType.DesktopColor;
         }
+
+        public static bool IsMultiTabEvent(this LevelEvent_Base levelEvent)
+        {
+            return levelEvent.type == LevelEventType.Comment;
+        }
+
+        public static Tab GetTab(this LevelEvent_Base levelEvent)
+        {
+            if (levelEvent.IsMultiTabEvent())
+            {
+                return levelEvent.tab;
+            }
+
+            return levelEvent.defaultTab;
+        }
     }
 }

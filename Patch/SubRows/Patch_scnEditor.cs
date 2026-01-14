@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,7 +15,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Prefix()
             {
-                SubRowStorage.Holder.Clear();
+                SubRowStorage.Instance.Clear();
             }
         }
 
@@ -23,8 +24,8 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix()
             {
-                SubRowStorage.Holder.CorrectMaxUsedY();
-                SubRowStorage.Holder.UpdateCurrentTabSubRowUI(true);
+                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY();
+                GeneralManager.Instance.UpdateTab(force: true);
             }
         }
 
@@ -33,7 +34,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(LevelEventControl_Base eventControl)
             {
-                SubRowStorage.Holder.HandleNewLevelEventControl(eventControl);
+                GeneralManager.Instance.HandleNewLevelEventControl(eventControl);
             }
         }
 
@@ -42,7 +43,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Prefix()
             {
-                SubRowStorage.Holder.UpdateCurrentTabSubRowUI();
+                GeneralManager.Instance.UpdateTab(force: false);
             }
         }
 
@@ -51,54 +52,39 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
             {
-                const int makeSpriteIndex = 5;
-
-                MethodInfo fixSprite = typeof(SetLevelEventControlType)
-                    .GetMethod(nameof(FixSprite), BindingFlags.NonPublic | BindingFlags.Static);
-
-                MethodInfo fixEvent = typeof(SetLevelEventControlType)
-                    .GetMethod(nameof(FixEvent), BindingFlags.NonPublic | BindingFlags.Static);
-
-                CodeMatch matchSpriteDataIndex = new(
-                    code => code.opcode == OpCodes.Stloc_S
-                    && code.operand is LocalBuilder { LocalIndex: makeSpriteIndex });
+                MethodInfo setupJustCreatedEvent = typeof(SetLevelEventControlType)
+                    .GetMethod(nameof(SetupJustCreatedEvent), BindingFlags.NonPublic | BindingFlags.Static);
 
                 return new CodeMatcher(instructions)
                     .MatchForward(false, new CodeMatch(OpCodes.Stloc_3))
                     .Advance(1)
                     .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
-                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, fixEvent))
+                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, setupJustCreatedEvent))
 
                     .InstructionEnumeration();
             }
 
-            private static void FixEvent(LevelEvent_Base levelEvent)
+            private static void SetupJustCreatedEvent(LevelEvent_Base levelEvent)
             {
-                SubRowStorage.Holder.SetupEvent(levelEvent);
-            }
-
-            private static void FixSprite(LevelEvent_Base levelEvent)
-            {
-                if (!PluginConfig.SpriteSubRowsEnabled
-                    || !SubRowStorage.Holder.TryFindSpriteForRow(levelEvent.y, out _, out int roomPosition, out int subRow))
-                {
-                    return;
-                }
-
-                // The vanilla code sets the target anyway, no need to bother
-                // levelEvent.target = id;
-                SubRowStorage.EventInfo info = SubRowStorage.Holder.GetOrCreateEventData(levelEvent);
-                info.subRow = subRow;
-                levelEvent.y = roomPosition;
+                GeneralManager.Instance.SetupJustCreatedEvent(levelEvent);
             }
         }
 
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.ShowTabSection))]
         private static class ShowTabSection
         {
+            private static void Prefix(Tab tab)
+            {
+                GeneralManager.Instance.ChangeTab(tab);
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.SwapSpritePositions))]
+        private static class SwapSpritePositions
+        {
             private static void Postfix()
             {
-                SubRowStorage.Holder.UpdateCurrentTabSubRowUI(force: true);
+                SpriteManager.Instance.UpdateTab(force: true);
             }
         }
     }

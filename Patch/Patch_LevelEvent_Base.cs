@@ -15,7 +15,7 @@ namespace RDEditorPlus.Patch
             {
                 if (PluginConfig.SubRowsEnabled)
                 {
-                    SubRowStorage.Holder.DecodeEvent(__instance, dict);
+                    SubRowStorage.Instance.DecodeEvent(__instance, dict);
                 }
             }
         }
@@ -28,7 +28,7 @@ namespace RDEditorPlus.Patch
                 StringBuilder builder = null;
 
                 if (PluginConfig.SubRowsEnabled
-                    && SubRowStorage.Holder.TryConstructJSONData(__instance, out string subRowData))
+                    && SubRowStorage.Instance.TryConstructJSONData(__instance, out string subRowData))
                 {
                     (builder ??= new()).Append(subRowData);
                 }

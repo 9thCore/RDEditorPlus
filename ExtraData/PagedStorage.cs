@@ -35,8 +35,8 @@ namespace RDEditorPlus.ExtraData
         }
 
         // protected readonly PageData[,] rowData = new PageData[RDEditorConstants.RoomCount * RDEditorConstants.MaxRowsPerPage];
-        protected readonly Dictionary<string, HeaderData> spriteData = new Dictionary<string, HeaderData>();
-        protected readonly HeaderData[] roomData = new HeaderData[RDEditorConstants.RoomCount];
+        public readonly Dictionary<string, HeaderData> spriteData = new Dictionary<string, HeaderData>();
+        public readonly HeaderData[] roomData = new HeaderData[RDEditorConstants.RoomCount];
         // protected readonly List<PageData>[] windowData = new List<PageData>[RDEditorConstants.WindowCount];
     }
 }

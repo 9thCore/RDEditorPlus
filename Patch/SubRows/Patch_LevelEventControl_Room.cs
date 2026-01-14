@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 
 namespace RDEditorPlus.Patch.SubRows
@@ -11,7 +11,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(LevelEventControl_Room __instance)
             {
-                SubRowStorage.Holder.OffsetLevelEventPosition(__instance);
+                RoomManager.Instance.UpdateUI(__instance);
             }
         }
     }

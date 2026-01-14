@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,13 +14,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
             {
-                const int levelEventControlIndex = 14;
-
                 MethodInfo modifyY = typeof(OnPointerClick).GetMethod(nameof(ModifyY), BindingFlags.NonPublic | BindingFlags.Static);
-
-                CodeMatch matchLevelEventControl = new(
-                    code => code.opcode == OpCodes.Stloc_S
-                    && code.operand is LocalBuilder { LocalIndex: levelEventControlIndex });
 
                 return new CodeMatcher(instructions)
                     .MatchForward(false, new CodeMatch(OpCodes.Stloc_3))
@@ -32,7 +26,7 @@ namespace RDEditorPlus.Patch.SubRows
 
             private static int ModifyY(int y)
             {
-                return SubRowStorage.Holder.ModifyPlacementY(y);
+                return GeneralManager.Instance.ModifyPointerClickYPosition(y);
             }
         }
     }

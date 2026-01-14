@@ -15,6 +15,6 @@ namespace RDEditorPlus.ExtraData
             storage.Clear();
         }
 
-        protected readonly Dictionary<int, EventData> storage = new();
+        public readonly Dictionary<int, EventData> storage = new();
     }
 }

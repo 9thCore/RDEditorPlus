@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 
 namespace RDEditorPlus.Patch.SubRows
@@ -11,7 +11,8 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix()
             {
-                SubRowStorage.Holder.UpdateSpriteHeaders();
+                SpriteManager.Instance.UpdateTab(force: true);
+                scnEditor.instance.timeline.maxUsedY = SpriteManager.Instance.GetCurrentTabMaxUsedY();
             }
         }
     }

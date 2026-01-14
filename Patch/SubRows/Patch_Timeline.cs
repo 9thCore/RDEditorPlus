@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace RDEditorPlus.Patch.SubRows
             {
                 while (__result.MoveNext())
                 {
-                    SubRowStorage.Holder.UpdateHeaders();
+                    GeneralManager.Instance.UpdateTabPanelOnly();
                     yield return __result.Current;
                 }
             }
@@ -40,7 +41,7 @@ namespace RDEditorPlus.Patch.SubRows
 
             private static void CorrectMaxUsedY()
             {
-                SubRowStorage.Holder.CorrectMaxUsedY();
+                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY();
             }
         }
 
@@ -49,7 +50,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix()
             {
-                SubRowStorage.Holder.UpdateHeaders();
+                GeneralManager.Instance.UpdateTabPanelOnly();
             }
         }
 
@@ -97,7 +98,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Prefix()
             {
-                SubRowStorage.Holder.CorrectMaxUsedY();
+                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY();
             }
         }
 
@@ -106,7 +107,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(ref int __result)
             {
-                SubRowStorage.Holder.OverrideUsedRowCount(ref __result);
+                GeneralManager.Instance.OverrideUsedRowCount(ref __result);
             }
         }
     }
