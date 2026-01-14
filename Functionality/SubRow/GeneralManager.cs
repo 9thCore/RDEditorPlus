@@ -2,7 +2,6 @@
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
-using UnityEngine;
 
 namespace RDEditorPlus.Functionality.SubRow
 {
@@ -101,6 +100,11 @@ namespace RDEditorPlus.Functionality.SubRow
             preCreationEventVisualRow = 0;
         }
 
+        public override int? GetTimelineDisabledRowsValueThing()
+        {
+            return currentTabController?.GetTimelineDisabledRowsValueThing();
+        }
+
         public bool CanAllSelectedEventsBeDragged(bool originalFlag, int offset)
         {
             return currentTabController?.CanAllSelectedEventsBeDragged(offset / scnEditor.instance.cellHeight) ?? originalFlag;
@@ -142,28 +146,6 @@ namespace RDEditorPlus.Functionality.SubRow
                 UpdateTab(force: false);
             }
         }
-
-        //private void FixPreCreationEventControl(LevelEventControl_Base eventControl)
-        //{
-        //    LevelEvent_Base levelEvent = eventControl.levelEvent;
-
-        //    if (currentTabController == null
-        //        || !currentTabController.TryGetPreCreationEventData(levelEvent.y, out int realY, out int realRow, out int visualRow))
-        //    {
-        //        return;
-        //    }
-
-        //    if (levelEvent.row != realRow)
-        //    {
-        //        // i got no clue why its sometimes added multiple times
-        //        while (eventControl.container.Remove(eventControl)) ;
-        //        levelEvent.row = realRow;
-        //        eventControl.container.Add(eventControl);
-        //    }
-
-        //    preCreationEventVisualRow = visualRow;
-        //    levelEvent.y = realY;
-        //}
 
         public int PreCreationEventVisualRow => preCreationEventVisualRow;
 

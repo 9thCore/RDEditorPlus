@@ -15,6 +15,8 @@ namespace RDEditorPlus.Functionality.SubRow
         public abstract void UpdateTab(bool force);
         public abstract void UpdateTabPanelOnly();
 
+        public abstract int? GetTimelineDisabledRowsValueThing();
+
         public abstract int GetCurrentTabMaxUsedY();
 
         public abstract bool TryGetPreCreationEventData(int y, out int realY, out int realRow, out int visualRow);

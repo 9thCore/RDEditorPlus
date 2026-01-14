@@ -264,6 +264,11 @@ namespace RDEditorPlus.Functionality.SubRow
             // Nothing special
         }
 
+        public override int? GetTimelineDisabledRowsValueThing()
+        {
+            return scnEditor.instance.timeline.maxUsedY;
+        }
+
         public int GetTimelineRowOffset()
         {
             return PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow ? 1 : 0;

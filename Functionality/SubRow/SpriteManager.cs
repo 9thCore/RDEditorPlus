@@ -112,6 +112,11 @@ namespace RDEditorPlus.Functionality.SubRow
             levelEvent.target = SpriteHeader.GetSpriteData(levelEvent.y, levelEvent.room).spriteId;
         }
 
+        public override int? GetTimelineDisabledRowsValueThing()
+        {
+            return Mathf.Min(scnEditor.instance.timeline.maxUsedY, scnEditor.instance.timeline.scaledRowCellCount - 2);
+        }
+
         private void UpdatePage(bool force, int page)
         {
             // If an event is above the first decoration that got its size updated,

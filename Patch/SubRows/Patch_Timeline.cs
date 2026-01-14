@@ -71,25 +71,7 @@ namespace RDEditorPlus.Patch.SubRows
 
             private static int GetActualValue(int currentValue)
             {
-                switch (scnEditor.instance.currentTab)
-                {
-                    case Tab.Sprites:
-                        if (!PluginConfig.SpriteSubRowsEnabled)
-                        {
-                            return currentValue;
-                        }
-
-                        return Mathf.Min(scnEditor.instance.timeline.maxUsedY, scnEditor.instance.timeline.scaledRowCellCount - 2);
-                    case Tab.Rooms:
-                        if (!PluginConfig.RoomSubRowsEnabled)
-                        {
-                            return currentValue;
-                        }
-
-                        return scnEditor.instance.timeline.maxUsedY;
-                    default:
-                        return currentValue;
-                }
+                return GeneralManager.Instance.GetTimelineDisabledRowsValueThing() ?? currentValue;
             }
         }
 
