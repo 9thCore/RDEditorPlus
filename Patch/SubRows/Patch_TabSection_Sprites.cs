@@ -11,7 +11,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix()
             {
-                SpriteManager.Instance.UpdateTab(force: true);
+                SpriteManager.Instance.UpdateTab(force: false);
                 scnEditor.instance.timeline.UpdateMaxUsedY();
             }
         }

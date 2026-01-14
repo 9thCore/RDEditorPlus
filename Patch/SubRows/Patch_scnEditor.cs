@@ -82,9 +82,12 @@ namespace RDEditorPlus.Patch.SubRows
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.SwapSpritePositions))]
         private static class SwapSpritePositions
         {
-            private static void Postfix()
+            private static void Postfix(LevelEvent_MakeSprite a, LevelEvent_MakeSprite b)
             {
-                SpriteManager.Instance.UpdateTab(force: true);
+                SubRowStorage.Instance.UpdateSpriteUsedSubRowCountIfRequired(a.spriteId, 0);
+                SubRowStorage.Instance.UpdateSpriteUsedSubRowCountIfRequired(b.spriteId, 0);
+
+                SpriteManager.Instance.UpdateTab(force: false);
             }
         }
     }
