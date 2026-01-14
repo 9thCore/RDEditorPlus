@@ -83,9 +83,16 @@ namespace RDEditorPlus.ExtraData
             return 0;
         }
 
-        public void SetRoomUsedSubRowCount(int room, int usedSubRowCount)
+        public void Clear()
         {
-            roomData[room] = new(usedSubRowCount);
+            eventData.Clear();
+            spriteData.Clear();
+            GeneralManager.Instance.Clear();
+
+            for (int i = 0; i < RDEditorConstants.RoomCount; i++)
+            {
+                roomData[i] = new(0);
+            }
         }
 
         public int GetRoomExtraVisualRowCount(int room)
@@ -107,18 +114,6 @@ namespace RDEditorPlus.ExtraData
             }
 
             return false;
-        }
-
-        public void Clear()
-        {
-            eventData.Clear();
-            spriteData.Clear();
-            GeneralManager.Instance.Clear();
-
-            for (int i = 0; i < RDEditorConstants.RoomCount; i++)
-            {
-                roomData[i] = new(0);
-            }
         }
 
         public int GetSpriteExtraVisualRowCount(string target)
@@ -151,47 +146,6 @@ namespace RDEditorPlus.ExtraData
             }
 
             return false;
-        }
-
-        public int GetNumberOfRowsAboveSprite(string target)
-        {
-            LevelEvent_MakeSprite sprite = SpriteHeader.GetSpriteData(target);
-            if (sprite == null)
-            {
-                return 0;
-            }
-
-            int room = sprite.room;
-            int accumulated = 0;
-
-            foreach (LevelEvent_MakeSprite sprite2 in scnEditor.instance.spritesData)
-            {
-                if (sprite2 == sprite)
-                {
-                    return accumulated;
-                }
-
-                if (sprite2.room != room)
-                {
-                    continue;
-                }
-
-                accumulated += GetSpriteVisualRowCount(sprite2.spriteId);
-            }
-
-            return 0;
-        }
-
-        public int GetNumberOfRowsAboveRoom(int room)
-        {
-            int accumulated = 0;
-
-            for (int i = 0; i < room; i++)
-            {
-                accumulated += GetRoomVisualRowCount(i);
-            }
-
-            return accumulated;
         }
 
         public int GetEventCorrectedRow(LevelEvent_Base levelEvent)
@@ -256,6 +210,47 @@ namespace RDEditorPlus.ExtraData
                 default:
                     return 0;
             }
+        }
+
+        private int GetNumberOfRowsAboveSprite(string target)
+        {
+            LevelEvent_MakeSprite sprite = SpriteHeader.GetSpriteData(target);
+            if (sprite == null)
+            {
+                return 0;
+            }
+
+            int room = sprite.room;
+            int accumulated = 0;
+
+            foreach (LevelEvent_MakeSprite sprite2 in scnEditor.instance.spritesData)
+            {
+                if (sprite2 == sprite)
+                {
+                    return accumulated;
+                }
+
+                if (sprite2.room != room)
+                {
+                    continue;
+                }
+
+                accumulated += GetSpriteVisualRowCount(sprite2.spriteId);
+            }
+
+            return 0;
+        }
+
+        private int GetNumberOfRowsAboveRoom(int room)
+        {
+            int accumulated = 0;
+
+            for (int i = 0; i < room; i++)
+            {
+                accumulated += GetRoomVisualRowCount(i);
+            }
+
+            return accumulated;
         }
 
         private class EventData(int subRow)
