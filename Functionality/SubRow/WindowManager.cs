@@ -260,6 +260,11 @@ namespace RDEditorPlus.Functionality.SubRow
             return scnEditor.instance.timeline.maxUsedY;
         }
 
+        public override void OverrideUsedRowCount(ref int usedRowCount)
+        {
+            usedRowCount = Math.Max(usedRowCount, scnEditor.instance.timeline.maxUsedY);
+        }
+
         public int GetTimelineRowOffset()
         {
             return PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow ? 1 : 0;
