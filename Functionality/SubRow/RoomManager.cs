@@ -128,7 +128,6 @@ namespace RDEditorPlus.Functionality.SubRow
             }
 
             eventControl.levelEvent.y = room;
-
             return room;
         }
 

@@ -138,6 +138,7 @@ namespace RDEditorPlus.Functionality.SubRow
             {
                 Tab.Sprites => PluginConfig.SpriteSubRowsEnabled ? spriteController : null,
                 Tab.Rooms => PluginConfig.RoomSubRowsEnabled ? roomController : null,
+                Tab.Windows => PluginConfig.WindowSubRowsEnabled ? windowController : null,
                 _ => null,
             };
 
@@ -154,5 +155,6 @@ namespace RDEditorPlus.Functionality.SubRow
         private BaseManager currentTabController = null;
         private readonly SpriteManager spriteController = SpriteManager.Instance;
         private readonly RoomManager roomController = RoomManager.Instance;
+        private readonly WindowManager windowController = WindowManager.Instance;
     }
 }

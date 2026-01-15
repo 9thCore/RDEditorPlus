@@ -87,6 +87,7 @@ namespace RDEditorPlus.ExtraData
         {
             eventData.Clear();
             spriteData.Clear();
+            windowData.Clear();
             GeneralManager.Instance.Clear();
 
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
@@ -142,6 +143,44 @@ namespace RDEditorPlus.ExtraData
             if (spriteData[target].usedSubRowCount != usedSubRowCount)
             {
                 spriteData[target].usedSubRowCount = usedSubRowCount;
+                return true;
+            }
+
+            return false;
+        }
+
+        public int GetWindowExtraVisualRowCount(int window)
+        {
+            if (window < windowData.Count)
+            {
+                return windowData[window].usedSubRowCount;
+            }
+
+            return 0;
+        }
+
+        public int GetWindowVisualRowCount(int window)
+        {
+            return GetWindowExtraVisualRowCount(window) + 1;
+        }
+
+        public bool UpdateWindowUsedSubRowCountIfRequired(int window, int usedSubRowCount)
+        {
+            if (window >= windowData.Count)
+            {
+                int start = windowData.Count;
+                for (int i = start; i < window; i++)
+                {
+                    windowData.Add(new(0));
+                }
+
+                windowData.Add(new(usedSubRowCount));
+                return true;
+            }
+        
+            if (windowData[window].usedSubRowCount != usedSubRowCount)
+            {
+                windowData[window].usedSubRowCount = usedSubRowCount;
                 return true;
             }
 
@@ -207,6 +246,8 @@ namespace RDEditorPlus.ExtraData
                     return GetNumberOfRowsAboveSprite(levelEvent.target);
                 case Tab.Rooms:
                     return GetNumberOfRowsAboveRoom(levelEvent.y) + RoomManager.Instance.GetTimelineRowOffset();
+                case Tab.Windows:
+                    return GetNumberOfRowsAboveWindow(levelEvent.y) + WindowManager.Instance.GetTimelineRowOffset();
                 default:
                     return 0;
             }
@@ -253,6 +294,18 @@ namespace RDEditorPlus.ExtraData
             return accumulated;
         }
 
+        private int GetNumberOfRowsAboveWindow(int window)
+        {
+            int accumulated = 0;
+
+            for (int i = 0; i < window; i++)
+            {
+                accumulated += GetWindowVisualRowCount(i);
+            }
+
+            return accumulated;
+        }
+
         private class EventData(int subRow)
         {
             public int subRow = subRow;
@@ -266,6 +319,7 @@ namespace RDEditorPlus.ExtraData
         private readonly Dictionary<int, EventData> eventData = new();
         private readonly Dictionary<string, HeaderData> spriteData = new();
         private readonly HeaderData[] roomData = new HeaderData[RDEditorConstants.RoomCount];
+        private readonly List<HeaderData> windowData = new();
 
         public const string SubRowKey = "mod_rdEditorPlus_subRow";
         public const int LayoutElementPriority = 99;

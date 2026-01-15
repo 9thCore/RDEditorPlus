@@ -11,6 +11,11 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(LevelEventControl_Room __instance)
             {
+                if (!PluginConfig.RoomSubRowsEnabled)
+                {
+                    return;
+                }
+
                 RoomManager.Instance.UpdateUI(__instance);
             }
         }
