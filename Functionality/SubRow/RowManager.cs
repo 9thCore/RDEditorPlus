@@ -164,10 +164,10 @@ namespace RDEditorPlus.Functionality.SubRow
         private bool TryFindPatientForRow(int room, int row, out int patient, out int roomPosition)
         {
             roomPosition = 0;
+            patient = 0;
 
             if (row < 0)
             {
-                patient = 0;
                 return false;
             }
 
@@ -175,6 +175,7 @@ namespace RDEditorPlus.Functionality.SubRow
             {
                 if (makeRow.room != room)
                 {
+                    patient++;
                     continue;
                 }
 
@@ -183,11 +184,11 @@ namespace RDEditorPlus.Functionality.SubRow
 
                 if (row < 0)
                 {
-                    patient = makeRow.row;
                     return true;
                 }
 
                 roomPosition++;
+                patient++;
             }
 
             patient = 0;
