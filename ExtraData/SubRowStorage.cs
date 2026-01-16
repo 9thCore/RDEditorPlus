@@ -14,8 +14,11 @@ namespace RDEditorPlus.ExtraData
         {
             get
             {
-                instance ??= new SubRowStorage();
-                instance.Clear();
+                if (instance == null)
+                {
+                    instance = new();
+                    instance.Clear();
+                }
                 return instance;
             }
         }
