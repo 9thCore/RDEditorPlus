@@ -4,7 +4,6 @@ using RDLevelEditor;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
 
 namespace RDEditorPlus.ExtraData
 {
@@ -16,6 +15,7 @@ namespace RDEditorPlus.ExtraData
             get
             {
                 instance ??= new SubRowStorage();
+                instance.Clear();
                 return instance;
             }
         }
@@ -392,7 +392,6 @@ namespace RDEditorPlus.ExtraData
         private readonly Dictionary<string, HeaderData> spriteData = new();
         private readonly HeaderData[] roomData = new HeaderData[RDEditorConstants.RoomCount];
         private readonly List<HeaderData> windowData = new();
-        //private readonly HeaderData[] rowData = new HeaderData[RDEditorConstants.RoomCount * RDEditorConstants.MaxRowsPerPage];
         private readonly Dictionary<int, HeaderData> rowData = new();
 
         public const string SubRowKey = "mod_rdEditorPlus_subRow";
