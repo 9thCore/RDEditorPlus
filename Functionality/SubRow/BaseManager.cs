@@ -1,5 +1,4 @@
 ﻿using RDEditorPlus.ExtraData;
-using RDEditorPlus.Util;
 using RDLevelEditor;
 using UnityEngine;
 
@@ -17,7 +16,7 @@ namespace RDEditorPlus.Functionality.SubRow
 
         public abstract int? GetTimelineDisabledRowsValueThing();
 
-        public abstract int GetCurrentTabMaxUsedY();
+        public abstract int? GetCurrentTabMaxUsedY();
 
         public abstract bool TryGetPreCreationEventData(int y, out int realY, out int realRow, out int visualRow);
 

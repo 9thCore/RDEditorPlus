@@ -131,7 +131,7 @@ namespace RDEditorPlus.Functionality.SubRow
             return room;
         }
 
-        public override int GetCurrentTabMaxUsedY()
+        public override int? GetCurrentTabMaxUsedY()
         {
             int maxUsedY = GetTimelineRowOffset();
 

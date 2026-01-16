@@ -24,7 +24,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix()
             {
-                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY();
+                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY() ?? scnEditor.instance.timeline.maxUsedY;
                 GeneralManager.Instance.UpdateTab(force: true);
             }
         }

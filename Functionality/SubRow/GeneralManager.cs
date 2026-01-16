@@ -53,9 +53,9 @@ namespace RDEditorPlus.Functionality.SubRow
             currentTabController?.UpdateFullTimelineHeightEvent(eventControl);
         }
 
-        public override int GetCurrentTabMaxUsedY()
+        public override int? GetCurrentTabMaxUsedY()
         {
-            return currentTabController?.GetCurrentTabMaxUsedY() ?? 0;
+            return currentTabController?.GetCurrentTabMaxUsedY();
         }
 
         public override void UpdateTab(bool force)

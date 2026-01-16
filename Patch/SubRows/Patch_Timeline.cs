@@ -41,7 +41,7 @@ namespace RDEditorPlus.Patch.SubRows
 
             private static void CorrectMaxUsedY()
             {
-                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY();
+                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY() ?? scnEditor.instance.timeline.maxUsedY;
             }
         }
 
@@ -80,7 +80,7 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Prefix()
             {
-                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY();
+                scnEditor.instance.timeline.maxUsedY = GeneralManager.Instance.GetCurrentTabMaxUsedY() ?? scnEditor.instance.timeline.maxUsedY;
             }
         }
 
