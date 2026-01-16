@@ -109,7 +109,7 @@ namespace RDEditorPlus.Functionality.SubRow
 
         public bool CanAllSelectedEventsBeDragged(bool originalFlag, int offset)
         {
-            return currentTabController?.CanAllSelectedEventsBeDragged(offset / scnEditor.instance.cellHeight) ?? originalFlag;
+            return currentTabController?.CanAllSelectedEventsBeDragged(offset) ?? originalFlag;
         }
 
         public int ModifyPointerClickYPosition(int y)
