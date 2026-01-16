@@ -4,6 +4,7 @@ using RDLevelEditor;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 namespace RDEditorPlus.ExtraData
 {
@@ -88,6 +89,7 @@ namespace RDEditorPlus.ExtraData
             eventData.Clear();
             spriteData.Clear();
             windowData.Clear();
+            rowData.Clear();
             GeneralManager.Instance.Clear();
 
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
@@ -187,6 +189,38 @@ namespace RDEditorPlus.ExtraData
             return false;
         }
 
+        public int GetPatientExtraVisualRowCount(int uid)
+        {
+            if (rowData.TryGetValue(uid, out HeaderData data))
+            {
+                return data.usedSubRowCount;
+            }
+
+            return 0;
+        }
+
+        public int GetPatientVisualRowCount(int uid)
+        {
+            return GetPatientExtraVisualRowCount(uid) + 1;
+        }
+
+        public bool UpdatePatientUsedSubRowCountIfRequired(int uid, int usedSubRowCount)
+        {
+            if (!rowData.TryGetValue(uid, out HeaderData data))
+            {
+                rowData[uid] = new(usedSubRowCount);
+                return true;
+            }
+
+            if (data.usedSubRowCount != usedSubRowCount)
+            {
+                data.usedSubRowCount = usedSubRowCount;
+                return true;
+            }
+
+            return false;
+        }
+
         public int GetEventCorrectedRow(LevelEvent_Base levelEvent)
         {
             if (levelEvent.IsFullTimelineHeight())
@@ -214,6 +248,14 @@ namespace RDEditorPlus.ExtraData
         public void SetLevelEventRow(LevelEventControl_Base eventControl, int row)
         {
             eventControl.SetRow(row);
+        }
+
+        public void CopyData(LevelEvent_Base source, LevelEvent_Base destination)
+        {
+            if (eventData.TryGetValue(source.uid, out EventData data))
+            {
+                eventData[destination.uid] = data.Copy();
+            }
         }
 
         public void SetupWithScrollMaskIntermediary(RectTransform rectTransform, string nameSuffix)
@@ -248,6 +290,8 @@ namespace RDEditorPlus.ExtraData
                     return GetNumberOfRowsAboveRoom(levelEvent.y) + RoomManager.Instance.GetTimelineRowOffset();
                 case Tab.Windows:
                     return GetNumberOfRowsAboveWindow(levelEvent.y) + WindowManager.Instance.GetTimelineRowOffset();
+                case Tab.Rows:
+                    return GetNumberOfRowsAbovePatient(levelEvent.row);
                 default:
                     return 0;
             }
@@ -306,9 +350,37 @@ namespace RDEditorPlus.ExtraData
             return accumulated;
         }
 
+        private int GetNumberOfRowsAbovePatient(int row)
+        {
+            int accumulated = 0;
+            int room = scnEditor.instance.rowsData[row].room;
+
+            foreach (LevelEvent_MakeRow makeRow in scnEditor.instance.rowsData)
+            {
+                if (makeRow.row == row)
+                {
+                    break;
+                }
+
+                if (makeRow.room != room)
+                {
+                    continue;
+                }
+
+                accumulated += GetPatientVisualRowCount(makeRow.uid);
+            }
+
+            return accumulated;
+        }
+
         private class EventData(int subRow)
         {
             public int subRow = subRow;
+
+            public EventData Copy()
+            {
+                return new(subRow);
+            }
         }
 
         private class HeaderData(int usedSubRowCount)
@@ -320,6 +392,8 @@ namespace RDEditorPlus.ExtraData
         private readonly Dictionary<string, HeaderData> spriteData = new();
         private readonly HeaderData[] roomData = new HeaderData[RDEditorConstants.RoomCount];
         private readonly List<HeaderData> windowData = new();
+        //private readonly HeaderData[] rowData = new HeaderData[RDEditorConstants.RoomCount * RDEditorConstants.MaxRowsPerPage];
+        private readonly Dictionary<int, HeaderData> rowData = new();
 
         public const string SubRowKey = "mod_rdEditorPlus_subRow";
         public const int LayoutElementPriority = 99;

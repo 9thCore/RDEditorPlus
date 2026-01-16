@@ -1,8 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using RDEditorPlus.Functionality.SubRow;
 using RDEditorPlus.Patch;
 using RDEditorPlus.Util;
+using RDLevelEditor;
 
 namespace RDEditorPlus
 {

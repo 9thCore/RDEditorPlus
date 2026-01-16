@@ -29,15 +29,6 @@ namespace RDEditorPlus.Patch.SubRows
             }
         }
 
-        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.AddNewEventControl))]
-        private static class AddNewEventControl
-        {
-            private static void Postfix(LevelEventControl_Base eventControl)
-            {
-                GeneralManager.Instance.HandleNewLevelEventControl(eventControl);
-            }
-        }
-
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.UpdateTimelineAccordingToLevelEventType))]
         private static class UpdateTimelineAccordingToLevelEventType
         {
@@ -88,6 +79,35 @@ namespace RDEditorPlus.Patch.SubRows
                 SubRowStorage.Instance.UpdateSpriteUsedSubRowCountIfRequired(b.spriteId, 0);
 
                 SpriteManager.Instance.UpdateTab(force: false);
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.AddNewRow))]
+        private static class AddNewRow
+        {
+            private static void Postfix()
+            {
+                if (!PluginConfig.PatientSubRowsEnabled)
+                {
+                    return;
+                }
+
+                RowManager.Instance.UpdateTab(force: false);
+                scnEditor.instance.timeline.UpdateMaxUsedY();
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.MoveRowVertically))]
+        private static class MoveRowVertically
+        {
+            private static void Postfix()
+            {
+                if (!PluginConfig.PatientSubRowsEnabled)
+                {
+                    return;
+                }
+
+                RowManager.Instance.UpdateTab(force: false);
             }
         }
     }

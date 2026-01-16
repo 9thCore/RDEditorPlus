@@ -110,25 +110,29 @@ namespace RDEditorPlus.Functionality.SubRow
             return currentTabController?.CanAllSelectedEventsBeDragged(offset / scnEditor.instance.cellHeight) ?? originalFlag;
         }
 
-        public void HandleNewLevelEventControl(LevelEventControl_Base eventControl)
-        {
-            LevelEvent_Base levelEvent = eventControl.levelEvent;
-
-            if (levelEvent.IsFullTimelineHeight())
-            {
-                return;
-            }
-        }
-
         public int ModifyPointerClickYPosition(int y)
         {
             if (currentTabController == null
-                || !currentTabController.TryGetPreCreationEventData(y, out int realY, out _, out int visualRow))
+                || !currentTabController.TryGetPreCreationEventData(y, out int realY, out int _, out int visualRow))
             {
                 return y;
             }
 
             preCreationEventVisualRow = visualRow;
+            return realY;
+        }
+        
+        public int RowEventYFix(int y, LevelEventControl_Base eventControl)
+        {
+            if (currentTabController == null
+                || !currentTabController.TryGetPreCreationEventData(y, out int realY, out int _, out int _))
+            {
+                return y;
+            }
+
+            SubRowStorage.Instance.SetVisualRow(eventControl.levelEvent, y);
+            UpdateTab(force: false);
+            scnEditor.instance.timeline.UpdateMaxUsedY();
             return realY;
         }
 
@@ -139,6 +143,7 @@ namespace RDEditorPlus.Functionality.SubRow
                 Tab.Sprites => PluginConfig.SpriteSubRowsEnabled ? spriteController : null,
                 Tab.Rooms => PluginConfig.RoomSubRowsEnabled ? roomController : null,
                 Tab.Windows => PluginConfig.WindowSubRowsEnabled ? windowController : null,
+                Tab.Rows => PluginConfig.PatientSubRowsEnabled ? rowController : null,
                 _ => null,
             };
 
@@ -156,5 +161,6 @@ namespace RDEditorPlus.Functionality.SubRow
         private readonly SpriteManager spriteController = SpriteManager.Instance;
         private readonly RoomManager roomController = RoomManager.Instance;
         private readonly WindowManager windowController = WindowManager.Instance;
+        private readonly RowManager rowController = RowManager.Instance;
     }
 }
