@@ -1,10 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using RDEditorPlus.Functionality.SubRow;
 using RDEditorPlus.Patch;
 using RDEditorPlus.Util;
-using RDLevelEditor;
 
 namespace RDEditorPlus
 {
@@ -40,7 +38,7 @@ namespace RDEditorPlus
             PatchUtil.PatchNested(harmony, typeof(Patch_LevelEvent_Base)); // We want this patching regardless
             Patch.SubRows.PatchHandler.Patch(harmony);
 
-            Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
+            Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
         }
     }
 }
