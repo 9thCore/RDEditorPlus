@@ -78,6 +78,8 @@ namespace RDEditorPlus.Functionality.SubRow
             base.Clear();
             roomController.Clear();
             spriteController.Clear();
+            rowController.Clear();
+            windowController.Clear();
 
             preCreationEventVisualRow = 0;
         }
