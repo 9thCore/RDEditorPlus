@@ -202,16 +202,19 @@ namespace RDEditorPlus.Functionality.SubRow
             bool updateEventPositions = force;
 
             List<LevelEvent_MakeRow> currentRows = scnEditor.instance.rowsData;
+
+            int index = 0;
             foreach (LevelEvent_MakeRow row in currentRows)
             {
                 if (row.room != page)
                 {
+                    index++;
                     continue;
                 }
 
                 int usedSubRowCount = 0;
 
-                List<LevelEventControl_Base> controls = scnEditor.instance.eventControls_rows[row.row];
+                List<LevelEventControl_Base> controls = scnEditor.instance.eventControls_rows[index];
                 foreach (LevelEventControl_Base control in controls)
                 {
                     int num = SubRowStorage.Instance.GetSubRow(control.levelEvent) + 1;
@@ -224,6 +227,8 @@ namespace RDEditorPlus.Functionality.SubRow
                 }
 
                 updateEventPositions |= SubRowStorage.Instance.UpdatePatientUsedSubRowCountIfRequired(row.uid, usedSubRowCount);
+
+                index++;
             }
         }
 
