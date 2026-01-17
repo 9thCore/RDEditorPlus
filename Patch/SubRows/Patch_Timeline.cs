@@ -20,6 +20,11 @@ namespace RDEditorPlus.Patch.SubRows
             {
                 while (__result.MoveNext())
                 {
+                    if (Plugin.RDModificationsRowPatchEnabled)
+                    {
+                        scnEditor.instance.timeline.UpdateMaxUsedY();
+                    }
+                    
                     GeneralManager.Instance.UpdateTabPanelOnly();
                     yield return __result.Current;
                 }
@@ -84,13 +89,13 @@ namespace RDEditorPlus.Patch.SubRows
                 }
 
                 int? enabledRows = GeneralManager.Instance.GetTimelineDisabledRowsValueThing();
-                if (enabledRows == null)
+                if (!enabledRows.HasValue)
                 {
                     return;
                 }
 
                 float height = (__instance.scaledRowCellCount - enabledRows.Value) * __instance.cellHeight;
-                __instance.disabledRowsQuad.GetComponent<RectTransform>().SizeDeltaY(height);
+                __instance.disabledRowsQuad.SizeDeltaY(height);
             }
         }
 
