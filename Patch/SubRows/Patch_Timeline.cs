@@ -58,8 +58,31 @@ namespace RDEditorPlus.Patch.SubRows
         [HarmonyAfter(Plugin.RDModificationsGUID)]
         private static class LateUpdate
         {
+            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            {
+                MethodInfo method = typeof(LateUpdate).GetMethod(nameof(GetActualValue), BindingFlags.NonPublic | BindingFlags.Static);
+
+                return new CodeMatcher(instructions)
+                    .MatchForward(false, new CodeMatch(OpCodes.Stloc_2))
+                    .ThrowIfInvalid($"Could not find where the local variable is set, can't apply {nameof(GetActualValue)} patch.")
+                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, method))
+
+                    .InstructionEnumeration();
+            }
+
+            private static int GetActualValue(int currentValue)
+            {
+                return GeneralManager.Instance.GetTimelineDisabledRowsValueThing() ?? currentValue;
+            }
+
             private static void Postfix(Timeline __instance)
             {
+                if (!Plugin.RDModificationsRowPatchEnabled
+                    || scnEditor.instance.currentTab != Tab.Rows)
+                {
+                    return;
+                }
+
                 int? enabledRows = GeneralManager.Instance.GetTimelineDisabledRowsValueThing();
                 if (enabledRows == null)
                 {
