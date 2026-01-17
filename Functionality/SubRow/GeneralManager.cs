@@ -2,6 +2,9 @@
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.SubRow
 {
@@ -151,7 +154,98 @@ namespace RDEditorPlus.Functionality.SubRow
 
             if (tab != Tab.Sprites)
             {
+                ResetAlternatingTimelineStrips();
                 UpdateTab(force: false);
+            }
+        }
+
+        public void ResetAlternatingTimelineStrips()
+        {
+            foreach (RectTransform rect in alternatingTimelineStrip)
+            {
+                rect.gameObject.SetActive(false);
+            }
+        }
+
+        public void SetAlternatingTimelineStrips(List<int> rows)
+        {
+            lastZoom = scnEditor.instance.timeline.zoomVertFactor;
+            float length = 0f;
+
+            for (int i = alternatingTimelineStrip.Count * 2; i < rows.Count; i += 2)
+            {
+                GameObject strip = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_AlternatingTimelineStrip{alternatingTimelineStrip.Count}");
+
+                if (alternatingTimelineImageTemplate == null)
+                {
+                    alternatingTimelineImageTemplate = scnEditor.instance.timeline.scrollViewVertContent
+                        .GetComponentInParent<Image>();
+                }
+
+                strip.transform.SetParent(scnEditor.instance.timeline.scrollViewVertContent);
+                strip.transform.SetAsFirstSibling();
+                strip.transform.localPosition = Vector3.zero;
+                strip.transform.localScale = Vector3.one;
+
+                Image image = strip.AddComponent<Image>();
+                image.sprite = alternatingTimelineImageTemplate.sprite;
+                image.type = alternatingTimelineImageTemplate.type;
+                image.color = alternateColor;
+
+                RectTransform rect = strip.GetComponent<RectTransform>();
+                alternatingTimelineStrip.Add(rect);
+
+                rect.anchorMin = Vector2.up;
+                rect.anchorMax = Vector2.up;
+
+                if (length == 0f)
+                {
+                    length = scnEditor.instance.timeline
+                        .grid.GetComponent<RectTransform>()
+                        .offsetMax.x;
+                }
+
+                rect.offsetMax = new Vector2(length, 0f);
+            }
+
+            float offset = 0f;
+            int index = 0;
+
+            for (int i = 0; i < rows.Count; i += 2)
+            {
+                RectTransform rect = alternatingTimelineStrip[index++];
+                rect.gameObject.SetActive(true);
+
+                float height = rows[i] * scnEditor.instance.cellHeight;
+
+                rect.OffsetMaxY(offset);
+                rect.offsetMin = new Vector2(0f, offset - height);
+
+                offset -= height;
+
+                if (i < rows.Count - 1)
+                {
+                    offset -= rows[i + 1] * scnEditor.instance.cellHeight;
+                }
+            }
+
+            for (; index < alternatingTimelineStrip.Count; index++)
+            {
+                alternatingTimelineStrip[index].gameObject.SetActive(false);
+            }
+        }
+
+        public void ResizeAlternatingTimelineStrips()
+        {
+            float length = scnEditor.instance.timeline.grid.GetComponent<RectTransform>().offsetMax.x;
+            float zoom = scnEditor.instance.timeline.zoomVertFactor;
+            float factor = zoom / lastZoom;
+            lastZoom = zoom;
+
+            foreach (RectTransform rect in alternatingTimelineStrip)
+            {
+                rect.OffsetMinY(rect.offsetMin.y * factor);
+                rect.offsetMax = new Vector2(length, rect.offsetMax.y * factor);
             }
         }
 
@@ -159,10 +253,17 @@ namespace RDEditorPlus.Functionality.SubRow
 
         private int preCreationEventVisualRow = 0;
 
+        private float lastZoom;
+
         private BaseManager currentTabController = null;
         private readonly SpriteManager spriteController = SpriteManager.Instance;
         private readonly RoomManager roomController = RoomManager.Instance;
         private readonly WindowManager windowController = WindowManager.Instance;
         private readonly RowManager rowController = RowManager.Instance;
+
+        private Image alternatingTimelineImageTemplate = null;
+        private readonly List<RectTransform> alternatingTimelineStrip = new();
+
+        public static readonly Color alternateColor = new(1f, 1f, 1f, 0.1f);
     }
 }

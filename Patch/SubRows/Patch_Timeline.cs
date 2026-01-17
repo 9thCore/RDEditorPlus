@@ -118,5 +118,14 @@ namespace RDEditorPlus.Patch.SubRows
                 GeneralManager.Instance.OverrideUsedRowCount(ref __result);
             }
         }
+
+        [HarmonyPatch(typeof(Timeline), nameof(Timeline.ResizeGrid))]
+        private static class ResizeGrid
+        {
+            private static void Postfix()
+            {
+                GeneralManager.Instance.ResizeAlternatingTimelineStrips();
+            }
+        }
     }
 }
