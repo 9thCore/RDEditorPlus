@@ -200,6 +200,8 @@ namespace RDEditorPlus.Functionality.SubRow
             // ...Except if we're to force doing it anyway, as part of an undo
             bool updateEventPositions = force;
 
+            List<int> alternatingRows = new();
+
             List<LevelEvent_MakeRow> currentRows = scnEditor.instance.rowsData;
 
             int index = 0;
@@ -227,8 +229,12 @@ namespace RDEditorPlus.Functionality.SubRow
 
                 updateEventPositions |= SubRowStorage.Instance.UpdatePatientUsedSubRowCountIfRequired(row.uid, usedSubRowCount);
 
+                alternatingRows.Add(usedSubRowCount + 1);
+
                 index++;
             }
+
+            GeneralManager.Instance.SetAlternatingTimelineStrips(alternatingRows);
         }
 
         private float ResizeHeader(GameObject header, int extraRowCount)

@@ -2,6 +2,7 @@
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -194,6 +195,13 @@ namespace RDEditorPlus.Functionality.SubRow
                     }
                 }
             }
+
+            List<int> alternatingRows = new();
+            for (int i = 0; i < WindowCount; i++)
+            {
+                alternatingRows.Add(usedSubRowCounts[i] + 1);
+            }
+            GeneralManager.Instance.SetAlternatingTimelineStrips(alternatingRows);
 
             foreach (LevelEventControl_Base control in scnEditor.instance.eventControls_windows)
             {

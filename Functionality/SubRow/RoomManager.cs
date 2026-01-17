@@ -2,6 +2,7 @@
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -213,6 +214,13 @@ namespace RDEditorPlus.Functionality.SubRow
                 int room = levelEvent.GetYValueAsValidRoom();
                 usedSubRowCounts[room] = Math.Max(usedSubRowCounts[room], num);
             }
+
+            List<int> alternatingRows = new();
+            for (int i = 0; i < RDEditorConstants.RoomCount; i++)
+            {
+                alternatingRows.Add(usedSubRowCounts[i] + 1);
+            }
+            GeneralManager.Instance.SetAlternatingTimelineStrips(alternatingRows);
 
             int firstRoomThatUpdated = -1;
 
