@@ -10,6 +10,7 @@ namespace RDEditorPlus.Patch.SubRows
     internal static class Patch_TabSection_Rows
     {
         [HarmonyPatch(typeof(TabSection_Rows), nameof(TabSection_Rows.Setup))]
+        [HarmonyAfter(Plugin.RDModificationsGUID)]
         private static class Setup
         {
             private static void Postfix(TabSection_Rows __instance)
@@ -19,9 +20,17 @@ namespace RDEditorPlus.Patch.SubRows
                     return;
                 }
 
-                SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.rowsListRect, "Rows");
-                __instance.rowsListRect.offsetMin = Vector2.zero;
-                __instance.rowsListRect.offsetMax = Vector2.zero;
+                if (__instance.rowsListRect.transform.parent.name.Contains(Plugin.RDModificationsMaskName))
+                {
+                    Plugin.RDModificationsRowPatchEnabled = true;
+                }
+                else
+                {
+                    SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.rowsListRect, "Rows");
+
+                    __instance.rowsListRect.offsetMin = Vector2.zero;
+                    __instance.rowsListRect.offsetMax = Vector2.zero;
+                }
 
                 __instance.rowsListRect.EnsureComponent<RowTabScroller>();
             }

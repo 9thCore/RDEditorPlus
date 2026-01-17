@@ -140,13 +140,13 @@ namespace RDEditorPlus.Functionality.SubRow
                 ResizeHeader(tab.rowHeaders[index], 0);
             }
 
+            float baseOffset = scnEditor.instance.timeline.height
+                - scnEditor.instance.cellHeight * tab.rowHeaders.Count
+                - extraOffset;
+
             float scroll = float.IsNaN(scrollPosition) ? 0 : scrollPosition;
 
-            tab.rowsListRect.OffsetMinY(scnEditor.instance.timeline.height
-                - scnEditor.instance.cellHeight * RDEditorConstants.MaxRowsPerPage
-                - extraOffset
-                + scroll);
-
+            tab.rowsListRect.OffsetMinY(baseOffset + scroll);
             tab.rowsListRect.OffsetMaxY(scroll);
         }
 

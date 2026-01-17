@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.ExtraData;
 using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 using System.Collections;
@@ -13,6 +12,7 @@ namespace RDEditorPlus.Patch.SubRows
     internal static class Patch_Timeline
     {
         [HarmonyPatch(typeof(Timeline), nameof(Timeline.UpdateUIInternalCo))]
+        [HarmonyAfter(Plugin.RDModificationsGUID)]
         private static class UpdateUIInternalCo
         {
             // This is how coroutines are correctly patched, apparently
@@ -55,27 +55,24 @@ namespace RDEditorPlus.Patch.SubRows
         }
 
         [HarmonyPatch(typeof(Timeline), nameof(Timeline.LateUpdate))]
+        [HarmonyAfter(Plugin.RDModificationsGUID)]
         private static class LateUpdate
         {
-            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            private static void Postfix(Timeline __instance)
             {
-                MethodInfo method = typeof(LateUpdate).GetMethod(nameof(GetActualValue), BindingFlags.NonPublic | BindingFlags.Static);
+                int? enabledRows = GeneralManager.Instance.GetTimelineDisabledRowsValueThing();
+                if (enabledRows == null)
+                {
+                    return;
+                }
 
-                return new CodeMatcher(instructions)
-                    .MatchForward(false, new CodeMatch(OpCodes.Stloc_2))
-                    .ThrowIfInvalid($"Could not find where the local variable is set, can't apply {nameof(GetActualValue)} patch.")
-                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, method))
-
-                    .InstructionEnumeration();
-            }
-
-            private static int GetActualValue(int currentValue)
-            {
-                return GeneralManager.Instance.GetTimelineDisabledRowsValueThing() ?? currentValue;
+                float height = (__instance.scaledRowCellCount - enabledRows.Value) * __instance.cellHeight;
+                __instance.disabledRowsQuad.GetComponent<RectTransform>().SizeDeltaY(height);
             }
         }
 
         [HarmonyPatch(typeof(Timeline), nameof(Timeline.ApplyNewMaxUsedY))]
+        [HarmonyAfter(Plugin.RDModificationsGUID)]
         private static class ApplyNewMaxUsedY
         {
             private static void Prefix()
@@ -85,6 +82,7 @@ namespace RDEditorPlus.Patch.SubRows
         }
 
         [HarmonyPatch(typeof(Timeline), $"get_{nameof(Timeline.usedRowCount)}")]
+        [HarmonyAfter(Plugin.RDModificationsGUID)]
         private static class get_usedRowCount
         {
             private static void Postfix(ref int __result)

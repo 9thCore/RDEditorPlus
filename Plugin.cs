@@ -7,8 +7,12 @@ using RDEditorPlus.Util;
 namespace RDEditorPlus
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+    [BepInDependency(RDModificationsGUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
+        public const string RDModificationsGUID = "com.rhythmdr.randommodifications";
+        public const string RDModificationsMaskName = "RDM";
+
         public static Plugin Instance;
         internal static new ManualLogSource Logger;
 
@@ -40,5 +44,7 @@ namespace RDEditorPlus
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
         }
+
+        public static bool RDModificationsRowPatchEnabled = false;
     }
 }
