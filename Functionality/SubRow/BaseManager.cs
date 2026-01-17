@@ -32,13 +32,21 @@ namespace RDEditorPlus.Functionality.SubRow
         public virtual void UpdateTabScroll()
         {
             float y = scnEditor.instance.timeline.scrollViewVertContent.anchoredPosition.y;
-            if (y == scrollPosition)
+            if (!Plugin.RDModificationsRowPatchEnabled
+                && y == scrollPosition)
             {
                 return;
             }
 
             scrollPosition = y;
-            UpdateTabPanelOnly();
+
+            if (Plugin.RDModificationsRowPatchEnabled)
+            {
+                UpdateTab(force: false);
+            } else
+            {
+                UpdateTabPanelOnly();
+            }
         }
 
         public virtual void Clear()
