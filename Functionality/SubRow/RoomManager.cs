@@ -154,10 +154,7 @@ namespace RDEditorPlus.Functionality.SubRow
             TabSection_Rooms tab = scnEditor.instance.tabSection_rooms;
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
-                LayoutElement element = PluginConfig.PreviewScaleSubRowsEnabled
-                    ? tab.labels[i].EnsureComponent<LayoutElement>()
-                    : tab.previews[i].transform.parent.EnsureComponent<LayoutElement>();
-
+                LayoutElement element = tab.labels[i].EnsureComponent<LayoutElement>();
                 element.layoutPriority = 99;
 
                 int extraRowCount = SubRowStorage.Instance.GetRoomExtraVisualRowCount(i);
