@@ -117,6 +117,11 @@ namespace RDEditorPlus.Functionality.SubRow
             return Mathf.Min(scnEditor.instance.timeline.maxUsedY, scnEditor.instance.timeline.scaledRowCellCount - 2);
         }
 
+        public override bool AffectedByTallEventConfig()
+        {
+            return false;
+        }
+
         private void UpdatePage(bool force, int page)
         {
             // If an event is above the first decoration that got its size updated,

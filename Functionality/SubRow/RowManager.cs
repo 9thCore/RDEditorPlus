@@ -154,6 +154,11 @@ namespace RDEditorPlus.Functionality.SubRow
                 scnEditor.instance.timeline.maxUsedY + (stillHasSpaceInThisRoom ? 1 : 0));
         }
 
+        public override bool AffectedByTallEventConfig()
+        {
+            return false;
+        }
+
         private bool TryFindPatientForRow(int row, out int patient, out int roomPosition)
         {
             return TryFindPatientForRow(scnEditor.instance.selectedRowsTabPageIndex, row, out patient, out roomPosition);

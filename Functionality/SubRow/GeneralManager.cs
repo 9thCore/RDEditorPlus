@@ -110,6 +110,11 @@ namespace RDEditorPlus.Functionality.SubRow
             return currentTabController?.GetTimelineDisabledRowsValueThing();
         }
 
+        public override bool AffectedByTallEventConfig()
+        {
+            throw new InvalidOperationException();
+        }
+
         public bool CanAllSelectedEventsBeDragged(bool originalFlag, int offset)
         {
             return currentTabController?.CanAllSelectedEventsBeDragged(offset) ?? originalFlag;
@@ -174,6 +179,15 @@ namespace RDEditorPlus.Functionality.SubRow
                 return;
             }
 
+            float offset = 0f;
+
+            if (PluginConfig.TallEventSubRowsBehaviour == PluginConfig.SubRowTallEventBehaviour.KeepInSpecialRow
+                && currentTabController != null
+                && currentTabController.AffectedByTallEventConfig())
+            {
+                offset = -scnEditor.instance.cellHeight;
+            }
+
             lastZoom = scnEditor.instance.timeline.zoomVertFactor;
             float length = 0f;
 
@@ -215,7 +229,6 @@ namespace RDEditorPlus.Functionality.SubRow
                 rect.offsetMax = new Vector2(length, 0f);
             }
 
-            float offset = 0f;
             int index = 0;
 
             for (int i = 0; i < rows.Count; i += 2)
@@ -226,9 +239,8 @@ namespace RDEditorPlus.Functionality.SubRow
                 float height = rows[i] * scnEditor.instance.cellHeight;
 
                 rect.OffsetMaxY(offset);
-                rect.offsetMin = new Vector2(0f, offset - height);
-
                 offset -= height;
+                rect.offsetMin = new Vector2(0f, offset);
 
                 if (i < rows.Count - 1)
                 {

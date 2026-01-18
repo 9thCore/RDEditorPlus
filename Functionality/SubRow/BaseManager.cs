@@ -22,6 +22,8 @@ namespace RDEditorPlus.Functionality.SubRow
 
         public abstract void SetupJustCreatedEvent(LevelEvent_Base levelEvent);
 
+        public abstract bool AffectedByTallEventConfig();
+
         public virtual void UpdateUI(LevelEventControl_Base eventControl)
         {
             int num = SubRowStorage.Instance.GetEventCorrectedRow(eventControl.levelEvent);
