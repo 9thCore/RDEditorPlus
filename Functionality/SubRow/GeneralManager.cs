@@ -169,6 +169,11 @@ namespace RDEditorPlus.Functionality.SubRow
 
         public void SetAlternatingTimelineStrips(List<int> rows)
         {
+            if (!PluginConfig.AlternatingColorSubRowsEnabled)
+            {
+                return;
+            }
+
             lastZoom = scnEditor.instance.timeline.zoomVertFactor;
             float length = 0f;
 

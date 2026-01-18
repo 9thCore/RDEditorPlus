@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using System.IO;
+using UnityEngine;
 
 namespace RDEditorPlus
 {
@@ -31,6 +32,7 @@ namespace RDEditorPlus
         public const string PATCH_SUB_ROWS_TALL_EVENTS = "What to do in the case of a tall event, like Show Rooms or Reorder Windows.\n" +
             "Will only take effect if there is a tall event in the selected tabs.\n" +
             nameof(SubRowTallEventBehaviour.KeepInSpecialRow) + " will add a special, non-expandable row at the top of the timeline where they will be put, scaled down to fit on a single row.";
+        public const string PATCH_SUB_ROWS_ALTERNATING_COLORS = "If the timeline should have alternating colors to help with lining up events on a specific element.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -38,6 +40,7 @@ namespace RDEditorPlus
         public static bool RoomSubRowsEnabled => Instance.roomSubRows.Value;
         public static bool WindowSubRowsEnabled => Instance.windowSubRows.Value;
         public static SubRowTallEventBehaviour TallEventSubRowsBehaviour => Instance.subRowTallEventBehaviour.Value;
+        public static bool AlternatingColorSubRowsEnabled => Instance.alternatingColorSubRows.Value;
 
         public readonly ConfigEntry<bool> subRows;
         public readonly ConfigEntry<bool> spriteSubRows;
@@ -45,6 +48,7 @@ namespace RDEditorPlus
         public readonly ConfigEntry<bool> roomSubRows;
         public readonly ConfigEntry<bool> windowSubRows;
         public readonly ConfigEntry<SubRowTallEventBehaviour> subRowTallEventBehaviour;
+        public readonly ConfigEntry<bool> alternatingColorSubRows;
 
         public PluginConfig()
         {
@@ -83,6 +87,12 @@ namespace RDEditorPlus
                 nameof(subRowTallEventBehaviour),
                 SubRowTallEventBehaviour.ExpandToTimelineHeight,
                 PATCH_SUB_ROWS_TALL_EVENTS);
+
+            alternatingColorSubRows = config.Bind(
+                CATEGORY_SUBROWS,
+                nameof(alternatingColorSubRows),
+                true,
+                PATCH_SUB_ROWS_ALTERNATING_COLORS);
         }
 
         public void Noop()
