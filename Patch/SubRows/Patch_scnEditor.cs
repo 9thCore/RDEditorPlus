@@ -10,6 +10,19 @@ namespace RDEditorPlus.Patch.SubRows
 {
     internal static class Patch_scnEditor
     {
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Awake))]
+        private static class Awake
+        {
+            private static void Prefix()
+            {
+                GeneralManager.RemoveInstance();
+                RoomManager.RemoveInstance();
+                RowManager.RemoveInstance();
+                SpriteManager.RemoveInstance();
+                WindowManager.RemoveInstance();
+            }
+        }
+
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.DeleteAllData))]
         private static class DeleteAllData
         {

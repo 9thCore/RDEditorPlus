@@ -20,6 +20,11 @@ namespace RDEditorPlus.Functionality.SubRow
             }
         }
 
+        public static void RemoveInstance()
+        {
+            instance = null;
+        }
+
         public override bool CanAllSelectedEventsBeDragged(int offset)
         {
             throw new InvalidOperationException();

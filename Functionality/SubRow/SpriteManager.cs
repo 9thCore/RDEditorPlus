@@ -20,6 +20,11 @@ namespace RDEditorPlus.Functionality.SubRow
             }
         }
 
+        public static void RemoveInstance()
+        {
+            instance = null;
+        }
+
         public override void UpdateFullTimelineHeightEvent(LevelEventControl_Base eventControl)
         {
             // There should be no full timeline height events in the sprites tab

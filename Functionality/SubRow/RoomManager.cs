@@ -20,6 +20,11 @@ namespace RDEditorPlus.Functionality.SubRow
             }
         }
 
+        public static void RemoveInstance()
+        {
+            instance = null;
+        }
+
         public override void UpdateFullTimelineHeightEvent(LevelEventControl_Base eventControlBase)
         {
             if (eventControlBase is not LevelEventControl_ShowRooms eventControl)
