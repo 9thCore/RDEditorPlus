@@ -146,13 +146,18 @@ namespace RDEditorPlus.Functionality.SubRow
 
         public override void UpdateTabPanelOnly()
         {
+            const float baseTextHeight = 8f;
+
             float roomTabOffset = GetTimelineCellOffset();
             float extraOffset = 0f;
 
             TabSection_Rooms tab = scnEditor.instance.tabSection_rooms;
             for (int i = 0; i < RDEditorConstants.RoomCount; i++)
             {
-                LayoutElement element = tab.labels[i].EnsureComponent<LayoutElement>();
+                LayoutElement element = PluginConfig.PreviewScaleSubRowsEnabled
+                    ? tab.labels[i].EnsureComponent<LayoutElement>()
+                    : tab.previews[i].transform.parent.EnsureComponent<LayoutElement>();
+
                 element.layoutPriority = 99;
 
                 int extraRowCount = SubRowStorage.Instance.GetRoomExtraVisualRowCount(i);
@@ -161,13 +166,7 @@ namespace RDEditorPlus.Functionality.SubRow
                 {
                     float heightOffset = scnEditor.instance.cellHeight * extraRowCount;
 
-                    // I don't know why text.preferredHeight is 48 when first loading in? So let's just hardcode the 8 for now
-                    // TODO figure this out lol
-
-                    // Text text = tab.labels[i];
-                    // element.preferredHeight = text.preferredHeight + heightOffset;
-
-                    element.preferredHeight = 8f + heightOffset;
+                    element.preferredHeight = baseTextHeight + heightOffset;
                     extraOffset += heightOffset;
 
                     element.enabled = true;
@@ -175,6 +174,74 @@ namespace RDEditorPlus.Functionality.SubRow
                 else
                 {
                     element.enabled = false;
+                }
+
+                if (PluginConfig.PreviewScaleSubRowsEnabled)
+                {
+                    LayoutElement element2 = previewScalingElements[i];
+
+                    int rows = SubRowStorage.Instance.GetRoomVisualRowCount(i);
+                    float height = rows * scnEditor.instance.cellHeight;
+
+                    element2.preferredHeight = height;
+
+                    bool visible = rows >= PluginConfig.PreviewScaleSubRowsMinimum;
+                    previewBorders[i].gameObject.SetActive(visible);
+
+                    if (visible)
+                    {
+                        const float roomPreviewAspectRatio = 18f / 11f;
+                        const float center = 0.5f;
+                        const float borderWidth = 1f;
+
+                        float previewHeight = height - baseTextHeight;
+                        float previewWidth = previewHeight * roomPreviewAspectRatio;
+
+                        float parentWidth = previewScalingRects[i].sizeDelta.x;
+                        float parentHeight = height;
+
+                        float anchorWidth = previewWidth / parentWidth;
+                        float anchorHeight = previewHeight / parentHeight;
+
+                        float verticalOffset = 0f;
+
+                        if (anchorWidth > 1f)
+                        {
+                            float factor = 1f / anchorWidth;
+                            float oldHeight = anchorHeight;
+
+                            anchorWidth *= factor;
+                            anchorHeight *= factor;
+
+                            previewWidth *= factor;
+                            previewHeight *= factor;
+
+                            verticalOffset = (oldHeight - anchorHeight) / 2f;
+                        }
+
+                        float minX = -anchorWidth / 2f + center;
+                        float maxX = anchorWidth / 2f + center;
+
+                        previewBorders[i].anchorMin = new Vector2(minX, verticalOffset);
+                        previewBorders[i].anchorMax = new Vector2(maxX, anchorHeight + verticalOffset);
+
+                        float childAnchorWidth = (previewWidth - borderWidth * 2f) / previewWidth;
+                        float childAnchorHeight = (previewHeight - borderWidth * 2f) / previewHeight;
+
+                        Vector2 childAnchorMin = new Vector2(
+                            -childAnchorWidth / 2f + center,
+                            -childAnchorHeight / 2f + center);
+
+                        Vector2 childAnchorMax = new Vector2(
+                             childAnchorWidth / 2f + center, 
+                             childAnchorHeight / 2f + center);
+
+                        foreach (RectTransform child in previewBorders[i])
+                        {
+                            child.anchorMin = childAnchorMin;
+                            child.anchorMax = childAnchorMax;
+                        }
+                    }
                 }
             }
 
@@ -315,6 +382,10 @@ namespace RDEditorPlus.Functionality.SubRow
             room = 0;
             return false;
         }
+
+        public readonly List<LayoutElement> previewScalingElements = new();
+        public readonly List<RectTransform> previewScalingRects = new();
+        public readonly List<RectTransform> previewBorders = new();
 
         private RectTransform roomLayoutGroupCache = null;
     }

@@ -33,6 +33,9 @@ namespace RDEditorPlus
             "Will only take effect if there is a tall event in the selected tabs.\n" +
             nameof(SubRowTallEventBehaviour.KeepInSpecialRow) + " will add a special, non-expandable row at the top of the timeline where they will be put, scaled down to fit on a single row.";
         public const string PATCH_SUB_ROWS_ALTERNATING_COLORS = "If the timeline should have alternating colors to help with lining up events on a specific element.";
+        public const string PATCH_SUB_ROWS_SCALE_PREVIEW = "If the room previews should be moved and scaled to take up more space the more rows it has.";
+        public const string PATCH_SUB_ROWS_SCALE_PREVIEW_MINIMUM = "The minimum amount of rows the preview must have to be visible.\n" +
+            "If set to 1 or less, the preview will be visible at all times.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -41,6 +44,8 @@ namespace RDEditorPlus
         public static bool WindowSubRowsEnabled => Instance.windowSubRows.Value;
         public static SubRowTallEventBehaviour TallEventSubRowsBehaviour => Instance.subRowTallEventBehaviour.Value;
         public static bool AlternatingColorSubRowsEnabled => Instance.alternatingColorSubRows.Value;
+        public static bool PreviewScaleSubRowsEnabled => Instance.previewScaleSubRows.Value;
+        public static int PreviewScaleSubRowsMinimum => Instance.previewScaleMinimumSubRows.Value;
 
         public readonly ConfigEntry<bool> subRows;
         public readonly ConfigEntry<bool> spriteSubRows;
@@ -49,6 +54,8 @@ namespace RDEditorPlus
         public readonly ConfigEntry<bool> windowSubRows;
         public readonly ConfigEntry<SubRowTallEventBehaviour> subRowTallEventBehaviour;
         public readonly ConfigEntry<bool> alternatingColorSubRows;
+        public readonly ConfigEntry<bool> previewScaleSubRows;
+        public readonly ConfigEntry<int> previewScaleMinimumSubRows;
 
         public PluginConfig()
         {
@@ -93,6 +100,18 @@ namespace RDEditorPlus
                 nameof(alternatingColorSubRows),
                 true,
                 PATCH_SUB_ROWS_ALTERNATING_COLORS);
+
+            previewScaleSubRows = config.Bind(
+                CATEGORY_SUBROWS,
+                nameof(previewScaleSubRows),
+                false,
+                PATCH_SUB_ROWS_SCALE_PREVIEW);
+
+            previewScaleMinimumSubRows = config.Bind(
+                CATEGORY_SUBROWS,
+                nameof(previewScaleMinimumSubRows),
+                2,
+                PATCH_SUB_ROWS_SCALE_PREVIEW_MINIMUM);
         }
 
         public void Noop()
