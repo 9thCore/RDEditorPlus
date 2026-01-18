@@ -180,6 +180,7 @@ namespace RDEditorPlus.Functionality.SubRow
             for (int i = alternatingTimelineStrip.Count * 2; i < rows.Count; i += 2)
             {
                 GameObject strip = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_AlternatingTimelineStrip{alternatingTimelineStrip.Count}");
+                strip.layer = RDLayer.UI;
 
                 if (alternatingTimelineImageTemplate == null)
                 {
@@ -196,6 +197,7 @@ namespace RDEditorPlus.Functionality.SubRow
                 image.sprite = alternatingTimelineImageTemplate.sprite;
                 image.type = alternatingTimelineImageTemplate.type;
                 image.color = alternateColor;
+                image.raycastTarget = false;
 
                 RectTransform rect = strip.GetComponent<RectTransform>();
                 alternatingTimelineStrip.Add(rect);
