@@ -109,7 +109,7 @@ namespace RDEditorPlus.Functionality.SubRow
 
         public override void SetupJustCreatedEvent(LevelEvent_Base levelEvent)
         {
-            levelEvent.target = SpriteHeader.GetSpriteData(levelEvent.y, levelEvent.room).spriteId;
+            levelEvent.target = SpriteHeader.GetSpriteData(levelEvent.y, scnEditor.instance.selectedSpritesTabPageIndex).spriteId;
         }
 
         public override int? GetTimelineDisabledRowsValueThing()
