@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.Functionality.SubRow;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 
 namespace RDEditorPlus.Patch.SubRows
@@ -11,9 +12,11 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(LevelEventControl_Action __instance)
             {
-                if (__instance.levelEvent.type != LevelEventType.Comment)
+                switch (__instance.levelEvent.GetTab())
                 {
-                    return;
+                    case Tab.Song:
+                    case Tab.Actions:
+                        return;
                 }
 
                 GeneralManager.Instance.UpdateUI(__instance);
