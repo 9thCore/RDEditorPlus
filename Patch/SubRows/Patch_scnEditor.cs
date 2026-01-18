@@ -123,5 +123,14 @@ namespace RDEditorPlus.Patch.SubRows
                 RowManager.Instance.UpdateTab(force: false);
             }
         }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Paste), new System.Type[] { typeof(bool) })]
+        private static class Paste
+        {
+            private static void Postfix()
+            {
+                GeneralManager.Instance.UpdateTab(force: false);
+            }
+        }
     }
 }
