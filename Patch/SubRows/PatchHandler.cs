@@ -1,18 +1,7 @@
-﻿using HarmonyLib;
-using RDEditorPlus.Util;
-
-namespace RDEditorPlus.Patch.SubRows
+﻿namespace RDEditorPlus.Patch.SubRows
 {
-    internal static class PatchHandler
+    internal class PatchHandler : BasePatchHandler<PatchHandler>
     {
-        public static void Patch(Harmony harmony)
-        {
-            if (!PluginConfig.SubRowsEnabled)
-            {
-                return;
-            }
-
-            PatchUtil.PatchAllFromCurrentNamespace(harmony, typeof(PatchHandler));
-        }
+        protected override bool CanApply => PluginConfig.SubRowsEnabled;
     }
 }

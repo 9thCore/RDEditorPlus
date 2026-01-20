@@ -40,7 +40,7 @@ namespace RDEditorPlus
 
             Harmony harmony = new(MyPluginInfo.PLUGIN_GUID);
             PatchUtil.PatchNested(harmony, typeof(Patch_LevelEvent_Base)); // We want this patching regardless
-            Patch.SubRows.PatchHandler.Patch(harmony);
+            Patch.SubRows.PatchHandler.Instance.Patch(harmony);
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
         }
