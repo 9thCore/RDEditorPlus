@@ -16,6 +16,7 @@ namespace RDEditorPlus.Patch.SubRows
                 {
                     case Tab.Song:
                     case Tab.Actions:
+                    case Tab.None:
                         return;
                 }
 
