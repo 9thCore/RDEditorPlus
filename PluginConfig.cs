@@ -40,8 +40,10 @@ namespace RDEditorPlus
             "If set to 1 or less, the preview will be visible at all times.";
 
         public const string PATCH_CUSTOM_METHODS_TOGGLE = "Toggle for all custom method mod functionality.\nIf disabled, none of the patches below will be applied.";
-        public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE = "Toggle for the custom method autocompletion, using known custom methods by the community.\n" +
-            "Will request to " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", so if you don't trust this patch, leave this disabled.";
+        public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE = "Toggle for the custom method autocompletion.\n" +
+            "If set to " + nameof(CustomMethodAutocompleteBehaviour.Disabled) + ", will not be enabled.\n" +
+            "If set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ", will request from " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", the public database of known custom methods by the community.\n" +
+            "If set to " + nameof(CustomMethodAutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in TSV (tab-separated values) format.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -54,7 +56,7 @@ namespace RDEditorPlus
         public static int PreviewScaleSubRowsMinimum => Instance.previewScaleMinimumSubRows.Value;
 
         public static bool CustomMethodsEnabled => Instance.customMethods.Value;
-        public static bool CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
+        public static CustomMethodAutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
 
         public readonly ConfigEntry<bool> subRows;
         public readonly ConfigEntry<bool> spriteSubRows;
@@ -67,7 +69,7 @@ namespace RDEditorPlus
         public readonly ConfigEntry<int> previewScaleMinimumSubRows;
 
         public readonly ConfigEntry<bool> customMethods;
-        public readonly ConfigEntry<bool> customMethodsAutocomplete;
+        public readonly ConfigEntry<CustomMethodAutocompleteBehaviour> customMethodsAutocomplete;
 
         public PluginConfig()
         {
@@ -135,7 +137,7 @@ namespace RDEditorPlus
             customMethodsAutocomplete = config.Bind(
                 CATEGORY_CUSTOMMETHODS,
                 nameof(customMethodsAutocomplete),
-                false,
+                CustomMethodAutocompleteBehaviour.Disabled,
                 PATCH_CUSTOM_METHODS_AUTOCOMPLETE);
         }
 
@@ -149,6 +151,13 @@ namespace RDEditorPlus
             KeepFourRowsHigh,
             ExpandToTimelineHeight,
             KeepInSpecialRow
+        }
+
+        public enum CustomMethodAutocompleteBehaviour
+        {
+            Disabled,
+            RequestFromWeb,
+            FetchFromFile
         }
     }
 }

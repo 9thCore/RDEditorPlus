@@ -44,27 +44,50 @@ namespace RDEditorPlus.ExtraData
 
         private IEnumerator PrepareAllowedMethodsForFetch()
         {
-            if (!PluginConfig.CustomMethodsAutocomplete)
+            switch (PluginConfig.CustomMethodsAutocomplete)
             {
-                yield break;
+                case PluginConfig.CustomMethodAutocompleteBehaviour.Disabled:
+                    yield break;
+                case PluginConfig.CustomMethodAutocompleteBehaviour.RequestFromWeb:
+
+                    using (UnityWebRequest webRequest = UnityWebRequest.Get(CustomMethodsSpreadsheetURL))
+                    {
+                        yield return webRequest.SendWebRequest();
+
+                        switch (webRequest.result)
+                        {
+                            case UnityWebRequest.Result.ConnectionError:
+                            case UnityWebRequest.Result.DataProcessingError:
+                                Plugin.LogError("Custom methods web request error: " + webRequest.error);
+                                break;
+                            case UnityWebRequest.Result.ProtocolError:
+                                Plugin.LogError("Custom methods web request HTTP Error: " + webRequest.error);
+                                break;
+                            case UnityWebRequest.Result.Success:
+                                yield return FetchMethodsFromText(webRequest.downloadHandler.text);
+                                break;
+                        }
+                    }
+
+                    yield break;
+                case PluginConfig.CustomMethodAutocompleteBehaviour.FetchFromFile:
+                    string fullPath = Assembly.GetExecutingAssembly().Location;
+                    string directory = Path.GetDirectoryName(fullPath);
+                    string file = Path.Combine(directory, CustomMethodsSpreadsheetFile);
+
+                    if (File.Exists(file))
+                    {
+                        yield return FetchMethodsFromText(File.ReadAllText(file));
+                    }
+                    else
+                    {
+                        Plugin.LogError($"File {file} does not exist, cannot fetch custom method autocompletion data.");
+                    }
+
+                    yield break;
             }
 
-            using UnityWebRequest webRequest = UnityWebRequest.Get(CustomMethodsSpreadsheetURL);
-            yield return webRequest.SendWebRequest();
-
-            switch (webRequest.result)
-            {
-                case UnityWebRequest.Result.ConnectionError:
-                case UnityWebRequest.Result.DataProcessingError:
-                    Plugin.LogError("Custom methods web request error: " + webRequest.error);
-                    break;
-                case UnityWebRequest.Result.ProtocolError:
-                    Plugin.LogError("Custom methods web request HTTP Error: " + webRequest.error);
-                    break;
-                case UnityWebRequest.Result.Success:
-                    yield return FetchMethodsFromText(webRequest.downloadHandler.text);
-                    break;
-            }
+            
 
             yield break;
         }
@@ -164,5 +187,6 @@ namespace RDEditorPlus.ExtraData
         private readonly static Regex CustomClassMatcher = new("\"(.+)\" Custom Methods");
 
         public const string CustomMethodsSpreadsheetURL = "https://docs.google.com/spreadsheets/d/1JAz6iRLqcn08ZeTeBHeeDrpdX6M5K0b1qRVQomua21s/export?format=tsv&gid=1128429183";
+        public const string CustomMethodsSpreadsheetFile = "customMethods.tsv";
     }
 }

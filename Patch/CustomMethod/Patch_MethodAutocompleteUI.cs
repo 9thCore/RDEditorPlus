@@ -13,7 +13,7 @@ namespace RDEditorPlus.Patch.CustomMethod
         {
             private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
             {
-                if (!PluginConfig.CustomMethodsAutocomplete)
+                if (PluginConfig.CustomMethodsAutocomplete == PluginConfig.CustomMethodAutocompleteBehaviour.Disabled)
                 {
                     return instructions;
                 }
