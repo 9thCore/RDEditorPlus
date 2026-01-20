@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using RDEditorPlus.ExtraData;
 using System.IO;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ namespace RDEditorPlus
         internal static readonly ConfigFile config = new(Path.Combine(Paths.ConfigPath, "RDEditorPlus.cfg"), true);
 
         public const string CATEGORY_SUBROWS = "SubRows";
+        public const string CATEGORY_CUSTOMMETHODS = "CustomMethods";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -37,6 +39,10 @@ namespace RDEditorPlus
         public const string PATCH_SUB_ROWS_SCALE_PREVIEW_MINIMUM = "The minimum amount of rows the preview must have to be visible.\n" +
             "If set to 1 or less, the preview will be visible at all times.";
 
+        public const string PATCH_CUSTOM_METHODS_TOGGLE = "Toggle for all custom method mod functionality.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE = "Toggle for the custom method autocompletion, using known custom methods by the community.\n" +
+            "Will request to " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", so if you don't trust this patch, leave this disabled.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -47,6 +53,9 @@ namespace RDEditorPlus
         public static bool PreviewScaleSubRowsEnabled => Instance.previewScaleSubRows.Value;
         public static int PreviewScaleSubRowsMinimum => Instance.previewScaleMinimumSubRows.Value;
 
+        public static bool CustomMethodsEnabled => Instance.customMethods.Value;
+        public static bool CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
+
         public readonly ConfigEntry<bool> subRows;
         public readonly ConfigEntry<bool> spriteSubRows;
         public readonly ConfigEntry<bool> patientSubRows;
@@ -56,6 +65,9 @@ namespace RDEditorPlus
         public readonly ConfigEntry<bool> alternatingColorSubRows;
         public readonly ConfigEntry<bool> previewScaleSubRows;
         public readonly ConfigEntry<int> previewScaleMinimumSubRows;
+
+        public readonly ConfigEntry<bool> customMethods;
+        public readonly ConfigEntry<bool> customMethodsAutocomplete;
 
         public PluginConfig()
         {
@@ -112,6 +124,19 @@ namespace RDEditorPlus
                 nameof(previewScaleMinimumSubRows),
                 2,
                 PATCH_SUB_ROWS_SCALE_PREVIEW_MINIMUM);
+
+
+            customMethods = config.Bind(
+                CATEGORY_CUSTOMMETHODS,
+                nameof(customMethods),
+                false,
+                PATCH_CUSTOM_METHODS_TOGGLE);
+
+            customMethodsAutocomplete = config.Bind(
+                CATEGORY_CUSTOMMETHODS,
+                nameof(customMethodsAutocomplete),
+                false,
+                PATCH_CUSTOM_METHODS_AUTOCOMPLETE);
         }
 
         public void Noop()
