@@ -22,6 +22,7 @@ namespace RDEditorPlus
 
         public const string CATEGORY_SUBROWS = "SubRows";
         public const string CATEGORY_CUSTOMMETHODS = "CustomMethods";
+        public const string CATEGORY_ROWS = "Rows";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -45,6 +46,9 @@ namespace RDEditorPlus
             "If set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ", will request from " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", the public database of known custom methods by the community.\n" +
             "If set to " + nameof(CustomMethodAutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in TSV (tab-separated values) format.";
 
+        public const string PATCH_ROW_TOGGLE = "Toggle for all row tab (patients) functionality.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_ROW_BEAT_SWITCH = "Whether a button that switches the selected beat from a classic beat to a oneshot beat (or vice-versa) should be added to their respective inspectors.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -58,6 +62,9 @@ namespace RDEditorPlus
         public static bool CustomMethodsEnabled => Instance.customMethods.Value;
         public static CustomMethodAutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
 
+        public static bool RowsEnabled => Instance.rows.Value;
+        public static RowBeatSwitchBehaviour RowBeatSwitch => Instance.rowBeatSwitch.Value;
+
         public readonly ConfigEntry<bool> subRows;
         public readonly ConfigEntry<bool> spriteSubRows;
         public readonly ConfigEntry<bool> patientSubRows;
@@ -70,6 +77,9 @@ namespace RDEditorPlus
 
         public readonly ConfigEntry<bool> customMethods;
         public readonly ConfigEntry<CustomMethodAutocompleteBehaviour> customMethodsAutocomplete;
+
+        public readonly ConfigEntry<bool> rows;
+        public readonly ConfigEntry<RowBeatSwitchBehaviour> rowBeatSwitch;
 
         public PluginConfig()
         {
@@ -139,6 +149,18 @@ namespace RDEditorPlus
                 nameof(customMethodsAutocomplete),
                 CustomMethodAutocompleteBehaviour.Disabled,
                 PATCH_CUSTOM_METHODS_AUTOCOMPLETE);
+
+            rows = config.Bind(
+                CATEGORY_ROWS,
+                nameof(rows),
+                false,
+                PATCH_ROW_TOGGLE);
+
+            rowBeatSwitch = config.Bind(
+                CATEGORY_ROWS,
+                nameof(rowBeatSwitch),
+                RowBeatSwitchBehaviour.Disabled,
+                PATCH_ROW_BEAT_SWITCH);
         }
 
         public void Noop()
@@ -158,6 +180,14 @@ namespace RDEditorPlus
             Disabled,
             RequestFromWeb,
             FetchFromFile
+        }
+
+        public enum RowBeatSwitchBehaviour
+        {
+            Disabled,
+            KeepTotalBeatLength,
+            KeepTickLengthOnly,
+            ResetToDefault
         }
     }
 }
