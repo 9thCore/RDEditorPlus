@@ -2,6 +2,7 @@
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -59,7 +60,21 @@ namespace RDEditorPlus.Patch.SubRows
                 MethodInfo setupJustCreatedEvent = typeof(SetLevelEventControlType)
                     .GetMethod(nameof(SetupJustCreatedEvent), BindingFlags.NonPublic | BindingFlags.Static);
 
+                MethodInfo fixType = typeof(SetLevelEventControlType)
+                    .GetMethod(nameof(FixType), BindingFlags.NonPublic | BindingFlags.Static);
+
+                MethodInfo fetchLevelEventClass = typeof(SetLevelEventControlType)
+                    .GetMethod(nameof(FetchLevelEventClass), BindingFlags.NonPublic | BindingFlags.Static);
+
+                MethodInfo typeLookup = typeof(Type)
+                    .GetMethod(nameof(Type.GetType), BindingFlags.Public | BindingFlags.Static, null, [typeof(string)], null);
+
                 return new CodeMatcher(instructions)
+                    .MatchForward(false, new CodeMatch(OpCodes.Call, typeLookup))
+                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, fetchLevelEventClass))
+                    .Advance(1)
+                    .InsertAndAdvance(new CodeInstruction(OpCodes.Call, fixType))
+
                     .MatchForward(false, new CodeMatch(OpCodes.Stloc_3))
                     .Advance(1)
                     .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
@@ -72,6 +87,26 @@ namespace RDEditorPlus.Patch.SubRows
             {
                 GeneralManager.Instance.SetupJustCreatedEvent(levelEvent);
             }
+
+            private static string FetchLevelEventClass(string text)
+            {
+                levelEventClass = text;
+                return text;
+            }
+
+            private static Type FixType(Type type)
+            {
+                if (type == null)
+                {
+                    // Might have loaded from the wrong assembly?
+                    return GameAssembly.GetType(levelEventClass, throwOnError: false, ignoreCase: true);
+                }
+
+                return type;
+            }
+
+            private static string levelEventClass;
+            private static readonly Assembly GameAssembly = typeof(scnEditor).Assembly;
         }
 
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.ShowTabSection))]
