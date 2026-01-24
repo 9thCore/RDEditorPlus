@@ -41,10 +41,6 @@ namespace RDEditorPlus
             "If set to 1 or less, the preview will be visible at all times.";
 
         public const string PATCH_CUSTOM_METHODS_TOGGLE = "Toggle for all custom method mod functionality.\nIf disabled, none of the patches below will be applied.";
-        public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE = "Toggle for the custom method autocompletion.\n" +
-            "If set to " + nameof(CustomMethodAutocompleteBehaviour.Disabled) + ", will not be enabled.\n" +
-            "If set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ", will request from " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", the public database of known custom methods by the community.\n" +
-            "If set to " + nameof(CustomMethodAutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in TSV (tab-separated values) format.";
 
         public const string PATCH_ROW_TOGGLE = "Toggle for all row tab (patients) functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_ROW_BEAT_SWITCH = "Whether a button that switches the selected beat from a classic beat to a oneshot beat (or vice-versa) should be added to their respective inspectors.";
@@ -59,8 +55,7 @@ namespace RDEditorPlus
         public static bool PreviewScaleSubRowsEnabled => Instance.previewScaleSubRows.Value;
         public static int PreviewScaleSubRowsMinimum => Instance.previewScaleMinimumSubRows.Value;
 
-        public static bool CustomMethodsEnabled => Instance.customMethods.Value;
-        public static CustomMethodAutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
+        public static bool CustomMethodsEnabled => false; // Instance.customMethods.Value;
 
         public static bool RowsEnabled => Instance.rows.Value;
         public static RowBeatSwitchBehaviour RowBeatSwitch => Instance.rowBeatSwitch.Value;
@@ -76,7 +71,6 @@ namespace RDEditorPlus
         public readonly ConfigEntry<int> previewScaleMinimumSubRows;
 
         public readonly ConfigEntry<bool> customMethods;
-        public readonly ConfigEntry<CustomMethodAutocompleteBehaviour> customMethodsAutocomplete;
 
         public readonly ConfigEntry<bool> rows;
         public readonly ConfigEntry<RowBeatSwitchBehaviour> rowBeatSwitch;
@@ -138,17 +132,12 @@ namespace RDEditorPlus
                 PATCH_SUB_ROWS_SCALE_PREVIEW_MINIMUM);
 
 
-            customMethods = config.Bind(
-                CATEGORY_CUSTOMMETHODS,
-                nameof(customMethods),
-                false,
-                PATCH_CUSTOM_METHODS_TOGGLE);
+            //customMethods = config.Bind(
+            //    CATEGORY_CUSTOMMETHODS,
+            //    nameof(customMethods),
+            //    false,
+            //    PATCH_CUSTOM_METHODS_TOGGLE);
 
-            customMethodsAutocomplete = config.Bind(
-                CATEGORY_CUSTOMMETHODS,
-                nameof(customMethodsAutocomplete),
-                CustomMethodAutocompleteBehaviour.Disabled,
-                PATCH_CUSTOM_METHODS_AUTOCOMPLETE);
 
             rows = config.Bind(
                 CATEGORY_ROWS,
@@ -173,13 +162,6 @@ namespace RDEditorPlus
             KeepFourRowsHigh,
             ExpandToTimelineHeight,
             KeepInSpecialRow
-        }
-
-        public enum CustomMethodAutocompleteBehaviour
-        {
-            Disabled,
-            RequestFromWeb,
-            FetchFromFile
         }
 
         public enum RowBeatSwitchBehaviour
