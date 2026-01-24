@@ -74,6 +74,12 @@ namespace RDEditorPlus.Util
             return true;
         }
 
-        public const string PropertyMultipleValuesReplacement = "<color=#F0F0F0>-/-</color>";
+        public static void SetupMixedText(Text text)
+        {
+            text.text = MixedText;
+            text.color = Color.black.WithAlpha(0.3f);
+        }
+
+        public const string MixedText = "[mixed]";
     }
 }
