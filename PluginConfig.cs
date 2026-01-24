@@ -23,6 +23,7 @@ namespace RDEditorPlus
         public const string CATEGORY_SUBROWS = "SubRows";
         public const string CATEGORY_CUSTOMMETHODS = "CustomMethods";
         public const string CATEGORY_ROWS = "Rows";
+        public const string CATEGORY_SELECT = "Select";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -50,6 +51,10 @@ namespace RDEditorPlus
         public const string PATCH_ROW_TOGGLE = "Toggle for all row tab (patients) functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_ROW_BEAT_SWITCH = "Whether a button that switches the selected beat from a classic beat to a oneshot beat (or vice-versa) should be added to their respective inspectors.";
 
+        public const string PATCH_SELECT_TOGGLE = "Toggle for all selection mod functionality.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_SELECT_MULTI = "Whether the inspector should work with multiple selected events.\n" +
+            "All events must be of the same type, and properties which differ between events will be shown with -/-.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -66,6 +71,9 @@ namespace RDEditorPlus
         public static bool RowsEnabled => Instance.rows.Value;
         public static RowBeatSwitchBehaviour RowBeatSwitch => Instance.rowBeatSwitch.Value;
 
+        public static bool SelectionEnabled => Instance.selection.Value;
+        public static bool SelectionMultiEditEnabled => Instance.selectionMultiEdit.Value;
+
         public readonly ConfigEntry<bool> subRows;
         public readonly ConfigEntry<bool> spriteSubRows;
         public readonly ConfigEntry<bool> patientSubRows;
@@ -81,6 +89,9 @@ namespace RDEditorPlus
 
         public readonly ConfigEntry<bool> rows;
         public readonly ConfigEntry<RowBeatSwitchBehaviour> rowBeatSwitch;
+
+        public readonly ConfigEntry<bool> selection;
+        public readonly ConfigEntry<bool> selectionMultiEdit;
 
         public PluginConfig()
         {
@@ -162,6 +173,18 @@ namespace RDEditorPlus
                 nameof(rowBeatSwitch),
                 RowBeatSwitchBehaviour.Disabled,
                 PATCH_ROW_BEAT_SWITCH);
+
+            selection = config.Bind(
+                CATEGORY_SELECT,
+                nameof(selection),
+                false,
+                PATCH_SELECT_TOGGLE);
+
+            selectionMultiEdit = config.Bind(
+                CATEGORY_SELECT,
+                nameof(selectionMultiEdit),
+                false,
+                PATCH_SELECT_MULTI);
         }
 
         public void Noop()

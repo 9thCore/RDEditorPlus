@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using RDLevelEditor;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace RDEditorPlus.Util
@@ -24,5 +28,52 @@ namespace RDEditorPlus.Util
 
             return copy.gameObject.GetComponentInChildren<Button>();
         }
+
+        public static bool CanMultiEdit()
+        {
+            if (!PluginConfig.SelectionMultiEditEnabled
+                || scnEditor.instance == null)
+            {
+                return false;
+            }
+
+            List<LevelEventControl_Base> selectedControls = scnEditor.instance.selectedControls;
+
+            if (selectedControls.Count <= 1)
+            {
+                return false;
+            }
+
+            LevelEvent_Base levelEvent = selectedControls[0].levelEvent;
+
+            // Check if all events are of the same type
+            LevelEventType type = levelEvent.type;
+            if (!selectedControls.All(control => control.levelEvent.type == type))
+            {
+                return false;
+            }
+
+            // Check if all properties which need enabling are enabled or disabled for all events in common
+            // Still unsure about this, I might end up going for specific checks for each event type in particular
+            ImmutableList<BasePropertyInfo> properties = levelEvent.info.propertiesInfo;
+            foreach (LevelEventControl_Base control in selectedControls)
+            {
+                LevelEvent_Base secondLevelEvent = control.levelEvent;
+                if (secondLevelEvent == levelEvent)
+                {
+                    continue;
+                }
+
+                if (properties.Any(property => property.enableIf != null &&
+                property.enableIf(levelEvent) != property.enableIf(secondLevelEvent)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public const string PropertyMultipleValuesReplacement = "<color=#F0F0F0>-/-</color>";
     }
 }
