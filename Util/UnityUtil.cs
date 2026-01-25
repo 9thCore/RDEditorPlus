@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace RDEditorPlus.Util
 {
@@ -37,6 +38,37 @@ namespace RDEditorPlus.Util
         public static void OffsetMaxY(this RectTransform transform, float value)
         {
             transform.offsetMax = new Vector2(transform.offsetMax.x, value);
+        }
+
+        public static T ReplaceWithDerivative<T>(this Dropdown source) where T : Dropdown
+        {
+            GameObject gameObject = source.gameObject;
+            bool editorDropdownWasPresent = false;
+
+            var properties = (source.template, source.alphaFadeSpeed, source.animationTriggers, source.captionImage, source.captionText,
+                source.colors, source.image, source.interactable, source.itemImage, source.itemText, source.onValueChanged,
+                 source.options, source.value);
+
+            if (gameObject.TryGetComponent(out EditorDropdown component))
+            {
+                editorDropdownWasPresent = true;
+                GameObject.DestroyImmediate(component);
+            }
+
+            GameObject.DestroyImmediate(source);
+
+            T destination = gameObject.AddComponent<T>();
+
+            if (editorDropdownWasPresent)
+            {
+                gameObject.AddComponent<EditorDropdown>();
+            }
+
+            (destination.template, destination.alphaFadeSpeed, destination.animationTriggers, destination.captionImage,
+                destination.captionText, destination.colors, destination.image, destination.interactable,
+                destination.itemImage, destination.itemText, destination.onValueChanged,destination.options, destination.value) = properties;
+
+            return destination;
         }
     }
 }
