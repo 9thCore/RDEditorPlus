@@ -2,7 +2,7 @@
 using RDEditorPlus.Util;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch.Select
+namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_RDInspectorPanelManager
     {

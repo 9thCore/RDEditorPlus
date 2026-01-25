@@ -31,8 +31,7 @@ namespace RDEditorPlus.Util
 
         public static bool CanMultiEdit()
         {
-            if (!PluginConfig.SelectionMultiEditEnabled
-                || scnEditor.instance == null)
+            if (scnEditor.instance == null)
             {
                 return false;
             }

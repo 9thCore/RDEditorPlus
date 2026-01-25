@@ -7,7 +7,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace RDEditorPlus.Patch.Select
+namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_Property
     {

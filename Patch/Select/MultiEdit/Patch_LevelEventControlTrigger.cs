@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch.Select
+namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_LevelEventControlEventTrigger
     {
@@ -10,8 +10,7 @@ namespace RDEditorPlus.Patch.Select
         {
             private static void Postfix()
             {
-                if (PluginConfig.SelectionMultiEditEnabled
-                    && scnEditor.instance.selectedControls.Count > 1)
+                if (scnEditor.instance.selectedControls.Count > 1)
                 {
                     LevelEvent_Base levelEvent = scnEditor.instance.selectedControls[0].levelEvent;
 

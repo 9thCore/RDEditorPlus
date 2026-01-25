@@ -53,7 +53,7 @@ namespace RDEditorPlus
 
         public const string PATCH_SELECT_TOGGLE = "Toggle for all selection mod functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_SELECT_MULTI = "Whether the inspector should work with multiple selected events.\n" +
-            "All events must be of the same type, and properties which differ between events will be shown with -/-.";
+            "All events must be of the same type, and some events may have other conditions.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;

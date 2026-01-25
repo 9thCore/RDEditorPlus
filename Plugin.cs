@@ -44,7 +44,7 @@ namespace RDEditorPlus
             Patch.SubRows.PatchHandler.Instance.Patch(harmony);
             Patch.CustomMethod.PatchHandler.Instance.Patch(harmony);
             Patch.Rows.PatchHandler.Instance.Patch(harmony);
-            Patch.Select.PatchHandler.Instance.Patch(harmony);
+            Patch.Select.MultiEdit.PatchHandler.Instance.Patch(harmony);
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
         }

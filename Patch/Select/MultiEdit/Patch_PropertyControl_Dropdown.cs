@@ -5,7 +5,7 @@ using RDLevelEditor;
 using System;
 using UnityEngine.UI;
 
-namespace RDEditorPlus.Patch.Select
+namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_PropertyControl_Dropdown
     {
@@ -14,12 +14,7 @@ namespace RDEditorPlus.Patch.Select
         {
             private static void Postfix(PropertyControl_Dropdown __instance)
             {
-                if (!PluginConfig.SelectionMultiEditEnabled)
-                {
-                    return;
-                }
-
-                CustomDropdown customDropdown = UnityUtil.ReplaceWithDerivative<CustomDropdown>(__instance.dropdown);
+                CustomDropdown customDropdown = __instance.dropdown.ReplaceWithDerivative<CustomDropdown>();
                 __instance.dropdown = customDropdown;
             }
         }
@@ -29,11 +24,6 @@ namespace RDEditorPlus.Patch.Select
         {
             private static bool Prefix(PropertyControl_Dropdown __instance)
             {
-                if (!PluginConfig.SelectionMultiEditEnabled)
-                {
-                    return true;
-                }
-
                 if (!__instance.EqualValueForSelectedEvents())
                 {
                     __instance.dropdown.captionText.text = InspectorUtil.MixedText;

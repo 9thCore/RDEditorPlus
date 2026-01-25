@@ -5,7 +5,7 @@ using RDLevelEditor;
 using System.Data.SqlTypes;
 using UnityEngine;
 
-namespace RDEditorPlus.Patch.Select
+namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_LevelEvent_Base
     {

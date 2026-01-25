@@ -6,7 +6,7 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Reflection;
 
-namespace RDEditorPlus.Patch.Select
+namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_scnEditor
     {
@@ -15,11 +15,6 @@ namespace RDEditorPlus.Patch.Select
         {
             private static bool Prefix(scnEditor __instance, ref LevelEventControl_Base __result)
             {
-                if (!PluginConfig.SelectionMultiEditEnabled)
-                {
-                    return true;
-                }
-
                 if (__instance.selectedControls.Count == 0)
                 {
                     __result = null;

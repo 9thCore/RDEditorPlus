@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RDEditorPlus.Patch.Select
+namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_PropertyControl_InputField
     {
@@ -17,7 +17,7 @@ namespace RDEditorPlus.Patch.Select
             {
                 RectTransform template = (RectTransform) __instance.inputField.textComponent.transform;
 
-                GameObject instance = GameObject.Instantiate(template.gameObject);
+                GameObject instance = Object.Instantiate(template.gameObject);
                 instance.SetActive(false);
 
                 RectTransform transform = (RectTransform) instance.transform;
