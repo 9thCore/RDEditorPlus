@@ -15,24 +15,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static void Postfix(PropertyControl_InputField __instance)
             {
-                RectTransform template = (RectTransform) __instance.inputField.textComponent.transform;
-
-                GameObject instance = Object.Instantiate(template.gameObject);
-                instance.SetActive(false);
-
-                RectTransform transform = (RectTransform) instance.transform;
-
-                transform.SetParent(__instance.inputField.transform);
-                transform.localRotation = template.localRotation;
-                transform.localScale = template.localScale;
-                transform.offsetMin = template.offsetMin;
-                transform.offsetMax = template.offsetMax;
-
-                Text text = instance.GetComponent<Text>();
-                InspectorUtil.SetupMixedText(text);
-                __instance.inputField.placeholder = text;
-
-                instance.SetActive(true);
+                __instance.inputField.SetupMixedPlaceholder();
             }
         }
 

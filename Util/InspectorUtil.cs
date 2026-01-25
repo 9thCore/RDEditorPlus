@@ -79,6 +79,39 @@ namespace RDEditorPlus.Util
             text.color = Color.black.WithAlpha(0.3f);
         }
 
+        public static void SetupMixedPlaceholder(this InputField inputField)
+        {
+            RectTransform template = (RectTransform) inputField.textComponent.transform;
+
+            GameObject instance = Object.Instantiate(template.gameObject);
+            instance.SetActive(false);
+
+            RectTransform transform = (RectTransform)instance.transform;
+
+            transform.SetParent(inputField.transform);
+            transform.localRotation = template.localRotation;
+            transform.localScale = template.localScale;
+            transform.offsetMin = template.offsetMin;
+            transform.offsetMax = template.offsetMax;
+
+            Text text = instance.GetComponent<Text>();
+            SetupMixedText(text);
+            inputField.placeholder = text;
+
+            instance.SetActive(true);
+        }
+
+        public static bool IsUsedMultiEdit(this NullablePropertyInfo nullablePropertyInfo)
+        {
+            if (!CanMultiEdit())
+            {
+                return false;
+            }
+
+            return scnEditor.instance.selectedControls.All(eventControl => nullablePropertyInfo.propertyInfo.GetValue(eventControl.levelEvent) != null);
+        }
+
         public const string MixedText = "[mixed]";
+        public const string MixedTextShorter = "mixed";
     }
 }
