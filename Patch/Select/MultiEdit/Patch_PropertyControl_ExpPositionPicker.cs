@@ -124,12 +124,6 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             }
         }
 
-        //private static PropertyUpdateType GetUpdateType(PropertyControl property)
-        //{
-        //    return PropertyData.TryGetValue(property, out PropertyAdditionalProperties properties)
-        //        ? properties.type : PropertyUpdateType.UpdateBoth;
-        //}
-
         private static PropertyUpdateType GetUpdateType(PropertyControl property)
         {
             return PropertyData.TryGetValue(property, out PropertyUpdateType type) ? type : PropertyUpdateType.UpdateBoth;
@@ -138,13 +132,6 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         private static readonly Dictionary<PropertyControl, PropertyUpdateType> PropertyData = new();
         private static readonly Dictionary<PropertyControl, string> PropertyLastXString = new();
         private static readonly Dictionary<PropertyControl, string> PropertyLastYString = new();
-
-        //private struct PropertyAdditionalProperties(string lastXString = null, string lastYString = null, PropertyUpdateType type = PropertyUpdateType.UpdateBoth)
-        //{
-        //    public string lastXString = lastXString;
-        //    public string lastYString = lastYString;
-        //    public PropertyUpdateType type = type;
-        //}
 
         [Flags]
         private enum PropertyUpdateType
