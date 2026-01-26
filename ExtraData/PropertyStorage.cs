@@ -32,9 +32,6 @@ namespace RDEditorPlus.ExtraData
             return changedProperties.Contains(property);
         }
 
-        public bool IsFirstLoopIfInDeselectLoop => lastFrame != Time.frameCount;
-        public int lastFrame = -1;
-
         private readonly HashSet<Property> changedProperties = new();
     }
 }

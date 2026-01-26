@@ -3,6 +3,7 @@ using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Data.SqlTypes;
+using System.Linq;
 using UnityEngine;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
@@ -21,25 +22,20 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 }
 
                 __state = false;
-                if (__instance.inspectorPanel != null
-                        && !__instance.isBaseEvent)
+                if (__instance.inspectorPanel != null)
                 {
                     using (new SaveStateScope(clearRedo: true, skipSaving: false, skipTimelinePos: false))
                     {
                         InspectorPanel panel = __instance.inspectorPanel;
-
-                        panel.Save(__instance, isNew: !PropertyStorage.Instance.IsFirstLoopIfInDeselectLoop);
-
                         foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                         {
-                            if (eventControl.levelEvent != __instance)
+                            if (!eventControl.levelEvent.isBaseEvent)
                             {
                                 panel.Save(eventControl.levelEvent, isNew: true);
                             }
                         }
 
                         PropertyStorage.Instance.UnmarkAll();
-                        PropertyStorage.Instance.lastFrame = Time.frameCount;
                     }
                 }
 
