@@ -73,13 +73,13 @@ namespace RDEditorPlus.Util
             return true;
         }
 
-        public static void SetupMixedText(Text text)
+        public static void SetupMixedText(Text text, string mixedText = null)
         {
-            text.text = MixedText;
+            text.text = mixedText ?? MixedText;
             text.color = Color.black.WithAlpha(0.3f);
         }
 
-        public static void SetupMixedPlaceholder(this InputField inputField)
+        public static void SetupMixedPlaceholder(this InputField inputField, string mixedText = null)
         {
             if (inputField.placeholder != null)
             {
@@ -100,7 +100,7 @@ namespace RDEditorPlus.Util
             transform.offsetMax = template.offsetMax;
 
             Text text = instance.GetComponent<Text>();
-            SetupMixedText(text);
+            SetupMixedText(text, mixedText);
             inputField.placeholder = text;
 
             instance.SetActive(true);
@@ -124,5 +124,6 @@ namespace RDEditorPlus.Util
         public const string DefaultNullText = "--";
         public const string MixedText = "[mixed]";
         public const string MixedTextShorter = "mixed";
+        public const string MixedTextSliderPercent = "--";
     }
 }
