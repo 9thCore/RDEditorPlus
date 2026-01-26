@@ -59,5 +59,42 @@ namespace RDEditorPlus.Util
 
             return xEqualBetweenEvents && yEqualBetweenEvents;
         }
+
+        public static bool EqualValueForSelectedEvents(this PropertyControl_PositionPicker propertyControl, out bool xEqualBetweenEvents, out bool yEqualBetweenEvents)
+        {
+            xEqualBetweenEvents = true;
+            yEqualBetweenEvents = true;
+
+            if (!InspectorUtil.CanMultiEdit())
+            {
+                return true;
+            }
+
+            Float2 value = (Float2)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
+
+            for (int i = 1; i < scnEditor.instance.selectedControls.Count; i++)
+            {
+                LevelEventControl_Base eventControl = scnEditor.instance.selectedControls[i];
+
+                Float2 value2 = (Float2)propertyControl.GetEventValue(eventControl.levelEvent);
+
+                if (value.x != value2.x)
+                {
+                    xEqualBetweenEvents = false;
+                }
+
+                if (value.y != value2.y)
+                {
+                    yEqualBetweenEvents = false;
+                }
+
+                if (!xEqualBetweenEvents && !yEqualBetweenEvents)
+                {
+                    return false;
+                }
+            }
+
+            return xEqualBetweenEvents && yEqualBetweenEvents;
+        }
     }
 }
