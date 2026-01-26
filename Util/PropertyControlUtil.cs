@@ -33,49 +33,27 @@ namespace RDEditorPlus.Util
                 return true;
             }
 
-            object value = propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
-            string valueXStringified = null;
-            string valueYStringified = null;
-            bool flag = value != null;
-
-            if (flag)
-            {
-                FloatExpression2 expression = (FloatExpression2) value;
-                valueXStringified = expression.x.ToString();
-                valueYStringified = expression.y.ToString();
-            }
+            FloatExpression2 expression = (FloatExpression2)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
 
             for (int i = 1; i < scnEditor.instance.selectedControls.Count; i++)
             {
                 LevelEventControl_Base eventControl = scnEditor.instance.selectedControls[i];
 
-                object value2 = propertyControl.GetEventValue(eventControl.levelEvent);
-                bool flag2 = value2 != null;
+                FloatExpression2 expression2 = (FloatExpression2)propertyControl.GetEventValue(eventControl.levelEvent);
 
-                if (flag != flag2)
+                if (!expression.x.Equal(expression2.x))
                 {
                     xEqualBetweenEvents = false;
-                    yEqualBetweenEvents = false;
-                    return false;
                 }
 
-                if (flag && flag2)
+                if (!expression.y.Equal(expression2.y))
                 {
-                    FloatExpression2 expression2 = (FloatExpression2) value2;
-                    if (valueXStringified != expression2.x.ToString())
-                    {
-                        xEqualBetweenEvents = false;
-                    }
+                    yEqualBetweenEvents = false;
+                }
 
-                    if (valueYStringified != expression2.y.ToString())
-                    {
-                        yEqualBetweenEvents = false;
-                    }
-
-                    if (!xEqualBetweenEvents && !yEqualBetweenEvents)
-                    {
-                        return false;
-                    }
+                if (!xEqualBetweenEvents && !yEqualBetweenEvents)
+                {
+                    return false;
                 }
             }
 
