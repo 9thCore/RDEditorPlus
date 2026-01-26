@@ -1,21 +1,27 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_PropertyControl_InputField
     {
-        [HarmonyPatch(typeof(PropertyControl_InputField), nameof(PropertyControl_InputField.Setup))]
-        private static class Setup
+        [HarmonyPatch(typeof(PropertyControl_InputField), nameof(PropertyControl_InputField.AddListeners))]
+        private static class AddListeners
         {
-            private static void Postfix(PropertyControl_InputField __instance)
+            private static void Postfix(PropertyControl_InputField __instance, InspectorPanel.ChangeAction action)
             {
-                __instance.inputField.SetupMixedPlaceholder();
+                InspectorUtil.SetupMixedPlaceholder(__instance.inputField);
+
+                RDInputField inputField = (RDInputField)__instance.inputField;
+
+                __instance.inputField.onEndEdit.AddListener(_ =>
+                {
+                    inputField.selected = false;
+                });
             }
         }
 
@@ -27,24 +33,24 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 if (!__instance.EqualValueForSelectedEvents())
                 {
                     __instance.inputField.text = string.Empty;
+                    ((Text)__instance.inputField.placeholder).text = InspectorUtil.MixedText;
                     return false;
                 }
 
+                ResetPlaceholder(__instance, __instance.inputField.text);
                 return true;
             }
         }
 
-        [HarmonyPatch(typeof(PropertyControl_InputField), nameof(PropertyControl_InputField.Save))]
-        private static class Save
+        private static void ResetPlaceholder(PropertyControl_InputField propertyControl, string text)
         {
-            private static bool Prefix(PropertyControl_InputField __instance)
+            if (propertyControl.AcceptsNull())
             {
-                if (string.IsNullOrEmpty(__instance.inputField.text))
-                {
-                    return false;
-                }
-
-                return true;
+                ((Text)propertyControl.inputField.placeholder).text = InspectorUtil.DefaultNullText;
+            }
+            else
+            {
+                ((Text)propertyControl.inputField.placeholder).text = string.Empty;
             }
         }
     }

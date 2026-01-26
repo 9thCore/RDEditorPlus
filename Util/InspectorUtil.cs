@@ -81,6 +81,11 @@ namespace RDEditorPlus.Util
 
         public static void SetupMixedPlaceholder(this InputField inputField)
         {
+            if (inputField.placeholder != null)
+            {
+                return;
+            }
+
             RectTransform template = (RectTransform) inputField.textComponent.transform;
 
             GameObject instance = Object.Instantiate(template.gameObject);
@@ -99,6 +104,11 @@ namespace RDEditorPlus.Util
             inputField.placeholder = text;
 
             instance.SetActive(true);
+        }
+
+        public static bool AcceptsNull(this PropertyControl_InputField propertyControl)
+        {
+            return propertyControl.inputField == propertyControl.expInputField;
         }
 
         public static bool IsUsedMultiEdit(this NullablePropertyInfo nullablePropertyInfo)
