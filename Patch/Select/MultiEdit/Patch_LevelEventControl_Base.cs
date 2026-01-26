@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
@@ -10,6 +11,11 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static bool Prefix(LevelEventControl_Base __instance)
             {
+                if (!InspectorUtil.CanMultiEdit())
+                {
+                    return true;
+                }
+
                 if (scnEditor.instance.changingState == 0)
                 {
                     __instance.levelEvent.SaveData();
