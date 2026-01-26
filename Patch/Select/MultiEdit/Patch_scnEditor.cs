@@ -1,10 +1,6 @@
 ﻿using HarmonyLib;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Reflection;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
