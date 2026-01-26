@@ -63,28 +63,42 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                 __instance.expPositionPicker.x.onEndEdit.AddListener(text =>
                 {
+                    string sound = __instance.expPositionPicker.PlayOnEndEdit ? "sndEditorValueChange" : null;
+
                     if (PropertyLastXString.TryGetValue(__instance, out string oldText) && oldText == text)
                     {
+                        if (sound != null)
+                        {
+                            __instance.inspectorPanel.LevelEditorPlaySound(sound, __instance.inspectorPanel.defaultGroup);
+                        }
+
                         return;
                     }
 
                     ((Text)__instance.expPositionPicker.x.placeholder).text = "--";
                     PropertyLastXString[__instance] = text;
                     PropertyData[__instance] = PropertyUpdateType.UpdateX;
-                    action(null, __instance.expPositionPicker.PlayOnEndEdit ? "sndEditorValueChange" : null, null);
+                    action(null, sound, null);
                 });
 
                 __instance.expPositionPicker.y.onEndEdit.AddListener(text =>
                 {
+                    string sound = __instance.expPositionPicker.PlayOnEndEdit ? "sndEditorValueChange" : null;
+
                     if (PropertyLastYString.TryGetValue(__instance, out string oldText) && oldText == text)
                     {
+                        if (sound != null)
+                        {
+                            __instance.inspectorPanel.LevelEditorPlaySound(sound, __instance.inspectorPanel.defaultGroup);
+                        }
+
                         return;
                     }
 
                     ((Text)__instance.expPositionPicker.y.placeholder).text = "--";
                     PropertyLastYString[__instance] = text;
                     PropertyData[__instance] = PropertyUpdateType.UpdateY;
-                    action(null, __instance.expPositionPicker.PlayOnEndEdit ? "sndEditorValueChange" : null, null);
+                    action(null, sound, null);
                 });
             }
         }
