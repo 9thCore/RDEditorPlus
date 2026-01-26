@@ -26,7 +26,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     }
                     else
                     {
-                        ((Text)__instance.positionPicker.x.placeholder).text = "--";
+                        ((Text)__instance.positionPicker.x.placeholder).text = InspectorUtil.DefaultNullText;
                     }
 
                     if (!y)
@@ -37,14 +37,14 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     }
                     else
                     {
-                        ((Text)__instance.positionPicker.y.placeholder).text = "--";
+                        ((Text)__instance.positionPicker.y.placeholder).text = InspectorUtil.DefaultNullText;
                     }
 
                     return false;
                 }
 
-                ((Text)__instance.positionPicker.x.placeholder).text = "--";
-                ((Text)__instance.positionPicker.y.placeholder).text = "--";
+                ((Text)__instance.positionPicker.x.placeholder).text = InspectorUtil.DefaultNullText;
+                ((Text)__instance.positionPicker.y.placeholder).text = InspectorUtil.DefaultNullText;
 
                 PropertyLastXString[__instance] = __instance.positionPicker.x.text;
                 PropertyLastYString[__instance] = __instance.positionPicker.y.text;
@@ -75,7 +75,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         return;
                     }
 
-                    ((Text)__instance.positionPicker.x.placeholder).text = "--";
+                    ((Text)__instance.positionPicker.x.placeholder).text = InspectorUtil.DefaultNullText;
                     PropertyLastXString[__instance] = text;
                     PropertyData[__instance] = PropertyUpdateType.UpdateX;
                     action(null, sound, null);
@@ -95,7 +95,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         return;
                     }
 
-                    ((Text)__instance.positionPicker.y.placeholder).text = "--";
+                    ((Text)__instance.positionPicker.y.placeholder).text = InspectorUtil.DefaultNullText;
                     PropertyLastYString[__instance] = text;
                     PropertyData[__instance] = PropertyUpdateType.UpdateY;
                     action(null, sound, null);

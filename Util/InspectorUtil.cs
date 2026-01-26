@@ -111,6 +111,7 @@ namespace RDEditorPlus.Util
             return scnEditor.instance.selectedControls.All(eventControl => nullablePropertyInfo.propertyInfo.GetValue(eventControl.levelEvent) != null);
         }
 
+        public const string DefaultNullText = "--";
         public const string MixedText = "[mixed]";
         public const string MixedTextShorter = "mixed";
     }
