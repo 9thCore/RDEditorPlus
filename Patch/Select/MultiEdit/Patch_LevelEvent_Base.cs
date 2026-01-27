@@ -2,9 +2,6 @@
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Data.SqlTypes;
-using System.Linq;
-using UnityEngine;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
@@ -32,6 +29,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                             if (!eventControl.levelEvent.isBaseEvent)
                             {
                                 panel.Save(eventControl.levelEvent, isNew: true);
+                                eventControl.UpdateUI();
                             }
                         }
 
