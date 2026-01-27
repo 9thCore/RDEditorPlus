@@ -100,6 +100,12 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     PropertyData[__instance] = PropertyUpdateType.UpdateY;
                     action(null, sound, null);
                 });
+
+                __instance.positionPicker.units.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    PropertyLastXString[__instance] = __instance.positionPicker.x.text;
+                    PropertyLastYString[__instance] = __instance.positionPicker.y.text;
+                });
             }
         }
 
