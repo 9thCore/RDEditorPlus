@@ -18,9 +18,18 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                 RDInputField inputField = (RDInputField)__instance.inputField;
 
-                __instance.inputField.onEndEdit.AddListener(_ =>
+                if (__instance.AcceptsNull())
+                {
+                    __instance.inputField.onValueChanged.AddListener(text =>
+                    {
+                        ResetPlaceholder(__instance, text);
+                    });
+                }
+
+                __instance.inputField.onEndEdit.AddListener(text =>
                 {
                     inputField.selected = false;
+                    ResetPlaceholder(__instance, text);
                 });
             }
         }
@@ -38,6 +47,21 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 }
 
                 ResetPlaceholder(__instance, __instance.inputField.text);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(PropertyControl_InputField), nameof(PropertyControl_InputField.Save))]
+        private static class Save
+        {
+            private static bool Prefix(PropertyControl_InputField __instance)
+            {
+                if (__instance.inputField.text.IsNullOrEmpty()
+                    && (!__instance.AcceptsNull() || ((Text)__instance.inputField.placeholder).text == InspectorUtil.MixedText))
+                {
+                    return false;
+                }
+
                 return true;
             }
         }
