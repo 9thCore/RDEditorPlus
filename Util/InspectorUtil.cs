@@ -123,7 +123,7 @@ namespace RDEditorPlus.Util
 
         public const string DefaultNullText = "--";
         public const string MixedText = "[mixed]";
-        public const string MixedTextShorter = "mixed";
-        public const string MixedTextSliderPercent = "--";
+        public const string MixedTextShorter = "[mix]";
+        public const string MixedTextSliderPercent = "[mix]";
     }
 }
