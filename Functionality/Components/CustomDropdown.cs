@@ -11,6 +11,7 @@ namespace RDEditorPlus.Functionality.Components
         protected override GameObject CreateDropdownList(GameObject template)
         {
             itemIndex = 0;
+            currentlyCreatingDropdown = true;
             return base.CreateDropdownList(template);
         }
 
@@ -25,6 +26,11 @@ namespace RDEditorPlus.Functionality.Components
                 int valueClearlyDifferentFromIndex = (itemIndex == 0) ? 1 : 0;
                 item.toggle.onValueChanged.AddListener(_ =>
                 {
+                    if (currentlyCreatingDropdown)
+                    {
+                        return;
+                    }
+
                     // Ensure the dropdown's value is definitely changed, even if it's the same as before
                     SetValueWithoutNotify(valueClearlyDifferentFromIndex);
                 });
@@ -50,9 +56,11 @@ namespace RDEditorPlus.Functionality.Components
                 }
             }
 
+            currentlyCreatingDropdown = false;
             return blocker;
         }
 
+        private bool currentlyCreatingDropdown;
         private int itemIndex;
     }
 }
