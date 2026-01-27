@@ -76,7 +76,7 @@ namespace RDEditorPlus.Util
         public static void SetupMixedText(Text text, string mixedText = null)
         {
             text.text = mixedText ?? MixedText;
-            text.color = Color.black.WithAlpha(0.3f);
+            text.color = Color.black.WithAlpha(MixedTextAlpha);
         }
 
         public static void SetupMixedPlaceholder(this InputField inputField, string mixedText = null)
@@ -121,6 +121,8 @@ namespace RDEditorPlus.Util
             return scnEditor.instance.selectedControls.All(eventControl => nullablePropertyInfo.propertyInfo.GetValue(eventControl.levelEvent) != null);
         }
 
+        public const float MixedTextAlpha = 0.3f;
+        public const float MixedSliderAlpha = 0.5f;
         public const string DefaultNullText = "--";
         public const string MixedText = "[mixed]";
         public const string MixedTextShorter = "[mix]";

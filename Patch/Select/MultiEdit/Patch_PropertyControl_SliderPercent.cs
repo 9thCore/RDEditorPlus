@@ -1,7 +1,10 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
@@ -21,10 +24,18 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static void Postfix(PropertyControl_SliderPercent __instance)
             {
-                __instance.slider.onValueChanged.AddListener(_ =>
+                RDEventTrigger trigger = __instance.slider.GetComponent<RDEventTrigger>();
+                trigger.onClick = (RDPointerEventData) Delegate.Combine(new RDPointerEventData((PointerEventData _) =>
                 {
-                    __instance.slider.handleRect.parent.gameObject.SetActive(true);
-                    __instance.slider.fillRect.parent.gameObject.SetActive(true);
+                    __instance.slider.handleRect.GetComponent<Graphic>().SetAlpha(1f);
+                    __instance.slider.fillRect.gameObject.SetActive(true);
+                    __instance.slider.value = __instance.slider.value;
+                }), trigger.onClick);
+
+                __instance.inputField.onEndEdit.AddListener(_ =>
+                {
+                    __instance.slider.handleRect.GetComponent<Graphic>().SetAlpha(1f);
+                    __instance.slider.fillRect.gameObject.SetActive(true);
                 });
             }
         }
@@ -37,11 +48,14 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 if (!__instance.EqualValueForSelectedEvents())
                 {
                     __instance.inputField.text = string.Empty;
-                    __instance.slider.handleRect.parent.gameObject.SetActive(false);
-                    __instance.slider.fillRect.parent.gameObject.SetActive(false);
+                    __instance.slider.SetNormalizedValueWithoutNotify(0.5f);
+                    __instance.slider.handleRect.GetComponent<Graphic>().SetAlpha(InspectorUtil.MixedSliderAlpha);
+                    __instance.slider.fillRect.gameObject.SetActive(false);
                     return false;
                 }
 
+                __instance.slider.handleRect.GetComponent<Graphic>().SetAlpha(1f);
+                __instance.slider.fillRect.gameObject.SetActive(true);
                 return true;
             }
         }

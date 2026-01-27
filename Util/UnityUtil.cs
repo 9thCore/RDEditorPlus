@@ -70,5 +70,15 @@ namespace RDEditorPlus.Util
 
             return destination;
         }
+
+        public static void SetAlpha(this Graphic graphic, float alpha)
+        {
+            graphic.color = graphic.color.WithAlpha(alpha);
+        }
+
+        public static void SetNormalizedValueWithoutNotify(this Slider slider, float normalizedValue)
+        {
+            slider.SetValueWithoutNotify(Mathf.Lerp(slider.minValue, slider.maxValue, normalizedValue));
+        }
     }
 }
