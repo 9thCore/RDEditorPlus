@@ -26,9 +26,10 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             }
         }
 
-        [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromRight))]
-        private static class DragClassicFromRight
+        private static class DragFromRight
         {
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromRight))]
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragOneshotFromRight))]
             private static void Prefix(LevelEventControlEventTrigger __instance)
             {
                 if (!float.IsNaN(dragDelta))
@@ -42,6 +43,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 dragDelta = snappedPosition - eventControl.hitPulse.anchoredPosition.x;
             }
 
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromRight))]
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragOneshotFromRight))]
             private static void Postfix(LevelEventControlEventTrigger __instance, bool playSound)
             {
                 if (callingMethodForEveryoneElse)
@@ -55,7 +58,14 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     if (__instance.control != eventControl)
                     {
-                        eventControl.trigger.DragClassicFromRight(playSound);
+                        if (eventControl.levelEvent.type == LevelEventType.AddClassicBeat)
+                        {
+                            eventControl.trigger.DragClassicFromRight(playSound);
+                        }
+                        else if (eventControl.levelEvent.type == LevelEventType.AddOneshotBeat)
+                        {
+                            eventControl.trigger.DragOneshotFromRight(playSound);
+                        }
                     }
                 }
 
@@ -63,6 +73,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 dragDelta = float.NaN;
             }
 
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromRight))]
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragOneshotFromRight))]
             private static void ILManipulator(ILContext il)
             {
                 ILCursor cursor = new(il);
@@ -86,9 +98,10 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             private static bool callingMethodForEveryoneElse = false;
         }
 
-        [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromLeft))]
-        private static class DragClassicFromLeft
+        private static class DragFromLeft
         {
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromLeft))]
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragOneshotFromLeft))]
             private static void Prefix(LevelEventControlEventTrigger __instance)
             {
                 if (!float.IsNaN(dragDelta))
@@ -102,6 +115,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 dragDelta = snappedPosition - eventControl.rt.anchoredPosition.x;
             }
 
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromLeft))]
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragOneshotFromLeft))]
             private static void Postfix(LevelEventControlEventTrigger __instance, bool playSound)
             {
                 if (callingMethodForEveryoneElse)
@@ -115,7 +130,14 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     if (__instance.control != eventControl)
                     {
-                        eventControl.trigger.DragClassicFromLeft(playSound);
+                        if (eventControl.levelEvent.type == LevelEventType.AddClassicBeat)
+                        {
+                            eventControl.trigger.DragClassicFromLeft(playSound);
+                        }
+                        else if (eventControl.levelEvent.type == LevelEventType.AddOneshotBeat)
+                        {
+                            eventControl.trigger.DragOneshotFromLeft(playSound);
+                        }
                     }
                 }
 
@@ -123,6 +145,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 dragDelta = float.NaN;
             }
 
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragClassicFromLeft))]
+            [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.DragOneshotFromLeft))]
             private static void ILManipulator(ILContext il)
             {
                 ILCursor cursor = new(il);
