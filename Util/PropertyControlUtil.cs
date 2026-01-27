@@ -23,6 +23,17 @@ namespace RDEditorPlus.Util
                 eventControl => propertyControl.GetEventValue(eventControl.levelEvent)?.ToString() == valueString);
         }
 
+        public static bool EqualValueForSelectedEvents(this PropertyControl_Checkbox propertyControl)
+        {
+            if (!InspectorUtil.CanMultiEdit())
+            {
+                return true;
+            }
+
+            bool value = (bool)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
+            return scnEditor.instance.selectedControls.All(eventControl => (bool)propertyControl.GetEventValue(eventControl.levelEvent) == value);
+        }
+
         public static bool EqualValueForSelectedEvents(this PropertyControl_ExpPositionPicker propertyControl, out bool xEqualBetweenEvents, out bool yEqualBetweenEvents)
         {
             xEqualBetweenEvents = true;

@@ -123,6 +123,7 @@ namespace RDEditorPlus.Util
 
         public const float MixedTextAlpha = 0.3f;
         public const float MixedSliderAlpha = 0.5f;
+        public const float MixedCheckboxAlpha = 0.3f;
         public const string DefaultNullText = "--";
         public const string MixedText = "[mixed]";
         public const string MixedTextShorter = "[mix]";
