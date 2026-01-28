@@ -137,5 +137,7 @@ namespace RDEditorPlus.Util
         public const string MixedText = "[mixed]";
         public const string MixedTextShorter = "[mix]";
         public const string MixedTextSliderPercent = "[mix]";
+        public const string MixedTextBar = "mix";
+        public const string MixedTextBeat = "[mix]";
     }
 }
