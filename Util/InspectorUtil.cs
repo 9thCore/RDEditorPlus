@@ -86,11 +86,11 @@ namespace RDEditorPlus.Util
             text.color = Color.black.WithAlpha(MixedTextAlpha);
         }
 
-        public static void SetupMixedPlaceholder(this InputField inputField, string mixedText = null)
+        public static Text SetupMixedPlaceholder(this InputField inputField, string mixedText = null)
         {
             if (inputField.placeholder != null)
             {
-                return;
+                return inputField.placeholder as Text;
             }
 
             RectTransform template = (RectTransform) inputField.textComponent.transform;
@@ -111,6 +111,8 @@ namespace RDEditorPlus.Util
             inputField.placeholder = text;
 
             instance.SetActive(true);
+
+            return text;
         }
 
         public static bool AcceptsNull(this PropertyControl_InputField propertyControl)
