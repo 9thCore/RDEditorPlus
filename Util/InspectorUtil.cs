@@ -47,6 +47,13 @@ namespace RDEditorPlus.Util
 
             // Check if all events are of the same type
             LevelEventType type = levelEvent.type;
+
+            // not bothering with this lol
+            if (type == LevelEventType.AddOneshotBeat)
+            {
+                return false;
+            }
+
             if (!selectedControls.All(control => control.levelEvent.type == type))
             {
                 return false;
