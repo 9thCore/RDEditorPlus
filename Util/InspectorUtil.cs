@@ -139,5 +139,10 @@ namespace RDEditorPlus.Util
         public const string MixedTextSliderPercent = "[mix]";
         public const string MixedTextBar = "mix";
         public const string MixedTextBeat = "[mix]";
+
+        public static readonly Color ConditionalNormalColor = new(4f / 255f, 1f, 1f);
+        public static readonly Color ConditionalNegatedColor = new(1f, 4f / 255f, 4f / 255f);
+        public static readonly Color ConditionalMixedColor = new(1f, 1f, 4f / 255f);
+        public static readonly Color ConditionalUnusedColor = new(1f, 1f, 1f);
     }
 }

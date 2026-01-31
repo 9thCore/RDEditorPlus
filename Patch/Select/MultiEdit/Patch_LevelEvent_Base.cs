@@ -2,6 +2,7 @@
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System.Diagnostics;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
@@ -47,6 +48,34 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     PropertyStorage.Instance.UnmarkAll();
                 }
             }
+        }
+
+        [HarmonyPatch(typeof(LevelEvent_Base), nameof(LevelEvent_Base.SetConditional))]
+        private static class SetConditional
+        {
+            private static void Postfix(LevelEvent_Base __instance, int conditionalId, string gid, bool? state)
+            {
+                if (calling
+                    || !InspectorUtil.CanMultiEdit())
+                {
+                    return;
+                }
+
+                calling = true;
+
+                foreach (LevelEventControl_Base eventControl in scnEditor.instance.eventControls)
+                {
+                    if (eventControl.levelEvent != __instance)
+                    {
+                        eventControl.levelEvent.SetConditional(conditionalId, gid, state);
+                        eventControl.UpdateUIInternal();
+                    }
+                }
+
+                calling = false;
+            }
+
+            private static bool calling = false;
         }
     }
 }
