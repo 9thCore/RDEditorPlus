@@ -25,11 +25,19 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     using (new SaveStateScope(clearRedo: true, skipSaving: false, skipTimelinePos: false))
                     {
                         InspectorPanel panel = __instance.inspectorPanel;
+                        bool setRow = panel.levelEventInfo.showsRowControl && PropertyStorage.Instance.rowChanged;
+                        int row = panel.row.dropdown.value + panel.levelEventInfo.attribute.defaultRow;
+
                         foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                         {
                             if (!eventControl.levelEvent.isBaseEvent)
                             {
-                                panel.Save(eventControl.levelEvent, isNew: true);
+                                if (setRow)
+                                {
+                                    eventControl.levelEvent.row = row;
+                                }
+
+                                panel.SaveProperties(eventControl.levelEvent);
                                 eventControl.UpdateUI();
                             }
                         }

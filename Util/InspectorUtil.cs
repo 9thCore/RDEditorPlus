@@ -130,6 +130,24 @@ namespace RDEditorPlus.Util
             return scnEditor.instance.selectedControls.All(eventControl => nullablePropertyInfo.propertyInfo.GetValue(eventControl.levelEvent) != null);
         }
 
+        public static bool RowEqualValueForSelectedEvents(this InspectorPanel panel)
+        {
+            if (!CanMultiEdit())
+            {
+                return true;
+            }
+
+            LevelEventInfo info = panel.levelEventInfo;
+
+            if (!info.showsRowControl)
+            {
+                return true;
+            }
+
+            int row = scnEditor.instance.selectedControls[0].levelEvent.row;
+            return scnEditor.instance.selectedControls.All(control => control.levelEvent.row == row);
+        }
+
         public const float MixedTextAlpha = 0.3f;
         public const float MixedSliderAlpha = 0.5f;
         public const float MixedCheckboxAlpha = 0.3f;

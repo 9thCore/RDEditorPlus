@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.Components;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
@@ -81,6 +82,31 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             private static void Prefix()
             {
                 PropertyStorage.Instance.UnmarkAll();
+            }
+        }
+
+        [HarmonyPatch(typeof(InspectorPanel), nameof(InspectorPanel.AwakeAuto))]
+        private static class AwakeAuto
+        {
+            private static void Postfix(InspectorPanel __instance)
+            {
+                if (__instance.levelEventInfo.showsRowControl)
+                {
+                    RowCustomDropdown customDropdown = __instance.row.dropdown.ReplaceWithDerivative<RowCustomDropdown>();
+                    __instance.row.dropdown = customDropdown;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(InspectorPanel), nameof(InspectorPanel.UpdateUIAuto))]
+        private static class UpdateUIAuto
+        {
+            private static void Postfix(InspectorPanel __instance)
+            {
+                if (!__instance.RowEqualValueForSelectedEvents())
+                {
+                    __instance.row.dropdown.captionText.text = InspectorUtil.MixedText;
+                }
             }
         }
     }

@@ -19,6 +19,7 @@ namespace RDEditorPlus.ExtraData
 
         public void UnmarkAll()
         {
+            rowChanged = false;
             changedProperties.Clear();
         }
 
@@ -31,6 +32,8 @@ namespace RDEditorPlus.ExtraData
         {
             return changedProperties.Contains(property);
         }
+
+        public bool rowChanged = false;
 
         private readonly HashSet<Property> changedProperties = new();
     }
