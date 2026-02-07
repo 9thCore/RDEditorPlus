@@ -16,11 +16,6 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static bool Prefix(Property __instance, LevelEvent_Base levelEvent)
             {
-                if (!PluginConfig.SelectionMultiEditEnabled)
-                {
-                    return true;
-                }
-
                 if (PropertyStorage.Instance.HasChanged(__instance))
                 {
                     Plugin.LogInfo($"(Save) Detected change: {__instance.gameObject}");
@@ -38,11 +33,6 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static void ILManipulator(ILContext il)
             {
-                if (!PluginConfig.SelectionMultiEditEnabled)
-                {
-                    return;
-                }
-
                 MethodInfo delegateInjector = typeof(Create).GetMethod(nameof(InjectDelegate), BindingFlags.NonPublic | BindingFlags.Static);
 
                 ILCursor cursor = new(il);
