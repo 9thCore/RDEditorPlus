@@ -19,9 +19,7 @@ namespace RDEditorPlus.Functionality.Components
         {
             DropdownItem item = base.CreateItem(itemTemplate);
 
-            Property property = GetComponentInParent<Property>();
-            if (property != null
-                && !property.control.EqualValueForSelectedEvents())
+            if (!IsOfEqualValue)
             {
                 int valueClearlyDifferentFromIndex = (itemIndex == 0) ? 1 : 0;
                 item.toggle.onValueChanged.AddListener(_ =>
@@ -44,9 +42,7 @@ namespace RDEditorPlus.Functionality.Components
         {
             GameObject blocker = base.CreateBlocker(rootCanvas);
 
-            Property property = GetComponentInParent<Property>();
-            if (property != null
-                && !property.control.EqualValueForSelectedEvents())
+            if (!IsOfEqualValue)
             {
                 captionText.text = InspectorUtil.MixedText;
 
@@ -59,6 +55,8 @@ namespace RDEditorPlus.Functionality.Components
             currentlyCreatingDropdown = false;
             return blocker;
         }
+
+        protected virtual bool IsOfEqualValue => !transform.parent.TryGetComponent(out Property property) || property.control.EqualValueForSelectedEvents();
 
         private bool currentlyCreatingDropdown;
         private int itemIndex;

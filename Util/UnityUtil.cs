@@ -80,5 +80,17 @@ namespace RDEditorPlus.Util
         {
             slider.SetValueWithoutNotify(Mathf.Lerp(slider.minValue, slider.maxValue, normalizedValue));
         }
+
+        public static bool TryGetComponentInParent<T>(this GameObject gameObject, out T result) where T : Component
+        {
+            result = gameObject.GetComponentInParent<T>();
+            return result != null;
+        }
+
+        public static bool TryGetComponentInParent<T>(this Component component, out T result) where T : Component
+        {
+            result = component.GetComponentInParent<T>();
+            return result != null;
+        }
     }
 }
