@@ -34,6 +34,7 @@ namespace RDEditorPlus.ExtraData
         }
 
         public bool rowChanged = false;
+        public bool skipUpdatingPropertyUI = false;
 
         private readonly HashSet<Property> changedProperties = new();
     }

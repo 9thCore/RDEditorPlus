@@ -24,6 +24,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     using (new SaveStateScope(clearRedo: true, skipSaving: false, skipTimelinePos: false))
                     {
+                        PropertyStorage.Instance.skipUpdatingPropertyUI = true;
+
                         InspectorPanel panel = __instance.inspectorPanel;
                         bool setRow = panel.levelEventInfo.showsRowControl && PropertyStorage.Instance.rowChanged;
                         int row = setRow ? panel.row.dropdown.value + panel.levelEventInfo.attribute.defaultRow : 0;
@@ -43,6 +45,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         }
 
                         PropertyStorage.Instance.UnmarkAll();
+                        PropertyStorage.Instance.skipUpdatingPropertyUI = false;
+                        panel.UpdateUI(scnEditor.instance.selectedControls[0].levelEvent);
                     }
                 }
 

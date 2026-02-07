@@ -11,6 +11,15 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_Property
     {
+        [HarmonyPatch(typeof(Property), nameof(Property.UpdateUI))]
+        private static class UpdateUI
+        {
+            private static bool Prefix()
+            {
+                return PropertyStorage.Instance.skipUpdatingPropertyUI == false;
+            }
+        }
+
         [HarmonyPatch(typeof(Property), nameof(Property.Save))]
         private static class Save
         {
