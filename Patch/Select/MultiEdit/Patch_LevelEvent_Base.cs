@@ -26,7 +26,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     {
                         InspectorPanel panel = __instance.inspectorPanel;
                         bool setRow = panel.levelEventInfo.showsRowControl && PropertyStorage.Instance.rowChanged;
-                        int row = panel.row.dropdown.value + panel.levelEventInfo.attribute.defaultRow;
+                        int row = setRow ? panel.row.dropdown.value + panel.levelEventInfo.attribute.defaultRow : 0;
 
                         foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                         {
