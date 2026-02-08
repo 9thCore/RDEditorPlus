@@ -56,7 +56,8 @@ namespace RDEditorPlus.Functionality.Components
             return blocker;
         }
 
-        protected virtual bool IsOfEqualValue => !transform.parent.TryGetComponent(out Property property) || property.control.EqualValueForSelectedEvents();
+        protected virtual bool IsOfEqualValue => !this.TryGetComponentInParent(out Property property)
+            || property.control.EqualValueForSelectedEvents();
 
         private bool currentlyCreatingDropdown;
         private int itemIndex;
