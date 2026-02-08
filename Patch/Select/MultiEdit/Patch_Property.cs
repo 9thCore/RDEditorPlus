@@ -2,6 +2,7 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Reflection;
@@ -25,6 +26,11 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static bool Prefix(Property __instance, LevelEvent_Base levelEvent)
             {
+                if (scnEditor.instance.selectedControls.Count <= 1)
+                {
+                    return true;
+                }
+
                 if (PropertyStorage.Instance.HasChanged(__instance))
                 {
                     Plugin.LogInfo($"(Save) Detected change: {__instance.gameObject}");
@@ -91,8 +97,12 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             {
                 return (Action extraActions, string sound = null, string group = null) =>
                 {
-                    Plugin.LogInfo($"(Delegate) Detected change: {property.gameObject}");
-                    PropertyStorage.Instance.MarkChanged(property);
+                    if (InspectorUtil.CanMultiEdit())
+                    {
+                        Plugin.LogInfo($"(Delegate) Detected change: {property.gameObject}");
+                        PropertyStorage.Instance.MarkChanged(property);
+                    }
+
                     action(extraActions, sound, group);
                 };
             }
