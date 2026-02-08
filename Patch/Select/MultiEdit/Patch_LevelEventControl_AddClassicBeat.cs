@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
@@ -10,7 +11,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static void Postfix(LevelEventControl_AddClassicBeat __instance, bool show)
             {
-                if (callingMethodForEveryoneElse)
+                if (!InspectorUtil.CanMultiEdit()
+                    || callingMethodForEveryoneElse)
                 {
                     return;
                 }
