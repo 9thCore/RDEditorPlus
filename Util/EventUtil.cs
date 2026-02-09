@@ -1,5 +1,8 @@
 ﻿using RDLevelEditor;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.UI;
 
 namespace RDEditorPlus.Util
 {
@@ -95,6 +98,26 @@ namespace RDEditorPlus.Util
             while (eventControl.container.Remove(eventControl)) ;
             eventControl.levelEvent.row = row;
             eventControl.container.Add(eventControl);
+        }
+
+        public static void UpdateVFXPresetDropdown()
+        {
+            InspectorPanel_SetVFXPreset panel = scnEditor.instance.inspectorPanelManager.Get<InspectorPanel_SetVFXPreset>();
+
+            PropertyControl_Dropdown control = panel.properties
+                .Select(property => property.control as PropertyControl_Dropdown)
+                .Where(control => control != null)
+                .First();
+
+            InspectorPanel_SetVFXPreset.UpdatePresetsToDisplay();
+            control.SetDropdownOptions(InspectorPanel_SetVFXPreset.displayedPresets, localize: true);
+
+            foreach (RDThemeFX preset in InspectorPanel_SetVFXPreset.legacyPresetsInLevel)
+            {
+                int index = Array.IndexOf(InspectorPanel_SetVFXPreset.displayedPresets, preset);
+                Dropdown.OptionData optionData = control.dropdown.options[index];
+                optionData.text = "<color=#8b0000>" + optionData.text + "</color>";
+            }
         }
     }
 }

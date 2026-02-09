@@ -8,6 +8,16 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_scnEditor
     {
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Start))]
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.DecodeData))]
+        private static class _Start_DecodeData_
+        {
+            private static void Postfix()
+            {
+                EventUtil.UpdateVFXPresetDropdown();
+            }
+        }
+
         [HarmonyPatch(typeof(scnEditor), $"get_{nameof(scnEditor.selectedControl)}")]
         private static class getSelectedControl
         {
