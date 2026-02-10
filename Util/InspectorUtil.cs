@@ -1,6 +1,5 @@
 ﻿using RDLevelEditor;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,27 +53,9 @@ namespace RDEditorPlus.Util
                 return false;
             }
 
-            if (!selectedControls.All(control => control.levelEvent.type == type))
+            if (!selectedControls.All(control => !control.levelEvent.isBaseEvent && control.levelEvent.type == type))
             {
                 return false;
-            }
-
-            // Check if all properties which need enabling are enabled or disabled for all events in common
-            // Still unsure about this, I might end up going for specific checks for each event type in particular
-            ImmutableList<BasePropertyInfo> properties = levelEvent.info.propertiesInfo;
-            foreach (LevelEventControl_Base control in selectedControls)
-            {
-                LevelEvent_Base secondLevelEvent = control.levelEvent;
-                if (secondLevelEvent == levelEvent)
-                {
-                    continue;
-                }
-
-                if (properties.Any(property => property.enableIf != null &&
-                property.enableIf(levelEvent) != property.enableIf(secondLevelEvent)))
-                {
-                    return false;
-                }
             }
 
             return true;
