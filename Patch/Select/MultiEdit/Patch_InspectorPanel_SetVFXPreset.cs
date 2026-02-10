@@ -2,7 +2,6 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RDLevelEditor;
-using System;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
