@@ -5,6 +5,7 @@ using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -105,6 +106,33 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                     action(extraActions, sound, group);
                 };
+            }
+        }
+
+        [HarmonyPatch(typeof(Property), nameof(Property.UpdateControlVisibility))]
+        private static class UpdateControlVisibility
+        {
+            private static void ILManipulator(ILContext il)
+            {
+                ILCursor cursor = new(il);
+
+                cursor
+                    .GotoNext(MoveType.After, instruction => instruction.MatchStloc(0))
+                    .Emit(OpCodes.Ldloc_0)
+                    .Emit(OpCodes.Ldarg_0)
+                    .EmitDelegate((bool flag, Property property) =>
+                    {
+                        if (!InspectorUtil.CanMultiEdit())
+                        {
+                            return flag;
+                        }
+
+                        var enableIf = property.propertyInfo.enableIf;
+                        return enableIf == null || scnEditor.instance.selectedControls.All(ec => enableIf(ec.levelEvent));
+                    });
+
+                cursor
+                    .Emit(OpCodes.Stloc_0);
             }
         }
     }
