@@ -52,6 +52,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 string beat = eventControl.beat.ToString();
 
                 InspectorPanel panel = eventControl.levelEvent.inspectorPanel;
+                panel.UpdateUIProperties(scnEditor.instance.selectedControls[0].levelEvent);
 
                 if (scnEditor.instance.selectedControls.Any(eventControl => eventControl.bar != bar))
                 {
