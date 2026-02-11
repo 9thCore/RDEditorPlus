@@ -1,7 +1,12 @@
 ﻿using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using RDEditorPlus.Util;
 using RDLevelEditor;
+using System;
+using System.Reflection;
+using System.Text;
+using UnityEngine;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
@@ -12,6 +17,9 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         {
             private static void ILManipulator(ILContext il)
             {
+                const int bloomVFXIndex = (int)RDThemeFX.Bloom;
+                const byte inputFieldPropertyLocalIndex = 8;
+
                 ILCursor cursor = new(il);
 
                 cursor.GotoNext(
@@ -26,6 +34,69 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     .GotoPrev(instruction => instruction.MatchLdstr("preset"))
                     .GotoNext(MoveType.Before, instruction => instruction.MatchLdloc(2))
                     .Emit(OpCodes.Br, label);
+
+                ILLabel label2 = null;
+                cursor
+                    .GotoNext(instruction => instruction.MatchLdcI4(bloomVFXIndex))
+                    .GotoNext(instruction => instruction.MatchBneUn(out label2))
+                    .GotoNext(MoveType.Before, instruction => instruction.MatchStloc(inputFieldPropertyLocalIndex))
+                    .EmitDelegate((PropertyControl_InputField inputField) =>
+                    {
+                        inputField.parentProperty.UpdateUI(scnEditor.instance.selectedControls[0].levelEvent);
+                    });
+
+                cursor
+                    .Emit(OpCodes.Br, label2);
+            }
+        }
+
+        [HarmonyPatch(typeof(InspectorPanel_SetVFXPreset), nameof(InspectorPanel_SetVFXPreset.SaveProperties))]
+        private static class SaveProperties
+        {
+            private static void ILManipulator(ILContext il)
+            {
+                const int bloomVFXIndex = (int)RDThemeFX.Bloom;
+                const byte inputFieldPropertyLocalIndex = 7;
+
+                ILCursor cursor = new(il);
+
+                ILLabel skipLabel = null;
+                cursor
+                    .GotoNext(instruction => instruction.MatchLdcI4(bloomVFXIndex))
+                    .GotoNext(instruction => instruction.MatchBneUn(out skipLabel))
+                    .GotoNext(MoveType.Before, instruction => instruction.MatchStloc(inputFieldPropertyLocalIndex))
+                    .EmitDelegate((PropertyControl_InputField inputField) =>
+                    {
+                        if (float.TryParse(inputField.inputField.text, out float value))
+                        {
+                            inputField.inputField.text = value.ToString();
+
+                            foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
+                            {
+                                if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent)
+                                {
+                                    vfxEvent.intensity = Mathf.Clamp(value, -5f, 5f);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
+                            {
+                                if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent)
+                                {
+                                    float x = vfxEvent.intensity;
+
+                                    vfxEvent.intensity = Mathf.Clamp(vfxEvent.intensity, -5f, 5f);
+                                }
+                            }
+                        }
+
+                        inputField.UpdateUI(scnEditor.instance.selectedControls[0].levelEvent);
+                    });
+
+                cursor
+                    .Emit(OpCodes.Br, skipLabel);
             }
         }
     }
