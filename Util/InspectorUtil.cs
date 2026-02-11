@@ -53,7 +53,7 @@ namespace RDEditorPlus.Util
                 return false;
             }
 
-            if (!selectedControls.All(control => !control.levelEvent.isBaseEvent && control.levelEvent.type == type))
+            if (selectedControls.Any(control => control.levelEvent.isBaseEvent || control.levelEvent.type != type))
             {
                 return false;
             }
