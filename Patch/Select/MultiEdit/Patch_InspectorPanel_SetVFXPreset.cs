@@ -65,13 +65,14 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     {
                         if (float.TryParse(inputField.inputField.text, out float value))
                         {
+                            float clamped = Mathf.Clamp(value, -5f, 5f);
                             inputField.inputField.text = value.ToString();
 
                             foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                             {
                                 if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent)
                                 {
-                                    vfxEvent.intensity = Mathf.Clamp(value, -5f, 5f);
+                                    vfxEvent.intensity = vfxEvent.preset == RDThemeFX.Bloom ? clamped : value;
                                 }
                             }
                         }
@@ -79,10 +80,9 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         {
                             foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                             {
-                                if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent)
+                                if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent
+                                && vfxEvent.preset == RDThemeFX.Bloom)
                                 {
-                                    float x = vfxEvent.intensity;
-
                                     vfxEvent.intensity = Mathf.Clamp(vfxEvent.intensity, -5f, 5f);
                                 }
                             }
