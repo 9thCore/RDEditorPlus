@@ -144,5 +144,9 @@ namespace RDEditorPlus.Util
         public static readonly Color ConditionalNegatedColor = new(1f, 4f / 255f, 4f / 255f);
         public static readonly Color ConditionalMixedColor = new(1f, 1f, 4f / 255f);
         public static readonly Color ConditionalUnusedColor = new(1f, 1f, 1f);
+
+        public static readonly Color RoomUnusedColor = "5B5B5BFF".HexToColor();
+        public static Color RoomUsedColor => RDConstants.data.colorPalette[3];
+        public static Color RoomHalfUsedColor => Color.Lerp(RoomUnusedColor, RoomUsedColor, 0.5f);
     }
 }
