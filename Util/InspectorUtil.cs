@@ -48,7 +48,8 @@ namespace RDEditorPlus.Util
             LevelEventType type = levelEvent.type;
 
             // not bothering with this lol
-            if (type == LevelEventType.AddOneshotBeat)
+            if (type == LevelEventType.AddOneshotBeat
+                || levelEvent.defaultTab == Tab.Song)
             {
                 return false;
             }
