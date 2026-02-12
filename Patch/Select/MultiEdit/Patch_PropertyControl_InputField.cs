@@ -22,14 +22,21 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     __instance.inputField.onValueChanged.AddListener(text =>
                     {
-                        ResetPlaceholder(__instance, text);
+                        if (__instance.EqualValueForSelectedEvents())
+                        {
+                            ResetPlaceholder(__instance, text);
+                        }
                     });
                 }
 
                 __instance.inputField.onEndEdit.AddListener(text =>
                 {
                     inputField.selected = false;
-                    ResetPlaceholder(__instance, text);
+
+                    if (__instance.EqualValueForSelectedEvents())
+                    {
+                        ResetPlaceholder(__instance, text);
+                    }
                 });
             }
         }
