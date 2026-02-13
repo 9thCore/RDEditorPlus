@@ -1,4 +1,5 @@
 ﻿using RDLevelEditor;
+using System;
 using System.Linq;
 
 namespace RDEditorPlus.Util
@@ -120,5 +121,35 @@ namespace RDEditorPlus.Util
             return scnEditor.instance.selectedControls.Select(control => (ColorOrPalette)propertyControl.GetEventValue(control.levelEvent))
                 .All(value2 => value2.paletteIndex == value.paletteIndex && value2.color == value.color);
         }
+
+        public static bool EqualValueForSelectedEvents(this PropertyControl_Image propertyControl)
+        {
+            if (!InspectorUtil.CanMultiEdit())
+            {
+                return true;
+            }
+
+            string[] values = propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent).CastToStringArray();
+
+            if (values == null)
+            {
+                return scnEditor.instance.selectedControls.All(array => array == null);
+            }
+
+            return scnEditor.instance.selectedControls.Select(control => propertyControl.GetEventValue(control.levelEvent).CastToStringArray())
+                .All(value2 => value2 != null && values.SequenceEqual(value2));
+        }
+
+        private static string[] CastToStringArray(this object value)
+        {
+            if (value is not object[] array)
+            {
+                return null;
+            }
+
+            return Array.ConvertAll(array, Converter);
+        }
+
+        private static readonly Converter<object, string> Converter = new(Convert.ToString);
     }
 }
