@@ -107,5 +107,18 @@ namespace RDEditorPlus.Util
 
             return xEqualBetweenEvents && yEqualBetweenEvents;
         }
+
+        public static bool EqualValueForSelectedEvents(this PropertyControl_Color propertyControl)
+        {
+            if (!InspectorUtil.CanMultiEdit())
+            {
+                return true;
+            }
+
+            ColorOrPalette value = (ColorOrPalette)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
+
+            return scnEditor.instance.selectedControls.Select(control => (ColorOrPalette)propertyControl.GetEventValue(control.levelEvent))
+                .All(value2 => value2.paletteIndex == value.paletteIndex && value2.color == value.color);
+        }
     }
 }

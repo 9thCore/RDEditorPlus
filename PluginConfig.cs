@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using RDEditorPlus.ExtraData;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -54,6 +55,12 @@ namespace RDEditorPlus
         public const string PATCH_SELECT_TOGGLE = "Toggle for all selection mod functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_SELECT_MULTI = "Whether the inspector should work with multiple selected events.\n" +
             "All events must be of the same type, and some events may have other conditions.";
+        public const string PATCH_SELECT_MULTI_COLOR = "How the color property should be mixed if it differs between selected events.\n" +
+            "If set to " + nameof(MultiEditColorBehaviour.JustSetToWhite) + ", it will be simply set to white.\n" +
+            "If set to " + nameof(MultiEditColorBehaviour.AverageRGB) + ", it will be the average of all the color's red, green and blue components, while keeping its alpha component 1.\n" +
+            "If set to " + nameof(MultiEditColorBehaviour.AverageRGBA) + ", it will be the average of all the color's red, green, blue and alpha components.\n" +
+            "If set to " + nameof(MultiEditColorBehaviour.AverageHSV) + ", it will be the average of all the color's hue, saturation and value, while keeping its alpha component 1.\n" +
+            "If set to " + nameof(MultiEditColorBehaviour.AverageHSVA) + ", it will be the average of all the color's hue, saturation, value and alpha components.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -73,6 +80,7 @@ namespace RDEditorPlus
 
         public static bool SelectionEnabled => Instance.selection.Value;
         public static bool SelectionMultiEditEnabled => Instance.selectionMultiEdit.Value;
+        public static MultiEditColorBehaviour SelectionMultiEditColorBehaviour => Instance.selectionMultiEditColor.Value;
 
         public readonly ConfigEntry<bool> subRows;
         public readonly ConfigEntry<bool> spriteSubRows;
@@ -92,6 +100,7 @@ namespace RDEditorPlus
 
         public readonly ConfigEntry<bool> selection;
         public readonly ConfigEntry<bool> selectionMultiEdit;
+        public readonly ConfigEntry<MultiEditColorBehaviour> selectionMultiEditColor;
 
         public PluginConfig()
         {
@@ -185,6 +194,12 @@ namespace RDEditorPlus
                 nameof(selectionMultiEdit),
                 false,
                 PATCH_SELECT_MULTI);
+
+            selectionMultiEditColor = config.Bind(
+                CATEGORY_SELECT,
+                nameof(selectionMultiEditColor),
+                MultiEditColorBehaviour.JustSetToWhite,
+                PATCH_SELECT_MULTI_COLOR);
         }
 
         public void Noop()
@@ -213,5 +228,16 @@ namespace RDEditorPlus
             KeepTickLengthOnly,
             ResetToDefault
         }
+
+        public enum MultiEditColorBehaviour
+        {
+            JustSetToWhite = 0,
+            AverageRGB = 2,
+            AverageRGBA = AverageRGB | AverageAlphaFragment,
+            AverageHSV = 4,
+            AverageHSVA = AverageHSV | AverageAlphaFragment
+        }
+
+        public const MultiEditColorBehaviour AverageAlphaFragment = (MultiEditColorBehaviour) 1;
     }
 }
