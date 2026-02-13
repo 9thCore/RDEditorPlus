@@ -3,8 +3,6 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +16,21 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             private static void Postfix(BarBeatPosition __instance)
             {
                 __instance.roomsContainer.transform.Find("overlay").GetComponent<Image>().sprite = RoomUtil.OverlaySprite;
+
+                GameObject template = __instance.evTagRunToggle.graphic.gameObject;
+
+                GameObject clone = GameObject.Instantiate(template);
+                clone.name = InspectorUtil.MixedTagRunButtonGraphic;
+                clone.transform.SetParent(template.transform.parent);
+                clone.transform.localScale = Vector3.one;
+                clone.gameObject.SetActive(false);
+
+                RectTransform transform = clone.transform as RectTransform;
+                RectTransform anchor = template.transform as RectTransform;
+                transform.offsetMin = anchor.offsetMin;
+                transform.offsetMax = anchor.offsetMax;
+
+                clone.GetComponent<Image>().color = Color.white.WithAlpha(InspectorUtil.MixedTagRunButtonAlpha);
             }
         }
 

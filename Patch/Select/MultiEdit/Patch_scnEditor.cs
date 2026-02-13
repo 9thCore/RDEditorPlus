@@ -44,27 +44,11 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     return true;
                 }
 
-                scnEditor.instance.selectedControls[0].ShowDataOnInspector();
+                var control = scnEditor.instance.selectedControls[0];
+                var panel = control.levelEvent.inspectorPanel;
 
-                LevelEventControl_Base eventControl = scnEditor.instance.selectedControls[0];
-
-                int bar = eventControl.bar;
-                string beat = eventControl.beat.ToString();
-
-                InspectorPanel panel = eventControl.levelEvent.inspectorPanel;
-                panel.UpdateUIProperties(scnEditor.instance.selectedControls[0].levelEvent);
-
-                if (scnEditor.instance.selectedControls.Any(eventControl => eventControl.bar != bar))
-                {
-                    ((Text)panel.position.bar.placeholder).text = InspectorUtil.MixedTextBar;
-                    panel.position.bar.text = string.Empty;
-                }
-
-                if (scnEditor.instance.selectedControls.Any(eventControl => eventControl.beat.ToString() != beat))
-                {
-                    ((Text)panel.position.beat.placeholder).text = InspectorUtil.MixedTextBeat;
-                    panel.position.beat.text = string.Empty;
-                }
+                panel.UpdateUIProperties(control.levelEvent);
+                panel.position.MultiEditUpdateUI();
 
                 return false;
             }

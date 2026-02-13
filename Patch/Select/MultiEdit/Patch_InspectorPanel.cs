@@ -1,10 +1,11 @@
 ﻿using HarmonyLib;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Functionality.Components;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -73,6 +74,47 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         }
                     });
                 }
+
+                if (__instance.position.evTag != null)
+                {
+                    InspectorUtil.SetupMixedPlaceholder(__instance.position.evTag).color = Color.white.WithAlpha(InspectorUtil.MixedTextAlpha);
+
+                    __instance.position.evTag.onEndEdit.AddListener(text =>
+                    {
+                        if (!InspectorUtil.CanMultiEdit()
+                        || string.IsNullOrEmpty(text))
+                        {
+                            return;
+                        }
+
+                        __instance.position.evTag.SetTextWithoutNotify(text);
+
+                        ((Text)__instance.position.beat.placeholder).text = string.Empty;
+                        foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
+                        {
+                            eventControl.levelEvent.tag = text;
+                        }
+                    });
+                }
+
+                if (__instance.position.evTagRunToggle != null)
+                {
+                    __instance.position.evTagRunToggle.onValueChanged.AddListener(value =>
+                    {
+                        if (!InspectorUtil.CanMultiEdit())
+                        {
+                            return;
+                        }
+
+                        foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
+                        {
+                            eventControl.levelEvent.tagRunNormally = value;
+                        }
+
+                        __instance.position.MultiEditUpdateUI();
+                        __instance.position.evTagRunToggle.isOn = value;
+                    });
+                }
             }
         }
 
@@ -107,6 +149,25 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     __instance.row.dropdown.captionText.text = InspectorUtil.MixedText;
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(InspectorPanel), nameof(InspectorPanel.UpdateUI))]
+        private static class UpdateUI
+        {
+            private static void ILManipulator(ILContext il)
+            {
+                ILCursor cursor = new(il);
+
+                ILLabel label = null;
+                cursor
+                    .GotoNext(instruction => instruction.MatchLdfld<InspectorPanel>(nameof(InspectorPanel.position)))
+                    .GotoNext(MoveType.After, instruction => instruction.MatchBrfalse(out label))
+                    .Emit(OpCodes.Ldarg_0)
+                    .EmitDelegate(InspectorUtil.TryMultiEditUpdateUI);
+
+                cursor
+                    .Emit(OpCodes.Brfalse, label);
             }
         }
     }
