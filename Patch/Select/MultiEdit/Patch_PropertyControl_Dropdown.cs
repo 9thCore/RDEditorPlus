@@ -30,6 +30,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     return false;
                 }
 
+                __instance.dropdown.RefreshShownValue();
                 return true;
             }
         }
