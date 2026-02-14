@@ -104,6 +104,16 @@ namespace RDEditorPlus.Util
             };
         }
 
+        public static bool EqualValueForSelectedEvents(this PropertyControl_ShowDialogue propertyControl)
+        {
+            if (!InspectorUtil.CanMultiEdit())
+            {
+                return true;
+            }
+
+            return CheckEqual(ev => (string)propertyControl.GetEventValue(ev));
+        }
+
         public enum Component
         {
             X,
