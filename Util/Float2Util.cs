@@ -12,5 +12,15 @@
                 yUsed = yProvider.yUsed
             };
         }
+
+        public static float X(this Float2 float2)
+        {
+            return float2.xUsed ? float2.x : float.NaN;
+        }
+
+        public static float Y(this Float2 float2)
+        {
+            return float2.yUsed ? float2.y : float.NaN;
+        }
     }
 }

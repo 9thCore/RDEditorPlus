@@ -52,8 +52,8 @@ namespace RDEditorPlus.Util
 
             return component switch
             {
-                Component.X => CheckEqual(ev => ((Float2)propertyControl.GetEventValue(ev)).x),
-                Component.Y => CheckEqual(ev => ((Float2)propertyControl.GetEventValue(ev)).y),
+                Component.X => CheckEqual(ev => ((Float2)propertyControl.GetEventValue(ev)).X()),
+                Component.Y => CheckEqual(ev => ((Float2)propertyControl.GetEventValue(ev)).Y()),
                 _ => false
             };
         }
@@ -98,8 +98,8 @@ namespace RDEditorPlus.Util
 
             return component switch
             {
-                Component.X => CheckEqual(ev => ((Float2[])propertyControl.GetEventValue(ev))[index].x),
-                Component.Y => CheckEqual(ev => ((Float2[])propertyControl.GetEventValue(ev))[index].y),
+                Component.X => CheckEqual(ev => ((Float2[])propertyControl.GetEventValue(ev))[index].X()),
+                Component.Y => CheckEqual(ev => ((Float2[])propertyControl.GetEventValue(ev))[index].Y()),
                 _ => false
             };
         }
