@@ -2,7 +2,6 @@
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Diagnostics;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
