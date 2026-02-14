@@ -44,16 +44,12 @@ namespace RDEditorPlus.Util
 
             LevelEvent_Base levelEvent = selectedControls[0].levelEvent;
 
-            // Check if all events are of the same type
-            LevelEventType type = levelEvent.type;
-
-            // not bothering with this lol
-            if (type == LevelEventType.AddOneshotBeat
-                || levelEvent.defaultTab == Tab.Song)
+            if (!levelEvent.inspectorPanel.auto)
             {
                 return false;
             }
 
+            LevelEventType type = levelEvent.type;
             if (selectedControls.Any(control => control.levelEvent.isBaseEvent || control.levelEvent.type != type))
             {
                 return false;
