@@ -8,6 +8,8 @@ namespace RDEditorPlus.Functionality.Components
     // this sucks
     public class CustomDropdown : Dropdown
     {
+        protected virtual void OnSelect() { }
+
         protected override GameObject CreateDropdownList(GameObject template)
         {
             itemIndex = 0;
@@ -30,6 +32,7 @@ namespace RDEditorPlus.Functionality.Components
                     }
 
                     // Ensure the dropdown's value is definitely changed, even if it's the same as before
+                    OnSelect();
                     SetValueWithoutNotify(valueClearlyDifferentFromIndex);
                 });
             }

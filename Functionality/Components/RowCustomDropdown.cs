@@ -1,15 +1,13 @@
 ﻿using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using UnityEngine.EventSystems;
 
 namespace RDEditorPlus.Functionality.Components
 {
     public class RowCustomDropdown : CustomDropdown
     {
-        public override void OnSelect(BaseEventData eventData)
+        protected override void OnSelect()
         {
-            base.OnSelect(eventData);
             PropertyStorage.Instance.rowChanged = true;
         }
 
