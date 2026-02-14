@@ -56,7 +56,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 var control = scnEditor.instance.selectedControls[0];
                 var panel = control.levelEvent.inspectorPanel;
 
-                panel.UpdateUIProperties(control.levelEvent);
+                panel.UpdateUI(control.levelEvent);
                 panel.position.MultiEditUpdateUI();
 
                 return false;
