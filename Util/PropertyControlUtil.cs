@@ -89,6 +89,21 @@ namespace RDEditorPlus.Util
                 .All(value2 => value2 != null && values.SequenceEqual(value2));
         }
 
+        public static bool EqualValueForSelectedEvents(this PropertyControl_SetRoomPerspective propertyControl, int index, Component component)
+        {
+            if (!InspectorUtil.CanMultiEdit())
+            {
+                return true;
+            }
+
+            return component switch
+            {
+                Component.X => CheckEqual(ev => ((Float2[])propertyControl.GetEventValue(ev))[index].x),
+                Component.Y => CheckEqual(ev => ((Float2[])propertyControl.GetEventValue(ev))[index].y),
+                _ => false
+            };
+        }
+
         public enum Component
         {
             X,
