@@ -1,20 +1,29 @@
 ﻿using HarmonyLib;
+using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Linq;
-using UnityEngine.UI;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
     internal static class Patch_scnEditor
     {
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Start))]
-        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.DecodeData))]
-        private static class _Start_DecodeData_
+        private static class Start
         {
             private static void Postfix()
             {
                 EventUtil.UpdateVFXPresetDropdown();
+                PropertyStorage.Instance.UpdateRowPropertyControls();
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.DecodeData))]
+        private static class DecodeData
+        {
+            private static void Postfix()
+            {
+                EventUtil.UpdateVFXPresetDropdown();
+                PropertyStorage.Instance.UpdateRowPropertyControls();
             }
         }
 
@@ -51,6 +60,33 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 panel.position.MultiEditUpdateUI();
 
                 return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.AddNewRow))]
+        private static class AddNewRow
+        {
+            private static void Postfix()
+            {
+                PropertyStorage.Instance.ScheduleRowPropertyControlsUpdate();
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.DeleteRowClick))]
+        private static class DeleteRowClick
+        {
+            private static void Postfix()
+            {
+                PropertyStorage.Instance.UpdateRowPropertyControls();
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.SwapRowPositions))]
+        private static class SwapRowPositions
+        {
+            private static void Postfix()
+            {
+                PropertyStorage.Instance.ScheduleRowPropertyControlsUpdate();
             }
         }
     }
