@@ -14,42 +14,39 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         [HarmonyPatch(typeof(PropertyControl_ExpPositionPicker), nameof(PropertyControl_ExpPositionPicker.UpdateUI))]
         private static class UpdateUI
         {
-            private static bool Prefix(PropertyControl_ExpPositionPicker __instance)
+            private static void Prefix(PropertyControl_ExpPositionPicker __instance, ref bool __runOriginal)
             {
-                if (!__instance.EqualValueForSelectedEvents(out bool x, out bool y))
+                __runOriginal = true;
+
+                if (!__instance.EqualValueForSelectedEvents(PropertyControlUtil.Component.X))
                 {
-                    if (!x)
-                    {
-                        __instance.expPositionPicker.x.text = string.Empty;
-                        PropertyLastXString[__instance] = string.Empty;
-                        ((Text)__instance.expPositionPicker.x.placeholder).text = InspectorUtil.MixedTextShorter;
-                    }
-                    else
-                    {
-                        ((Text)__instance.expPositionPicker.x.placeholder).text = InspectorUtil.DefaultNullText;
-                    }
-
-                    if (!y)
-                    {
-                        __instance.expPositionPicker.y.text = string.Empty;
-                        PropertyLastYString[__instance] = string.Empty;
-                        ((Text)__instance.expPositionPicker.y.placeholder).text = InspectorUtil.MixedTextShorter;
-                    }
-                    else
-                    {
-                        ((Text)__instance.expPositionPicker.y.placeholder).text = InspectorUtil.DefaultNullText;
-                    }
-
-                    return false;
+                    __instance.expPositionPicker.x.text = string.Empty;
+                    PropertyLastXString[__instance] = string.Empty;
+                    ((Text)__instance.expPositionPicker.x.placeholder).text = InspectorUtil.MixedTextShorter;
+                    __runOriginal = false;
+                }
+                else
+                {
+                    ((Text)__instance.expPositionPicker.x.placeholder).text = InspectorUtil.DefaultNullText;
                 }
 
-                ((Text)__instance.expPositionPicker.x.placeholder).text = InspectorUtil.DefaultNullText;
-                ((Text)__instance.expPositionPicker.y.placeholder).text = InspectorUtil.DefaultNullText;
+                if (!__instance.EqualValueForSelectedEvents(PropertyControlUtil.Component.Y))
+                {
+                    __instance.expPositionPicker.y.text = string.Empty;
+                    PropertyLastYString[__instance] = string.Empty;
+                    ((Text)__instance.expPositionPicker.y.placeholder).text = InspectorUtil.MixedTextShorter;
+                    __runOriginal = false;
+                }
+                else
+                {
+                    ((Text)__instance.expPositionPicker.y.placeholder).text = InspectorUtil.DefaultNullText;
+                }
 
-                PropertyLastXString[__instance] = __instance.expPositionPicker.x.text;
-                PropertyLastYString[__instance] = __instance.expPositionPicker.y.text;
-
-                return true;
+                if (__runOriginal)
+                {
+                    PropertyLastXString[__instance] = __instance.expPositionPicker.x.text;
+                    PropertyLastYString[__instance] = __instance.expPositionPicker.y.text;
+                }
             }
         }
 

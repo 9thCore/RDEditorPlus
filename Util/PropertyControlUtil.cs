@@ -1,5 +1,7 @@
 ﻿using RDLevelEditor;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace RDEditorPlus.Util
@@ -13,15 +15,7 @@ namespace RDEditorPlus.Util
                 return true;
             }
 
-            //object value = propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
-            //return scnEditor.instance.selectedControls.All(eventControl => propertyControl.GetEventValue(eventControl.levelEvent) == value);
-
-            // I'm aware stringifying everything isn't too great, but I'll swap this out later if needed
-            object value = propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
-            string valueString = value?.ToString();
-
-            return scnEditor.instance.selectedControls.All(
-                eventControl => propertyControl.GetEventValue(eventControl.levelEvent)?.ToString() == valueString);
+            return CheckEqual(ev => propertyControl.GetEventValue(ev)?.ToString());
         }
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_Checkbox propertyControl)
@@ -31,82 +25,37 @@ namespace RDEditorPlus.Util
                 return true;
             }
 
-            bool value = (bool)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
-            return scnEditor.instance.selectedControls.All(eventControl => (bool)propertyControl.GetEventValue(eventControl.levelEvent) == value);
+            return CheckEqual(ev => (bool)propertyControl.GetEventValue(ev));
         }
 
-        public static bool EqualValueForSelectedEvents(this PropertyControl_ExpPositionPicker propertyControl, out bool xEqualBetweenEvents, out bool yEqualBetweenEvents)
+        public static bool EqualValueForSelectedEvents(this PropertyControl_ExpPositionPicker propertyControl, Component component)
         {
-            xEqualBetweenEvents = true;
-            yEqualBetweenEvents = true;
-
             if (!InspectorUtil.CanMultiEdit())
             {
                 return true;
             }
 
-            FloatExpression2 expression = (FloatExpression2)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
-
-            for (int i = 1; i < scnEditor.instance.selectedControls.Count; i++)
+            return component switch
             {
-                LevelEventControl_Base eventControl = scnEditor.instance.selectedControls[i];
-
-                FloatExpression2 expression2 = (FloatExpression2)propertyControl.GetEventValue(eventControl.levelEvent);
-
-                if (!expression.x.Equal(expression2.x))
-                {
-                    xEqualBetweenEvents = false;
-                }
-
-                if (!expression.y.Equal(expression2.y))
-                {
-                    yEqualBetweenEvents = false;
-                }
-
-                if (!xEqualBetweenEvents && !yEqualBetweenEvents)
-                {
-                    return false;
-                }
-            }
-
-            return xEqualBetweenEvents && yEqualBetweenEvents;
+                Component.X => CheckEqual(ev => ((FloatExpression2)propertyControl.GetEventValue(ev)).x),
+                Component.Y => CheckEqual(ev => ((FloatExpression2)propertyControl.GetEventValue(ev)).y),
+                _ => false
+            };
         }
 
-        public static bool EqualValueForSelectedEvents(this PropertyControl_PositionPicker propertyControl, out bool xEqualBetweenEvents, out bool yEqualBetweenEvents)
+        public static bool EqualValueForSelectedEvents(this PropertyControl_PositionPicker propertyControl, Component component)
         {
-            xEqualBetweenEvents = true;
-            yEqualBetweenEvents = true;
-
             if (!InspectorUtil.CanMultiEdit())
             {
                 return true;
             }
 
-            Float2 value = (Float2)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
-
-            for (int i = 1; i < scnEditor.instance.selectedControls.Count; i++)
+            return component switch
             {
-                LevelEventControl_Base eventControl = scnEditor.instance.selectedControls[i];
-
-                Float2 value2 = (Float2)propertyControl.GetEventValue(eventControl.levelEvent);
-
-                if (value.x != value2.x)
-                {
-                    xEqualBetweenEvents = false;
-                }
-
-                if (value.y != value2.y)
-                {
-                    yEqualBetweenEvents = false;
-                }
-
-                if (!xEqualBetweenEvents && !yEqualBetweenEvents)
-                {
-                    return false;
-                }
-            }
-
-            return xEqualBetweenEvents && yEqualBetweenEvents;
+                Component.X => CheckEqual(ev => ((Float2)propertyControl.GetEventValue(ev)).x),
+                Component.Y => CheckEqual(ev => ((Float2)propertyControl.GetEventValue(ev)).y),
+                _ => false
+            };
         }
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_Color propertyControl)
@@ -138,6 +87,24 @@ namespace RDEditorPlus.Util
 
             return scnEditor.instance.selectedControls.Select(control => propertyControl.GetEventValue(control.levelEvent).CastToStringArray())
                 .All(value2 => value2 != null && values.SequenceEqual(value2));
+        }
+
+        public enum Component
+        {
+            X,
+            Y
+        }
+
+        private static bool CheckEqual<T>(Func<LevelEvent_Base, T> getter)
+        {
+            T value = getter(scnEditor.instance.selectedControls[0].levelEvent);
+
+            if (value == null)
+            {
+                return scnEditor.instance.selectedControls.All(control => getter(control.levelEvent) == null);
+            }
+
+            return scnEditor.instance.selectedControls.All(control => value.Equals(getter(control.levelEvent)));
         }
 
         private static string[] CastToStringArray(this object value)
