@@ -3,6 +3,14 @@ BepInEx 5 Rhythm Doctor mod that aims to expand the level editor with Quality of
 
 Features:  
 - Adds experimental multiple row support to the patient, decoration, room and window tabs (disabled by default, as there's high chance of incompatibility with other mods)
+- Adds a way to automatically download and autocomplete the community-selected custom methods, now almost obsolete though ever since the beta
+- Adds a way to switch row beats from oneshot to classic, and vice-versa. Compatible with the feature below
+- Adds experimental multi-edit support to almost every event. This has a few conditions applied:
+	- All the selected events must be of the same type, because trying to reason about with different types would only prove to be a mess
+	- The events must not be part of the Audio tab (I don't see why you'd have a need to multi-edit here in the first place...)
+	- The events must be on the new UI system - in other words, the events must not be one of: ChangePlayersRows, FloatingText, AdvanceText, AddOneshotBeat (because I don't want to handle them individually)
+	- The events must, also, not be one of ReorderRooms, ReorderWindows, ShowRooms, because there isn't a feasible way to do the first two... and I got lazy for the third
+	- Under any other conditions, the events should be editable intuitively
 
 Installation:  
 - [Install BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html) (Any 5.4.* should work just fine, even latest)
