@@ -8,31 +8,16 @@ namespace RDEditorPlus.Util
     {
         public static bool EqualValueForSelectedEvents(this PropertyControl propertyControl)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
-
             return CheckEqual(ev => propertyControl.GetEventValue(ev)?.ToString());
         }
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_Checkbox propertyControl)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
-
             return CheckEqual(ev => (bool)propertyControl.GetEventValue(ev));
         }
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_ExpPositionPicker propertyControl, Component component)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
-
             return component switch
             {
                 Component.X => CheckEqual(ev => ((FloatExpression2)propertyControl.GetEventValue(ev)).x),
@@ -43,11 +28,6 @@ namespace RDEditorPlus.Util
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_PositionPicker propertyControl, Component component)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
-
             return component switch
             {
                 Component.X => CheckEqual(ev => ((Float2)propertyControl.GetEventValue(ev)).X()),
@@ -58,11 +38,6 @@ namespace RDEditorPlus.Util
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_Color propertyControl)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
-
             ColorOrPalette value = (ColorOrPalette)propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent);
 
             return scnEditor.instance.selectedControls.Select(control => (ColorOrPalette)propertyControl.GetEventValue(control.levelEvent))
@@ -71,11 +46,6 @@ namespace RDEditorPlus.Util
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_Image propertyControl)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
-
             string[] values = propertyControl.GetEventValue(scnEditor.instance.selectedControls[0].levelEvent).CastToStringArray();
 
             if (values == null)
@@ -89,11 +59,6 @@ namespace RDEditorPlus.Util
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_SetRoomPerspective propertyControl, int index, Component component)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
-
             return component switch
             {
                 Component.X => CheckEqual(ev => ((Float2[])propertyControl.GetEventValue(ev))[index].X()),
@@ -104,10 +69,6 @@ namespace RDEditorPlus.Util
 
         public static bool EqualValueForSelectedEvents(this PropertyControl_ShowDialogue propertyControl)
         {
-            if (!InspectorUtil.CanMultiEdit())
-            {
-                return true;
-            }
             return CheckEqual(ev => (string)propertyControl.GetEventValue(ev));
         }
 
