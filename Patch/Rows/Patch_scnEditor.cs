@@ -89,7 +89,7 @@ namespace RDEditorPlus.Patch.Rows
                         if (keepTotalBeatLength)
                         {
                             float baseLength = levelEvent.tick * (levelEvent.GetLength() - 1);
-                            float synco = ((LevelEventControl_AddClassicBeat)control).syncoOffset;
+                            float synco = ((LevelEventControl_AddClassicBeat)control).syncoOffset * levelEvent.tick;
 
                             lengths[index++] = baseLength + synco;
                         }
