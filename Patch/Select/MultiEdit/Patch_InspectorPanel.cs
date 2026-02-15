@@ -168,6 +168,13 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                 cursor
                     .Emit(OpCodes.Brfalse, label);
+
+                cursor
+                    .GotoNext(MoveType.Before, instruction => instruction.MatchCall<InspectorPanel>(nameof(InspectorPanel.UpdateLevelEventHeight)))
+                    .EmitDelegate(() => PropertyStorage.Instance.scrollToTopOnUpdate);
+
+                cursor
+                    .Emit(OpCodes.And);
             }
         }
     }

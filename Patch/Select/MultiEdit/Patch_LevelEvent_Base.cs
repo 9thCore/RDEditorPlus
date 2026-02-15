@@ -45,7 +45,10 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                         PropertyStorage.Instance.UnmarkAll();
                         PropertyStorage.Instance.skipUpdatingPropertyUI = false;
+
+                        PropertyStorage.Instance.scrollToTopOnUpdate = false;
                         panel.UpdateUI(scnEditor.instance.selectedControls[0].levelEvent);
+                        PropertyStorage.Instance.scrollToTopOnUpdate = true;
                     }
                 }
 

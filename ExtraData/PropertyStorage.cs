@@ -67,6 +67,7 @@ namespace RDEditorPlus.ExtraData
         public bool colorPropertyEqual = false;
         public bool colorChanged = false;
         public bool skipUpdatingPropertyUI = false;
+        public bool scrollToTopOnUpdate = true;
 
         private readonly List<PropertyControl_Row> rowPropertyControls = new();
         private readonly HashSet<Property> changedProperties = new();
