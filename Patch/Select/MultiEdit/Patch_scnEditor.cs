@@ -2,6 +2,10 @@
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
@@ -88,6 +92,53 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             {
                 PropertyStorage.Instance.ScheduleRowPropertyControlsUpdate();
             }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.SetLevelEventControlType))]
+        private static class SetLevelEventControlType
+        {
+            private static bool Prefix(LevelEventType levelEventType, bool copyRow)
+            {
+                var editor = scnEditor.instance;
+
+                if (editor.filterMode
+                    || editor.selectedControls.Count == 1)
+                {
+                    return true;
+                }
+
+                Type type = GameAssembly.GetType($"RDLevelEditor.LevelEvent_{levelEventType}");
+
+                List<LevelEventControl_Base> newControls = new(editor.selectedControls.Count);
+                List<LevelEventControl_Base> controlListCopy = editor.selectedControls.ToList();
+
+                foreach (var control in controlListCopy)
+                {
+                    LevelEvent_Base newLevelEvent = (LevelEvent_Base)Activator.CreateInstance(type);
+                    newLevelEvent.CopyBasePropertiesFrom(control.levelEvent, copyBarAndBeat: true, copyRow);
+                    newLevelEvent.OnCreate();
+
+                    Tab tab = control.tab;
+                    if (tab == Tab.Sprites && newLevelEvent.type != LevelEventType.None)
+                    {
+                        LevelEvent_MakeSprite levelEvent_MakeSprite = editor.currentPageSpritesData[newLevelEvent.y];
+                        newLevelEvent.target = levelEvent_MakeSprite.spriteId;
+                    }
+
+                    editor.DeleteEventControl(control, false, false);
+                    LevelEventControl_Base newControl = editor.CreateEventControl(newLevelEvent, tab, false);
+                    newControl.UpdateUI();
+
+                    newControls.Add(newControl);
+                }
+
+                editor.UpdateTimelineAccordingToLevelEventType(levelEventType);
+                editor.SelectEventControls(newControls);
+
+                return false;
+            }
+
+            private static readonly Assembly GameAssembly = typeof(scnEditor).Assembly;
         }
     }
 }

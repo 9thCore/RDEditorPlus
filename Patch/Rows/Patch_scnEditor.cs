@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,22 +82,25 @@ namespace RDEditorPlus.Patch.Rows
                     int index = 0;
                     lengths = new float[scnEditor.instance.selectedControls.Count];
 
-                    LevelEvent_AddClassicBeat levelEvent = (LevelEvent_AddClassicBeat) scnEditor.instance.selectedControl.levelEvent;
+                    foreach (var control in scnEditor.instance.selectedControls)
+                    {
+                        LevelEvent_AddClassicBeat levelEvent = (LevelEvent_AddClassicBeat)control.levelEvent;
 
-                    if (keepTotalBeatLength)
-                    {
-                        float baseLength = levelEvent.tick * (levelEvent.GetLength() - 1);
-                        float synco = ((LevelEventControl_AddClassicBeat) scnEditor.instance.selectedControl).syncoOffset;
+                        if (keepTotalBeatLength)
+                        {
+                            float baseLength = levelEvent.tick * (levelEvent.GetLength() - 1);
+                            float synco = ((LevelEventControl_AddClassicBeat)control).syncoOffset;
 
-                        lengths[index++] = baseLength + synco;
-                    }
-                    else if (keepBeatTick)
-                    {
-                        lengths[index++] = levelEvent.tick;
-                    }
-                    else
-                    {
-                        lengths[index++] = 1; // Fallback
+                            lengths[index++] = baseLength + synco;
+                        }
+                        else if (keepBeatTick)
+                        {
+                            lengths[index++] = levelEvent.tick;
+                        }
+                        else
+                        {
+                            lengths[index++] = 1; // Fallback
+                        }
                     }
                 }
 
@@ -104,10 +109,12 @@ namespace RDEditorPlus.Patch.Rows
                 if (doAnyLengthStuff)
                 {
                     int index = 0;
+                    foreach (var control in scnEditor.instance.selectedControls)
+                    {
+                        ((LevelEvent_AddOneshotBeat)control.levelEvent).tick = lengths[index++];
+                    }
 
-                    LevelEvent_AddOneshotBeat levelEvent = (LevelEvent_AddOneshotBeat) scnEditor.instance.selectedControl.levelEvent;
-
-                    levelEvent.tick = lengths[index++];
+                    var levelEvent = scnEditor.instance.selectedControls[0].levelEvent;
                     levelEvent.inspectorPanel.UpdateUI(levelEvent);
                 }
             }
@@ -125,19 +132,22 @@ namespace RDEditorPlus.Patch.Rows
                     int index = 0;
                     lengths = new float[scnEditor.instance.selectedControls.Count];
 
-                    LevelEvent_AddOneshotBeat levelEvent = (LevelEvent_AddOneshotBeat) scnEditor.instance.selectedControl.levelEvent;
+                    foreach (var control in scnEditor.instance.selectedControls)
+                    {
+                        LevelEvent_AddOneshotBeat levelEvent = (LevelEvent_AddOneshotBeat)control.levelEvent;
 
-                    if (keepTotalBeatLength)
-                    {
-                        lengths[index++] = levelEvent.tick + levelEvent.actualDelay;
-                    }
-                    else if (keepBeatTick)
-                    {
-                        lengths[index++] = levelEvent.tick;
-                    }
-                    else
-                    {
-                        lengths[index++] = 1; // Fallback
+                        if (keepTotalBeatLength)
+                        {
+                            lengths[index++] = levelEvent.tick + levelEvent.actualDelay;
+                        }
+                        else if (keepBeatTick)
+                        {
+                            lengths[index++] = levelEvent.tick;
+                        }
+                        else
+                        {
+                            lengths[index++] = 1; // Fallback
+                        }
                     }
                 }
 
@@ -147,18 +157,24 @@ namespace RDEditorPlus.Patch.Rows
                 {
                     int index = 0;
 
-                    LevelEvent_AddClassicBeat levelEvent = (LevelEvent_AddClassicBeat) scnEditor.instance.selectedControl.levelEvent;
-
-                    if (keepTotalBeatLength)
+                    foreach (var control in scnEditor.instance.selectedControls)
                     {
-                        int length = levelEvent.GetLength() - 1;
-                        levelEvent.tick = length == 0 ? 0 : lengths[index++] / (levelEvent.GetLength() - 1);
-                    }
-                    else if (keepBeatTick)
-                    {
-                        levelEvent.tick = lengths[index++];
+                        var cast = (LevelEvent_AddClassicBeat)control.levelEvent;
+
+                        if (keepTotalBeatLength)
+                        {
+                            int length = cast.GetLength() - 1;
+                            cast.tick = length == 0 ? 0 : lengths[index] / length;
+                        }
+                        else if (keepBeatTick)
+                        {
+                            cast.tick = lengths[index];
+                        }
+
+                        index++;
                     }
 
+                    var levelEvent = scnEditor.instance.selectedControls[0].levelEvent;
                     levelEvent.inspectorPanel.UpdateUI(levelEvent);
                 }
             }
