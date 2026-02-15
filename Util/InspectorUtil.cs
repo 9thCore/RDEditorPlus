@@ -50,6 +50,14 @@ namespace RDEditorPlus.Util
             }
 
             LevelEventType type = levelEvent.type;
+
+            // too much of a pain
+            if (type == LevelEventType.ReorderRooms
+                || type == LevelEventType.ReorderWindows)
+            {
+                return false;
+            }
+
             if (selectedControls.Any(control => control.levelEvent.isBaseEvent || control.levelEvent.type != type))
             {
                 return false;
