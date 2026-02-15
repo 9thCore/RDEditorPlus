@@ -45,7 +45,8 @@ namespace RDEditorPlus.Util
 
             LevelEvent_Base levelEvent = selectedControls[0].levelEvent;
 
-            if (!levelEvent.inspectorPanel.auto)
+            if (levelEvent.isBaseEvent
+                || !levelEvent.inspectorPanel.auto)
             {
                 return false;
             }
