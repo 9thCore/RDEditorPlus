@@ -1,7 +1,5 @@
 ﻿using RDLevelEditor;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 namespace RDEditorPlus.Util
@@ -110,8 +108,17 @@ namespace RDEditorPlus.Util
             {
                 return true;
             }
-
             return CheckEqual(ev => (string)propertyControl.GetEventValue(ev));
+        }
+
+        public static bool EqualValueForSelectedEvents(this PropertyControl_CharacterPicker propertyControl)
+        {
+            return CheckEqual(ev => (string)propertyControl.GetEventValue(ev));
+        }
+
+        public static bool EqualCharacterForSelectedEvents()
+        {
+            return CheckEqual(GetCharacter);
         }
 
         public enum Component
@@ -132,6 +139,18 @@ namespace RDEditorPlus.Util
             return scnEditor.instance.selectedControls.All(control => value.Equals(getter(control.levelEvent)));
         }
 
+        private static CharacterOrCustom GetCharacter(LevelEvent_Base levelEvent) => GetCharacter(levelEvent.row);
+        private static CharacterOrCustom GetCharacter(int row)
+        {
+            var rows = scnEditor.instance.rowsData;
+            if (row < 0 || row >= rows.Count)
+            {
+                return new(Character.None);
+            }
+
+            return rows[row].character == Character.Custom ? new(rows[row].customCharacterName) : new(rows[row].character);
+        }
+
         private static string[] CastToStringArray(this object value)
         {
             if (value is not object[] array)
@@ -143,5 +162,45 @@ namespace RDEditorPlus.Util
         }
 
         private static readonly Converter<object, string> Converter = new(Convert.ToString);
+
+        private readonly struct CharacterOrCustom
+        {
+            public readonly Character character;
+            public readonly string customCharacter;
+
+            public bool IsCustom => customCharacter != null;
+
+            public CharacterOrCustom(Character character)
+            {
+                this.character = character;
+                customCharacter = null;
+            }
+
+            public CharacterOrCustom(string customCharacter)
+            {
+                character = default;
+                this.customCharacter = customCharacter;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is CharacterOrCustom that)
+                {
+                    if (IsCustom != that.IsCustom)
+                    {
+                        return false;
+                    }
+
+                    return IsCustom ? customCharacter == that.customCharacter : character == that.character;
+                }
+
+                return base.Equals(obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return (int)character;
+            }
+        }
     }
 }
