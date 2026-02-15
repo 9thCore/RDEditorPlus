@@ -55,7 +55,8 @@ namespace RDEditorPlus.Util
             // too much of a pain
             if (type == LevelEventType.ReorderRooms
                 || type == LevelEventType.ReorderWindows
-                || type == LevelEventType.ShowRooms)
+                || type == LevelEventType.ShowRooms
+                || RDEditorConstants.levelEventTabs[Tab.Song].Contains(type))
             {
                 return false;
             }
