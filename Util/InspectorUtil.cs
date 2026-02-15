@@ -183,6 +183,10 @@ namespace RDEditorPlus.Util
                 ((Text)position.evTag.placeholder).text = MixedTextTag;
                 position.evTag.text = string.Empty;
             }
+            else
+            {
+                ((Text)position.evTag.placeholder).text = string.Empty;
+            }
 
             if (controls.Any(eventControl => eventControl.levelEvent.tagRunNormally != tagRunNormally))
             {

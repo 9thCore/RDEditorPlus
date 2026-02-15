@@ -77,19 +77,18 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                 if (__instance.position.evTag != null)
                 {
-                    InspectorUtil.SetupMixedPlaceholder(__instance.position.evTag).color = Color.white.WithAlpha(InspectorUtil.MixedTextAlpha);
+                    InspectorUtil.SetupMixedPlaceholder(__instance.position.evTag, string.Empty)
+                        .color = Color.white.WithAlpha(InspectorUtil.MixedTextAlpha);
 
                     __instance.position.evTag.onEndEdit.AddListener(text =>
                     {
-                        if (!InspectorUtil.CanMultiEdit()
-                        || string.IsNullOrEmpty(text))
+                        if (!InspectorUtil.CanMultiEdit())
                         {
                             return;
                         }
 
+                        ((Text)__instance.position.evTag.placeholder).text = string.Empty;
                         __instance.position.evTag.SetTextWithoutNotify(text);
-
-                        ((Text)__instance.position.beat.placeholder).text = string.Empty;
                         foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                         {
                             eventControl.levelEvent.tag = text;
