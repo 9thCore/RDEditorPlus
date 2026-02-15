@@ -1,4 +1,5 @@
 ﻿using RDLevelEditor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -82,7 +83,7 @@ namespace RDEditorPlus.Util
 
             RectTransform template = (RectTransform) inputField.textComponent.transform;
 
-            GameObject instance = Object.Instantiate(template.gameObject);
+            GameObject instance = GameObject.Instantiate(template.gameObject);
             instance.SetActive(false);
 
             RectTransform transform = (RectTransform)instance.transform;
@@ -133,6 +134,14 @@ namespace RDEditorPlus.Util
 
             int row = scnEditor.instance.selectedControls[0].levelEvent.row;
             return scnEditor.instance.selectedControls.All(control => control.levelEvent.row == row);
+        }
+
+        public static bool SyncoBeatEqualValueForSelectedEvents()
+        {
+            const int Null = -2;
+
+            int syncoBeat = (scnEditor.instance.selectedControls[0].levelEvent as LevelEvent_SetRowXs)?.syncoBeat ?? Null;
+            return scnEditor.instance.selectedControls.All(control => syncoBeat == ((control.levelEvent as LevelEvent_SetRowXs)?.syncoBeat ?? Null));
         }
 
         public static bool TryMultiEditUpdateUI(this InspectorPanel panel)
@@ -232,5 +241,51 @@ namespace RDEditorPlus.Util
         public static readonly Color RoomUnusedColor = "5B5B5BFF".HexToColor();
         public static Color RoomUsedColor => RDConstants.data.colorPalette[3];
         public static Color RoomHalfUsedColor => Color.Lerp(RoomUnusedColor, RoomUsedColor, 0.5f);
+
+        public static Sprite MixedBeatModifierSprite
+        {
+            get
+            {
+                if (mixedBeatModifierSprite == null)
+                {
+                    const int Size = 32;
+
+                    Texture2D texture = new(Size, Size);
+
+                    for (int j = 0; j < Size; j++)
+                    {
+                        texture.SetPixel(0, j, Color.white);
+                        texture.SetPixel(Size - 1, j, Color.white);
+                    }
+
+                    for (int i = 1; i < Size - 1; i++)
+                    {
+                        texture.SetPixel(i, 0, Color.white);
+
+                        for (int j = 1; j < Size - 1; j++)
+                        {
+                            texture.SetPixel(i, j, Color.clear);
+                        }
+
+                        texture.SetPixel(i, Size - 1, Color.white);
+                    }
+
+                    Color lineColor = new(2f / 255f, 218f / 255f, 55f / 255f, 0.5f);
+                    for (int i = Size / 2 - 1; i <= Size / 2; i++)
+                    {
+                        for (int j = 1; j < Size - 1; j++)
+                        {
+                            texture.SetPixel(j, i, lineColor);
+                        }
+                    }
+
+                    texture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
+                    mixedBeatModifierSprite = Sprite.Create(texture, new Rect(0, 0, Size, Size), Vector2.zero);
+                }
+
+                return mixedBeatModifierSprite;
+            }
+        }
+        private static Sprite mixedBeatModifierSprite;
     }
 }

@@ -25,6 +25,7 @@ namespace RDEditorPlus.ExtraData
         public void UnmarkAll()
         {
             rowChanged = false;
+            beatModifierSyncoChanged = false;
             changedProperties.Clear();
         }
 
@@ -68,6 +69,7 @@ namespace RDEditorPlus.ExtraData
         public bool colorChanged = false;
         public bool skipUpdatingPropertyUI = false;
         public bool scrollToTopOnUpdate = true;
+        public bool beatModifierSyncoChanged = false;
 
         private readonly List<PropertyControl_Row> rowPropertyControls = new();
         private readonly HashSet<Property> changedProperties = new();

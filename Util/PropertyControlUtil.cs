@@ -77,6 +77,11 @@ namespace RDEditorPlus.Util
             return CheckEqual(ev => (string)propertyControl.GetEventValue(ev));
         }
 
+        public static bool EqualValueForSelectedEvents(this PropertyControl_BeatModifiers propertyControl, int index)
+        {
+            return CheckEqual(ev => propertyControl.GetEventValue(ev).ToString()[index]);
+        }
+
         public static bool EqualCharacterForSelectedEvents()
         {
             return CheckEqual(GetCharacter);
