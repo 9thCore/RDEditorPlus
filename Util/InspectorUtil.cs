@@ -53,7 +53,8 @@ namespace RDEditorPlus.Util
 
             // too much of a pain
             if (type == LevelEventType.ReorderRooms
-                || type == LevelEventType.ReorderWindows)
+                || type == LevelEventType.ReorderWindows
+                || type == LevelEventType.ShowRooms)
             {
                 return false;
             }
