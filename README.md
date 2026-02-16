@@ -1,5 +1,9 @@
 # RDEditorPlus
-BepInEx 5 Rhythm Doctor mod that aims to expand the level editor with Quality of Life features.
+BepInEx 5 Rhythm Doctor mod that aims to expand the level editor with Quality of Life features.  
+This mod always targets the latest **Beta** branch (because it would essentially). To switch to it on Steam:  
+- Right-click on Rhythm Doctor in the game list  
+- Properties > Game Version & Betas  
+- Select the `beta` version  
 
 Features:  
 - Adds experimental multiple row support to the patient, decoration, room and window tabs (disabled by default, as there's high chance of incompatibility with other mods)
