@@ -34,7 +34,6 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                 if (PropertyStorage.Instance.HasChanged(__instance))
                 {
-                    Plugin.LogInfo($"(Save) Detected change: {__instance.gameObject.name}");
                     return true;
                 }
 
@@ -100,7 +99,6 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     if (InspectorUtil.CanMultiEdit())
                     {
-                        Plugin.LogInfo($"(Delegate) Detected change: {property.gameObject.name}");
                         PropertyStorage.Instance.MarkChanged(property);
                     }
 
