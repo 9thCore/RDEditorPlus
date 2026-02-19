@@ -4,7 +4,7 @@ using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
 using System.Reflection;
 
-namespace RDEditorPlus.Patch.CustomMethod
+namespace RDEditorPlus.Patch.CustomMethod.Autocomplete
 {
     internal static class Patch_MethodAutocompleteUI
     {

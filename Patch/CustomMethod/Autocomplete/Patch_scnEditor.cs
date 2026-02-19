@@ -2,7 +2,7 @@
 using RDEditorPlus.ExtraData;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch.CustomMethod
+namespace RDEditorPlus.Patch.CustomMethod.Autocomplete
 {
     internal static class Patch_scnEditor
     {

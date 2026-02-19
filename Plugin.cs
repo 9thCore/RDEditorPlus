@@ -43,7 +43,7 @@ namespace RDEditorPlus
             PatchUtil.PatchNested(harmony, typeof(Patch_scnEditor));
 
             Patch.SubRows.PatchHandler.Instance.Patch(harmony);
-            Patch.CustomMethod.PatchHandler.Instance.Patch(harmony);
+            Patch.CustomMethod.Autocomplete.PatchHandler.Instance.Patch(harmony);
             Patch.Rows.BeatSwitch.PatchHandler.Instance.Patch(harmony);
             Patch.Select.MultiEdit.PatchHandler.Instance.Patch(harmony);
 

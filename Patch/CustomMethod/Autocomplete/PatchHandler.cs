@@ -1,4 +1,4 @@
-﻿namespace RDEditorPlus.Patch.CustomMethod
+﻿namespace RDEditorPlus.Patch.CustomMethod.Autocomplete
 {
     internal class PatchHandler : BasePatchHandler<PatchHandler>
     {
