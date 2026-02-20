@@ -77,7 +77,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
                 calling = true;
 
-                foreach (LevelEventControl_Base eventControl in scnEditor.instance.eventControls)
+                foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                 {
                     if (eventControl.levelEvent != __instance)
                     {
