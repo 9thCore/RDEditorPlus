@@ -62,20 +62,23 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         buttons[OnTopIndex].gameObject.SetActive(onTopUsedBySome);
                         if (onTopUsedBySome)
                         {
-                            buttons[OnTopIndex].GetComponent<Image>().color = RoomUtil.GetRoomUsageColor(usage[4]);
+                            buttons[OnTopIndex].GetComponent<Image>().color = RoomUtil.GetRoomUsageColor(usage[OnTopIndex]);
                         }
 
-                        if (!RoomUtil.DoSelectedEventsHaveTheSameRoomsUsage())
+                        var panel = scnEditor.instance.inspectorPanelManager.GetCurrent();
+                        if (panel != null)
                         {
-                            scnEditor.instance.inspectorPanelManager.GetCurrent().position
-                            .roomsContainer.transform.Find("overlay").GetComponent<Image>()
-                            .color = Color.white;
-                        }
-                        else
-                        {
-                            scnEditor.instance.inspectorPanelManager.GetCurrent().position
-                            .roomsContainer.transform.Find("overlay").GetComponent<Image>()
-                            .color = Color.clear;
+                            if (!RoomUtil.DoSelectedEventsHaveTheSameRoomsUsage())
+                            {
+                                panel.position.roomsContainer.transform.Find("overlay")
+                                .GetComponent<Image>().color = Color.white;
+                            }
+                            else
+                            {
+
+                                panel.position.roomsContainer.transform.Find("overlay")
+                                .GetComponent<Image>().color = Color.clear;
+                            }
                         }
                     });
 
