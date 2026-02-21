@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -29,6 +31,17 @@ namespace RDEditorPlus.ExtraData
         public bool IsAllowed(MethodInfo methodInfo)
         {
             return nonDevAllowedMethods.Contains(methodInfo);
+        }
+
+        public bool TryGetDescription(string key, out string description)
+        {
+            if (key.IsNullOrEmpty())
+            {
+                description = default;
+                return false;
+            }
+
+            return nonDevAllowedMethodDescriptions.TryGetValue(key, out description);
         }
 
         public void StartFetchOfMethods()
@@ -100,6 +113,7 @@ namespace RDEditorPlus.ExtraData
             string customClass = string.Empty;
             int timeout = MaxReadTimeout;
 
+            List<MethodInfo> collectedMethods = new();
             using StringReader stringReader = new(text);
 
             string line;
@@ -112,7 +126,22 @@ namespace RDEditorPlus.ExtraData
                 }
                 else if (TryFindMethod(customClass, line, out MethodInfo methodInfo))
                 {
+                    collectedMethods.Add(methodInfo);
                     nonDevAllowedMethods.Add(methodInfo);
+                }
+                else if (!line.StartsWith(RoomMethodPrefix) && !line.StartsWith(CommentCommandPrefix))
+                {
+                    int index = line.IndexOf('\t');
+                    string description = ((index != -1) ? line.Substring(0, index) : line).Replace("  ", "\n\n");
+                    string descriptionCapped = (description.Length < ArbitraryTextMaxLength) ? description : description.Substring(0, ArbitraryTextMaxLength);
+
+                    foreach (var method in collectedMethods)
+                    {
+                        var key = $"customMethod.{GetMethodClass(method)}.{method.Name}";
+                        nonDevAllowedMethodDescriptions[key] = descriptionCapped;
+                    }
+
+                    collectedMethods.Clear();
                 }
 
                 timeout--;
@@ -176,7 +205,29 @@ namespace RDEditorPlus.ExtraData
             return methodInfo != null;
         }
 
+        private static string GetMethodClass(MethodInfo methodInfo)
+        {
+            Type type = methodInfo.DeclaringType;
+
+            if (type == typeof(RDRoom))
+            {
+                return "room";
+            }
+            else if (type == typeof(scrVfxControl))
+            {
+                return "vfx";
+            }
+            else if (type == typeof(LevelBase)
+                || type.IsSubclassOf(typeof(LevelBase)))
+            {
+                return "level";
+            }
+
+            return string.Empty;
+        }
+
         private readonly HashSet<MethodInfo> nonDevAllowedMethods = new();
+        private readonly Dictionary<string, string> nonDevAllowedMethodDescriptions = new();
         private bool fetchedAlready = false;
 
         private const string CommentCommandPrefix = "()=>";
@@ -188,5 +239,7 @@ namespace RDEditorPlus.ExtraData
 
         public const string CustomMethodsSpreadsheetURL = "https://docs.google.com/spreadsheets/d/1JAz6iRLqcn08ZeTeBHeeDrpdX6M5K0b1qRVQomua21s/export?format=tsv&gid=1128429183";
         public const string CustomMethodsSpreadsheetFile = "customMethods.tsv";
+
+        public const int ArbitraryTextMaxLength = 800;
     }
 }
