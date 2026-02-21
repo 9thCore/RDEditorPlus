@@ -46,8 +46,12 @@ namespace RDEditorPlus
         public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE = "Toggle for the additional custom method autocompletion.\n" +
             "If enabled, there will be more custom methods available for autocompletion, but they will have a deep red color and will not have descriptions.\n" +
             "If set to " + nameof(CustomMethodAutocompleteBehaviour.Disabled) + ", will not be enabled.\n" +
-            "If set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ", will request from " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", the public database of known custom methods by the community.\n" +
+            "If set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ", will request from " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", the public database of known custom methods by the community, then save to a temporary file which is occassionally updated.\n" +
             "If set to " + nameof(CustomMethodAutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in TSV (tab-separated values) format.";
+        public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE_REFRESH_TIME = "How many days old the temporary download file (at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetDownloadedFile + "\") should be, before trying to request another.\n" +
+            "Only does something if " + nameof(customMethodsAutocomplete) + " is set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ".\n" +
+            "The file will only be requested once the editor is loaded, even if more than the specified amount of days have passed.\n" +
+            "The file will be re-downloaded if it does not already exist.";
 
         public const string PATCH_ROW_TOGGLE = "Toggle for all row tab (patients) functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_ROW_BEAT_SWITCH = "Whether a button that switches the selected beat from a classic beat to a oneshot beat (or vice-versa) should be added to their respective inspectors.";
@@ -74,6 +78,7 @@ namespace RDEditorPlus
 
         public static bool CustomMethodsEnabled => Instance.customMethods.Value;
         public static CustomMethodAutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
+        public static int CustomMethodsAutocompleteRefreshTime => Instance.customMethodsAutocompleteRefreshTime.Value;
 
         public static bool RowsEnabled => Instance.rows.Value;
         public static RowBeatSwitchBehaviour RowBeatSwitch => Instance.rowBeatSwitch.Value;
@@ -94,6 +99,7 @@ namespace RDEditorPlus
 
         public readonly ConfigEntry<bool> customMethods;
         public readonly ConfigEntry<CustomMethodAutocompleteBehaviour> customMethodsAutocomplete;
+        public readonly ConfigEntry<int> customMethodsAutocompleteRefreshTime;
 
         public readonly ConfigEntry<bool> rows;
         public readonly ConfigEntry<RowBeatSwitchBehaviour> rowBeatSwitch;
@@ -170,6 +176,12 @@ namespace RDEditorPlus
                 nameof(customMethodsAutocomplete),
                 CustomMethodAutocompleteBehaviour.Disabled,
                 PATCH_CUSTOM_METHODS_AUTOCOMPLETE);
+
+            customMethodsAutocompleteRefreshTime = config.Bind(
+                CATEGORY_CUSTOMMETHODS,
+                nameof(customMethodsAutocompleteRefreshTime),
+                30,
+                PATCH_CUSTOM_METHODS_AUTOCOMPLETE_REFRESH_TIME);
 
             rows = config.Bind(
                 CATEGORY_ROWS,

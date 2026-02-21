@@ -62,45 +62,62 @@ namespace RDEditorPlus.ExtraData
                 case PluginConfig.CustomMethodAutocompleteBehaviour.Disabled:
                     yield break;
                 case PluginConfig.CustomMethodAutocompleteBehaviour.RequestFromWeb:
-
-                    using (UnityWebRequest webRequest = UnityWebRequest.Get(CustomMethodsSpreadsheetURL))
-                    {
-                        yield return webRequest.SendWebRequest();
-
-                        switch (webRequest.result)
-                        {
-                            case UnityWebRequest.Result.ConnectionError:
-                            case UnityWebRequest.Result.DataProcessingError:
-                                Plugin.LogError("Custom methods web request error: " + webRequest.error);
-                                break;
-                            case UnityWebRequest.Result.ProtocolError:
-                                Plugin.LogError("Custom methods web request HTTP Error: " + webRequest.error);
-                                break;
-                            case UnityWebRequest.Result.Success:
-                                yield return FetchMethodsFromText(webRequest.downloadHandler.text);
-                                break;
-                        }
-                    }
-
-                    yield break;
-                case PluginConfig.CustomMethodAutocompleteBehaviour.FetchFromFile:
                     string fullPath = Assembly.GetExecutingAssembly().Location;
                     string directory = Path.GetDirectoryName(fullPath);
-                    string file = Path.Combine(directory, CustomMethodsSpreadsheetFile);
+                    string file = Path.Combine(directory, CustomMethodsSpreadsheetDownloadedFile);
 
-                    if (File.Exists(file))
+                    if (File.Exists(file)
+                        && (DateTime.Now - File.GetLastWriteTime(file) < TimeSpan.FromDays(PluginConfig.CustomMethodsAutocompleteRefreshTime)))
                     {
                         yield return FetchMethodsFromText(File.ReadAllText(file));
                     }
                     else
                     {
-                        Plugin.LogError($"File {file} does not exist, cannot fetch custom method autocompletion data.");
+                        using (UnityWebRequest webRequest = UnityWebRequest.Get(CustomMethodsSpreadsheetURL))
+                        {
+                            yield return webRequest.SendWebRequest();
+
+                            switch (webRequest.result)
+                            {
+                                case UnityWebRequest.Result.ConnectionError:
+                                case UnityWebRequest.Result.DataProcessingError:
+                                    Plugin.LogError("Custom methods web request error: " + webRequest.error);
+                                    break;
+                                case UnityWebRequest.Result.ProtocolError:
+                                    Plugin.LogError("Custom methods web request HTTP Error: " + webRequest.error);
+                                    break;
+                                case UnityWebRequest.Result.Success:
+
+                                    try
+                                    {
+                                        File.WriteAllText(file, webRequest.downloadHandler.text);
+                                        Plugin.LogInfo($"Saved temporary custom method autocompletion data to {file}.");
+                                    }
+                                    catch { }
+
+                                    yield return FetchMethodsFromText(webRequest.downloadHandler.text);
+                                    break;
+                            }
+                        }
+                    }
+
+                    yield break;
+                case PluginConfig.CustomMethodAutocompleteBehaviour.FetchFromFile:
+                    string fullPath2 = Assembly.GetExecutingAssembly().Location;
+                    string directory2 = Path.GetDirectoryName(fullPath2);
+                    string file2 = Path.Combine(directory2, CustomMethodsSpreadsheetFile);
+
+                    if (File.Exists(file2))
+                    {
+                        yield return FetchMethodsFromText(File.ReadAllText(file2));
+                    }
+                    else
+                    {
+                        Plugin.LogError($"File {file2} does not exist, cannot fetch custom method autocompletion data.");
                     }
 
                     yield break;
             }
-
-            
 
             yield break;
         }
@@ -239,6 +256,7 @@ namespace RDEditorPlus.ExtraData
 
         public const string CustomMethodsSpreadsheetURL = "https://docs.google.com/spreadsheets/d/1JAz6iRLqcn08ZeTeBHeeDrpdX6M5K0b1qRVQomua21s/export?format=tsv&gid=1128429183";
         public const string CustomMethodsSpreadsheetFile = "customMethods.tsv";
+        public const string CustomMethodsSpreadsheetDownloadedFile = "_downloadedCustomMethods.tsv";
 
         public const int ArbitraryTextMaxLength = 800;
     }
