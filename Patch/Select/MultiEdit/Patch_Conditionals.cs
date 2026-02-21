@@ -28,8 +28,6 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         ? ConditionalUtil.IsUsedMultiEdit(info.Conditional.id, out usageType)
                         : ConditionalUtil.IsUsedMultiEdit(info.Conditional.gid, out usageType);
 
-                    Plugin.LogInfo($"Usage: {multiEditUsageType}, {usageType}");
-
                     info.Button.Selected = multiEditUsageType == ConditionalUtil.MultiEditUsageType.UsedByAll;
                     info.Button.Negated = usageType == ConditionalUtil.UsageType.Negated;
 
