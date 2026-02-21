@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.Functionality.Components;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,9 +12,9 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
         [HarmonyPatch(typeof(Conditionals), nameof(Conditionals.ShowListPanel))]
         private static class ShowListPanel
         {
-            private static void Postfix(Conditionals __instance)
+            private static void Postfix(Conditionals __instance, bool visible)
             {
-                if (!InspectorUtil.CanMultiEdit())
+                if (!visible || !InspectorUtil.CanMultiEdit())
                 {
                     return;
                 }
@@ -29,6 +27,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                     multiEditUsageType = info.Conditional.gid.IsNullOrEmpty()
                         ? ConditionalUtil.IsUsedMultiEdit(info.Conditional.id, out usageType)
                         : ConditionalUtil.IsUsedMultiEdit(info.Conditional.gid, out usageType);
+
+                    Plugin.LogInfo($"Usage: {multiEditUsageType}, {usageType}");
 
                     info.Button.Selected = multiEditUsageType == ConditionalUtil.MultiEditUsageType.UsedByAll;
                     info.Button.Negated = usageType == ConditionalUtil.UsageType.Negated;

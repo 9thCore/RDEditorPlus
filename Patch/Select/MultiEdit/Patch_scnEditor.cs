@@ -140,5 +140,17 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
             private static readonly Assembly GameAssembly = typeof(scnEditor).Assembly;
         }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.AddEventControlToSelection))]
+        private static class AddEventControlToSelection
+        {
+            private static void Postfix(scnEditor __instance)
+            {
+                if (__instance.conditionalsPanel.showingListPanel)
+                {
+                    __instance.conditionalsPanel.ShowListPanel(visible: true);
+                }
+            }
+        }
     }
 }
