@@ -57,6 +57,18 @@ namespace RDEditorPlus.ExtraData
             StartCoroutine(RowPropertyControlsLateUpdate());
         }
 
+        public void ForceSelectEvent()
+        {
+            forceSelectEvent = true;
+        }
+
+        public bool GetNotForceSelectEvent()
+        {
+            bool force = forceSelectEvent;
+            forceSelectEvent = false;
+            return !force;
+        }
+
         private IEnumerator RowPropertyControlsLateUpdate()
         {
             // I have no clue why I have to wait here LOL
@@ -70,6 +82,7 @@ namespace RDEditorPlus.ExtraData
         public bool skipUpdatingPropertyUI = false;
         public bool scrollToTopOnUpdate = true;
         public bool beatModifierSyncoChanged = false;
+        public bool forceSelectEvent = false;
 
         private readonly List<PropertyControl_Row> rowPropertyControls = new();
         private readonly HashSet<Property> changedProperties = new();

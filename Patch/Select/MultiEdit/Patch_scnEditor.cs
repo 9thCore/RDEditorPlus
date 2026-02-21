@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Util;
 using RDLevelEditor;
@@ -6,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
@@ -150,6 +153,23 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     __instance.conditionalsPanel.ShowListPanel(visible: true);
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.SelectEventControl))]
+        private static class SelectEventControl
+        {
+            private static void ILManipulator(ILContext il)
+            {
+                ILCursor cursor = new(il);
+
+                cursor
+                    .GotoNext(instruction => instruction.MatchCall<UnityEngine.Object>("op_Equality"))
+                    .GotoNext(MoveType.Before, instruction => instruction.MatchBrfalse(out _))
+                    .EmitDelegate(PropertyStorage.Instance.GetNotForceSelectEvent);
+
+                cursor
+                    .Emit(OpCodes.And);
             }
         }
     }

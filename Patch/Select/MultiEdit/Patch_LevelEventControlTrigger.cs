@@ -1,8 +1,9 @@
 ﻿using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using RDEditorPlus.ExtraData;
+using RDEditorPlus.Util;
 using RDLevelEditor;
-using System;
 using UnityEngine;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
@@ -169,6 +170,23 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
 
             private static float dragDelta = float.NaN;
             private static bool callingMethodForEveryoneElse = false;
+        }
+
+        [HarmonyPatch(typeof(LevelEventControlEventTrigger), nameof(LevelEventControlEventTrigger.OnPointerClick))]
+        private static class OnPointerClick
+        {
+            private static void ILManipulator(ILContext il)
+            {
+                ILCursor cursor = new(il);
+
+                cursor
+                    .GotoNext(MoveType.After, instruction => instruction.MatchStsfld<LevelEventControlEventTrigger>(nameof(LevelEventControlEventTrigger.eventControls)))
+                    .EmitDelegate(PropertyStorage.Instance.ForceSelectEvent);
+
+                cursor
+                    .GotoNext(MoveType.After, instruction => instruction.MatchStloc(19))
+                    .EmitDelegate(PropertyStorage.Instance.ForceSelectEvent);
+            }
         }
     }
 }
