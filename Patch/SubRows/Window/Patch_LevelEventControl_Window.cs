@@ -2,7 +2,7 @@
 using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch.SubRows
+namespace RDEditorPlus.Patch.SubRows.Window
 {
     internal static class Patch_LevelEventControl_Window
     {

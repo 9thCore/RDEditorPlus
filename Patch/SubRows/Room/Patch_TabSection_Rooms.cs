@@ -6,7 +6,7 @@ using RDLevelEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RDEditorPlus.Patch.SubRows
+namespace RDEditorPlus.Patch.SubRows.Room
 {
     internal static class Patch_TabSection_Rooms
     {
@@ -15,11 +15,6 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(TabSection_Rooms __instance)
             {
-                if (!PluginConfig.RoomSubRowsEnabled)
-                {
-                    return;
-                }
-
                 SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.listRect, "Rooms");
                 __instance.listRect.offsetMin = Vector2.zero;
                 __instance.listRect.offsetMax = Vector2.zero;
@@ -74,7 +69,7 @@ namespace RDEditorPlus.Patch.SubRows
                         trigger.onPointerEnter = vanillaTrigger.onPointerEnter;
                         trigger.onPointerExit = vanillaTrigger.onPointerExit;
 
-                        GameObject.Destroy(vanillaTrigger);
+                        Object.Destroy(vanillaTrigger);
 
                         RoomManager.Instance.previewScalingElements.Add(element);
                         RoomManager.Instance.previewScalingRects.Add(group.GetComponent<RectTransform>());

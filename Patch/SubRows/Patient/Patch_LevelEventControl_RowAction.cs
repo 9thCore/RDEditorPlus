@@ -2,7 +2,7 @@
 using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch.SubRows
+namespace RDEditorPlus.Patch.SubRows.Patient
 {
     internal static class Patch_LevelEventControl_RowAction
     {
@@ -11,11 +11,6 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(LevelEventControl_RowAction __instance)
             {
-                if (!PluginConfig.PatientSubRowsEnabled)
-                {
-                    return;
-                }
-
                 RowManager.Instance.UpdateUI(__instance);
             }
         }

@@ -5,7 +5,7 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using UnityEngine;
 
-namespace RDEditorPlus.Patch.SubRows
+namespace RDEditorPlus.Patch.SubRows.Patient
 {
     internal static class Patch_TabSection_Rows
     {
@@ -15,11 +15,6 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(TabSection_Rows __instance)
             {
-                if (!PluginConfig.PatientSubRowsEnabled)
-                {
-                    return;
-                }
-
                 if (__instance.rowsListRect.transform.parent.name.Contains(Plugin.RDModificationsMaskName))
                 {
                     Plugin.RDModificationsRowPatchEnabled = true;

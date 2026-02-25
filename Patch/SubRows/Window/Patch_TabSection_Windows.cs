@@ -4,7 +4,7 @@ using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 using UnityEngine;
 
-namespace RDEditorPlus.Patch.SubRows
+namespace RDEditorPlus.Patch.SubRows.Window
 {
     internal class Patch_TabSection_Windows
     {
@@ -13,11 +13,6 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(TabSection_Windows __instance)
             {
-                if (!PluginConfig.WindowSubRowsEnabled)
-                {
-                    return;
-                }
-
                 SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.listRect, "Windows");
                 __instance.listRect.offsetMin = Vector2.zero;
                 __instance.listRect.offsetMax = Vector2.zero;
@@ -29,11 +24,6 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(TabSection_Windows __instance)
             {
-                if (!PluginConfig.WindowSubRowsEnabled)
-                {
-                    return;
-                }
-
                 WindowManager.Instance.UpdateTabScroll();
             }
         }

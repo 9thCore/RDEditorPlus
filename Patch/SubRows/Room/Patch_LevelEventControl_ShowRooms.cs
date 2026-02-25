@@ -2,7 +2,7 @@
 using RDEditorPlus.Functionality.SubRow;
 using RDLevelEditor;
 
-namespace RDEditorPlus.Patch.SubRows
+namespace RDEditorPlus.Patch.SubRows.Room
 {
     internal static class Patch_LevelEventControl_ShowRooms
     {
@@ -11,11 +11,6 @@ namespace RDEditorPlus.Patch.SubRows
         {
             private static void Postfix(LevelEventControl_ShowRooms __instance)
             {
-                if (!PluginConfig.RoomSubRowsEnabled)
-                {
-                    return;
-                }
-
                 RoomManager.Instance.UpdateFullTimelineHeightEvent(__instance);
             }
         }

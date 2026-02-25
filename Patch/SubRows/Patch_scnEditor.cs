@@ -96,35 +96,6 @@ namespace RDEditorPlus.Patch.SubRows
             }
         }
 
-        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.AddNewRow))]
-        private static class AddNewRow
-        {
-            private static void Postfix()
-            {
-                if (!PluginConfig.PatientSubRowsEnabled)
-                {
-                    return;
-                }
-
-                RowManager.Instance.UpdateTab(force: false);
-                scnEditor.instance.timeline.UpdateMaxUsedY();
-            }
-        }
-
-        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.MoveRowVertically))]
-        private static class MoveRowVertically
-        {
-            private static void Postfix()
-            {
-                if (!PluginConfig.PatientSubRowsEnabled)
-                {
-                    return;
-                }
-
-                RowManager.Instance.UpdateTab(force: false);
-            }
-        }
-
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Paste), new System.Type[] { typeof(bool) })]
         private static class Paste
         {
