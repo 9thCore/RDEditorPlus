@@ -36,7 +36,7 @@ namespace RDEditorPlus
             // Plugin startup logic
             Instance = this;
             Logger = base.Logger;
-            PluginConfig.Instance.Noop();
+            PluginConfig.Instance.Register();
 
             Harmony harmony = new(MyPluginInfo.PLUGIN_GUID);
             PatchUtil.PatchNested(harmony, typeof(Patch_LevelEvent_Base)); // We want this patching regardless

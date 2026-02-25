@@ -3,7 +3,9 @@ using BepInEx.Configuration;
 using RDEditorPlus.ExtraData;
 using System;
 using System.IO;
-using UnityEngine;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace RDEditorPlus
 {
@@ -87,136 +89,87 @@ namespace RDEditorPlus
         public static bool SelectionMultiEditEnabled => Instance.selectionMultiEdit.Value;
         public static MultiEditColorBehaviour SelectionMultiEditColorBehaviour => Instance.selectionMultiEditColor.Value;
 
+
+#pragma warning disable 0649
+        [Category(CATEGORY_SUBROWS)]
+        [Config<bool>(PATCH_SUB_ROWS_TOGGLE, false)]
         public readonly ConfigEntry<bool> subRows;
+
+        [Config<bool>(PATCH_SUB_ROWS_SPRITE, true)]
         public readonly ConfigEntry<bool> spriteSubRows;
+
+        [Config<bool>(PATCH_SUB_ROWS_PATIENT, true)]
         public readonly ConfigEntry<bool> patientSubRows;
+
+        [Config<bool>(PATCH_SUB_ROWS_ROOM, true)]
         public readonly ConfigEntry<bool> roomSubRows;
+
+        [Config<bool>(PATCH_SUB_ROWS_WINDOW, true)]
         public readonly ConfigEntry<bool> windowSubRows;
+
+        [Config<SubRowTallEventBehaviour>(PATCH_SUB_ROWS_TALL_EVENTS, SubRowTallEventBehaviour.ExpandToTimelineHeight)]
         public readonly ConfigEntry<SubRowTallEventBehaviour> subRowTallEventBehaviour;
+
+        [Config<bool>(PATCH_SUB_ROWS_ALTERNATING_COLORS, true)]
         public readonly ConfigEntry<bool> alternatingColorSubRows;
+
+        [Config<bool>(PATCH_SUB_ROWS_SCALE_PREVIEW, false)]
         public readonly ConfigEntry<bool> previewScaleSubRows;
+
+        [Config<int>(PATCH_SUB_ROWS_SCALE_PREVIEW_MINIMUM, 2)]
         public readonly ConfigEntry<int> previewScaleMinimumSubRows;
 
+
+        [Category(CATEGORY_CUSTOMMETHODS)]
+        [Config<bool>(PATCH_CUSTOM_METHODS_TOGGLE, false)]
         public readonly ConfigEntry<bool> customMethods;
+
+        [Config<CustomMethodAutocompleteBehaviour>(PATCH_CUSTOM_METHODS_AUTOCOMPLETE, CustomMethodAutocompleteBehaviour.Disabled)]
         public readonly ConfigEntry<CustomMethodAutocompleteBehaviour> customMethodsAutocomplete;
+
+        [Config<int>(PATCH_CUSTOM_METHODS_AUTOCOMPLETE_REFRESH_TIME, 30)]
         public readonly ConfigEntry<int> customMethodsAutocompleteRefreshTime;
 
+
+        [Category(CATEGORY_ROWS)]
+        [Config<bool>(PATCH_ROW_TOGGLE, false)]
         public readonly ConfigEntry<bool> rows;
+
+        [Config<RowBeatSwitchBehaviour>(PATCH_ROW_BEAT_SWITCH, RowBeatSwitchBehaviour.Disabled)]
         public readonly ConfigEntry<RowBeatSwitchBehaviour> rowBeatSwitch;
 
+
+        [Category(CATEGORY_SELECT)]
+        [Config<bool>(PATCH_SELECT_TOGGLE, false)]
         public readonly ConfigEntry<bool> selection;
+
+        [Config<bool>(PATCH_SELECT_MULTI, false)]
         public readonly ConfigEntry<bool> selectionMultiEdit;
+
+        [Config<MultiEditColorBehaviour>(PATCH_SELECT_MULTI_COLOR, MultiEditColorBehaviour.JustSetToWhite)]
         public readonly ConfigEntry<MultiEditColorBehaviour> selectionMultiEditColor;
+#pragma warning restore 0649
 
-        public PluginConfig()
+
+        public void Register()
         {
-            subRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(subRows),
-                false,
-                PATCH_SUB_ROWS_TOGGLE);
+            string category = string.Empty;
 
-            spriteSubRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(spriteSubRows),
-                true,
-                PATCH_SUB_ROWS_SPRITE);
+            var pairs = typeof(PluginConfig).GetFields()
+                .Select(info => new FieldAttributePair(info, info.GetCustomAttribute<ConfigAttribute>()))
+                .Where(pair => pair.Attribute != null)
+                .OrderBy(pair => pair.Attribute.Order);
 
-            patientSubRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(patientSubRows),
-                true,
-                PATCH_SUB_ROWS_PATIENT);
+            foreach (var pair in pairs)
+            {
+                var categoryFetch = pair.Field.GetCustomAttribute<CategoryAttribute>();
+                if (categoryFetch != null)
+                {
+                    category = categoryFetch.Category;
+                }
 
-            roomSubRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(roomSubRows),
-                true,
-                PATCH_SUB_ROWS_ROOM);
-
-            windowSubRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(windowSubRows),
-                true,
-                PATCH_SUB_ROWS_WINDOW);
-
-            subRowTallEventBehaviour = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(subRowTallEventBehaviour),
-                SubRowTallEventBehaviour.ExpandToTimelineHeight,
-                PATCH_SUB_ROWS_TALL_EVENTS);
-
-            alternatingColorSubRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(alternatingColorSubRows),
-                true,
-                PATCH_SUB_ROWS_ALTERNATING_COLORS);
-
-            previewScaleSubRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(previewScaleSubRows),
-                false,
-                PATCH_SUB_ROWS_SCALE_PREVIEW);
-
-            previewScaleMinimumSubRows = config.Bind(
-                CATEGORY_SUBROWS,
-                nameof(previewScaleMinimumSubRows),
-                2,
-                PATCH_SUB_ROWS_SCALE_PREVIEW_MINIMUM);
-
-
-            customMethods = config.Bind(
-                CATEGORY_CUSTOMMETHODS,
-                nameof(customMethods),
-                false,
-                PATCH_CUSTOM_METHODS_TOGGLE);
-
-            customMethodsAutocomplete = config.Bind(
-                CATEGORY_CUSTOMMETHODS,
-                nameof(customMethodsAutocomplete),
-                CustomMethodAutocompleteBehaviour.Disabled,
-                PATCH_CUSTOM_METHODS_AUTOCOMPLETE);
-
-            customMethodsAutocompleteRefreshTime = config.Bind(
-                CATEGORY_CUSTOMMETHODS,
-                nameof(customMethodsAutocompleteRefreshTime),
-                30,
-                PATCH_CUSTOM_METHODS_AUTOCOMPLETE_REFRESH_TIME);
-
-            rows = config.Bind(
-                CATEGORY_ROWS,
-                nameof(rows),
-                false,
-                PATCH_ROW_TOGGLE);
-
-            rowBeatSwitch = config.Bind(
-                CATEGORY_ROWS,
-                nameof(rowBeatSwitch),
-                RowBeatSwitchBehaviour.Disabled,
-                PATCH_ROW_BEAT_SWITCH);
-
-            selection = config.Bind(
-                CATEGORY_SELECT,
-                nameof(selection),
-                false,
-                PATCH_SELECT_TOGGLE);
-
-            selectionMultiEdit = config.Bind(
-                CATEGORY_SELECT,
-                nameof(selectionMultiEdit),
-                false,
-                PATCH_SELECT_MULTI);
-
-            selectionMultiEditColor = config.Bind(
-                CATEGORY_SELECT,
-                nameof(selectionMultiEditColor),
-                MultiEditColorBehaviour.JustSetToWhite,
-                PATCH_SELECT_MULTI_COLOR);
-        }
-
-        public void Noop()
-        {
-            // Just to create the singleton lol
+                pair.Bind(config, category);
+            }
         }
 
         public enum SubRowTallEventBehaviour
@@ -251,5 +204,35 @@ namespace RDEditorPlus
         }
 
         public const MultiEditColorBehaviour AverageAlphaFragment = (MultiEditColorBehaviour) 1;
+
+        [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+        private abstract class ConfigAttribute(int order) : Attribute
+        {
+            public readonly int Order = order;
+
+            public abstract void Bind(ConfigFile config, FieldInfo field, string category);
+        }
+
+        private class ConfigAttribute<T>(string description, T defaultValue, [CallerLineNumber] int order = 0) : ConfigAttribute(order)
+        {
+            public readonly string Description = description;
+            public readonly T Default = defaultValue;
+
+            public override void Bind(ConfigFile config, FieldInfo field, string category)
+            {
+                field.SetValue(instance, config.Bind(category, field.Name, Default, Description));
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+        private class CategoryAttribute(string category) : Attribute
+        {
+            public readonly string Category = category;
+        }
+
+        private record FieldAttributePair(FieldInfo Field, ConfigAttribute Attribute)
+        {
+            public void Bind(ConfigFile config, string category) => Attribute.Bind(config, Field, category);
+        }
     }
 }
