@@ -93,10 +93,17 @@ namespace RDEditorPlus.Functionality.Windows
             var tab = scnEditor.instance.tabSection_windows;
             DuplicateWindowsIfRequired(tab, windowCount);
 
+            Transform group = tab.listRect.GetComponentInChildren<VerticalLayoutGroup>().transform;
+            Transform addButton = group.GetChild(group.childCount - 1);
+
             int num = 0;
-            foreach (Transform child in tab.listRect)
+            foreach (Transform child in group)
             {
-                child.gameObject.SetActive(num < windowCount);
+                if (child != addButton)
+                {
+                    child.gameObject.SetActive(num < windowCount);
+                }
+
                 num++;
             }
         }
