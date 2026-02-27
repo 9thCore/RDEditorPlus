@@ -32,20 +32,33 @@
 
   <Target Name="CopyPlugin" AfterTargets="PostBuildEvent">
     <!-- RHYTHM_DOCTOR_PATH is a system environment variable, pointing to the game. -->
-    <CombinePath Condition="'$(Configuration)' == 'Release'" BasePath="$(RHYTHM_DOCTOR_PATH)\BepInEx\plugins" Paths="$(ProjectName)">
+    <CombinePath BasePath="$(RHYTHM_DOCTOR_PATH)\BepInEx\plugins" Paths="$(ProjectName)">
       <Output TaskParameter="CombinedPaths" ItemName="PluginOutputs" />
+    </CombinePath>
+
+    <!-- RHYTHM_DOCTOR_PRERELEASE_PATH is a system environment variable, pointing to where the assembly should be copied to, for zipping up. -->
+    <CombinePath BasePath="$(RHYTHM_DOCTOR_PRERELEASE_PATH)" Paths="$(ProjectName)">
+      <Output TaskParameter="CombinedPaths" ItemName="PluginPrereleaseOutputs" />
+    </CombinePath>
+
+    <!-- RHYTHM_DOCTOR_RELEASE_PATH is a system environment variable, pointing to where the final zip should be placed. -->
+    <CombinePath BasePath="$(RHYTHM_DOCTOR_RELEASE_PATH)" Paths="$(ProjectName)">
+      <Output TaskParameter="CombinedPaths" ItemName="PluginReleaseOutputs" />
     </CombinePath>
 
     <PropertyGroup>
       <PluginOutput>%(PluginOutputs.Identity)</PluginOutput>
+      <PluginPrereleaseOutput>%(PluginPrereleaseOutputs.Identity)</PluginPrereleaseOutput>
+      <PluginReleaseOutput>%(PluginReleaseOutputs.Identity)</PluginReleaseOutput>
     </PropertyGroup>
 
     <!-- Assembly -->
     <MakeDir Directories="$(PluginOutput)"></MakeDir>
     <Copy SourceFiles="$(OutDir)\$(ProjectName).dll" DestinationFolder="$(PluginOutput)" />
+    <Copy SourceFiles="$(OutDir)\$(ProjectName).dll" DestinationFolder="$(PluginPrereleaseOutput)" />
 
     <!-- Prepare release -->
-    <MakeDir Directories="$(ProjectDir)..\_Releases\$(ProjectName)"></MakeDir>
-    <ZipDirectory SourceDirectory="$(PluginOutput)" DestinationFile="$(ProjectDir)..\_Releases\$(ProjectName)\$(ProjectName)_v$(Version).zip" Overwrite="true" />
+    <MakeDir Directories="$(PluginReleaseOutput)"></MakeDir>
+    <ZipDirectory SourceDirectory="$(PluginPrereleaseOutput)" DestinationFile="$(PluginReleaseOutput)\$(ProjectName)_v$(Version).zip" Overwrite="true" />
   </Target>
 </Project>
