@@ -28,6 +28,24 @@ namespace RDEditorPlus.Functionality.Windows
 
         public void AddWindow()
         {
+            using (new SaveStateScope(clearRedo: true, skipSaving: false, skipTimelinePos: false))
+            {
+                foreach (var control in scnEditor.instance.eventControls_windows)
+                {
+                    if (control.levelEvent is LevelEvent_ReorderWindows levelEvent)
+                    {
+                        int[] order = levelEvent.order;
+                        levelEvent.order = new int[levelEvent.order.Length + 1];
+
+                        for (int i = order.Length - 1; i >= 0; i--)
+                        {
+                            levelEvent.order[i] = order[i];
+                        }
+                        levelEvent.order[order.Length] = WindowCount;
+                    }
+                }
+            }
+
             int value = extraWindowCount + 1;
             UpdateTabListSize(extraWindowCount, value);
             extraWindowCount = value;
@@ -55,10 +73,18 @@ namespace RDEditorPlus.Functionality.Windows
                     {
                         toBeDeleted.Add(control);
                     }
-                    else if (control.levelEvent.y > index)
+                    else
                     {
-                        control.levelEvent.y--;
-                        control.UpdateUI();
+                        if (control.levelEvent.y > index)
+                        {
+                            control.levelEvent.y--;
+                            control.UpdateUI();
+                        }
+
+                        if (control.levelEvent is LevelEvent_ReorderWindows levelEvent)
+                        {
+                            levelEvent.order = levelEvent.order.Where(windowIndex => windowIndex != WindowCount - 1).ToArray();
+                        }
                     }
                 }
 
