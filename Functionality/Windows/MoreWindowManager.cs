@@ -1,6 +1,6 @@
-﻿using RDEditorPlus.Util;
+﻿using RDEditorPlus.Functionality.SubRow;
+using RDEditorPlus.Util;
 using RDLevelEditor;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,6 +29,15 @@ namespace RDEditorPlus.Functionality.Windows
         {
             extraWindowCount++;
             UpdateTabWindows(WindowCount);
+
+            scnEditor.instance.timeline.UpdateMaxUsedY();
+
+            if (PluginConfig.SubRowsEnabled && PluginConfig.WindowSubRowsEnabled)
+            {
+                WindowManager.Instance.UpdateTab(force: false);
+            }
+            
+            scnEditor.instance.timeline.UpdateUI();
         }
 
         public void RemoveWindow(int index)

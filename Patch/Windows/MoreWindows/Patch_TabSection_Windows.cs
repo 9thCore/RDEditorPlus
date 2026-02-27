@@ -15,6 +15,10 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
         {
             private static void Postfix(TabSection_Windows __instance)
             {
+                __instance.listRect.SetupWithScrollMaskIntermediary("Windows");
+                __instance.listRect.offsetMin = Vector2.zero;
+                __instance.listRect.offsetMax = Vector2.zero;
+
                 if (!scnEditor.instance.tabSection_sprites.spriteHeaders[0].TryGetComponent(out SpriteHeader header))
                 {
                     Plugin.LogError($"{scnEditor.instance.tabSection_sprites.spriteHeaders[0].name} does not have a {nameof(SpriteHeader)}??");

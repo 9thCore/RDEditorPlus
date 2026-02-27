@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.Windows;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
@@ -182,7 +183,7 @@ namespace RDEditorPlus.Functionality.SubRow
                 }
 
                 int num = SubRowStorage.Instance.GetSubRow(levelEvent) + 1;
-                int window = levelEvent.GetYValueAsValidRoom();
+                int window = levelEvent.y;
                 usedSubRowCounts[window] = Math.Max(usedSubRowCounts[window], num);
             }
 
@@ -210,7 +211,7 @@ namespace RDEditorPlus.Functionality.SubRow
 
             foreach (LevelEventControl_Base control in scnEditor.instance.eventControls_windows)
             {
-                int window = control.levelEvent.GetYValueAsValidRoom();
+                int window = control.levelEvent.y;
                 if (control.levelEvent.IsFullTimelineHeight()
                     || window > firstWindowThatUpdated)
                 {
@@ -293,6 +294,18 @@ namespace RDEditorPlus.Functionality.SubRow
             return GetTimelineRowOffset() * scnEditor.instance.cellHeight;
         }
 
+        public override void UpdateTabScroll()
+        {
+            float y = scnEditor.instance.timeline.scrollViewVertContent.anchoredPosition.y;
+            if (y == scrollPosition)
+            {
+                return;
+            }
+
+            scrollPosition = y;
+            UpdateTabPanelOnly();
+        }
+
         private bool TryFindWindowForRow(int row, out int window)
         {
             row -= GetTimelineRowOffset();
@@ -318,7 +331,7 @@ namespace RDEditorPlus.Functionality.SubRow
             return false;
         }
 
-        private int WindowCount => RDEditorConstants.WindowCount;
+        private int WindowCount => MoreWindowManager.Instance.WindowCount;
 
         private RectTransform layoutGroupCache = null;
     }
