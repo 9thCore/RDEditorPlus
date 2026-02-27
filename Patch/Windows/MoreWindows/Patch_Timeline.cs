@@ -18,10 +18,7 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
                 {
                     if (PluginConfig.SubRowsEnabled && PluginConfig.WindowSubRowsEnabled)
                     {
-                        if (MoreWindowManager.Instance.WindowCount >= __instance.rowCellCount)
-                        {
-                            __result++;
-                        }
+                        __result++;
                     }
                     else
                     {
