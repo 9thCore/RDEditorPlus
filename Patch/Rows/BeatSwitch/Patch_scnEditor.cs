@@ -37,7 +37,7 @@ namespace RDEditorPlus.Patch.Rows.BeatSwitch
                 }
                 else
                 {
-                    const float Spacing = 4f;
+                    const float Offset = -20f;
 
                     Transform parent = oneshotPanel.transform.Find("breakWaveHolder");
                     RectTransform oneshotTemplate = (RectTransform) parent.Find("switchToSetWave");
@@ -45,21 +45,11 @@ namespace RDEditorPlus.Patch.Rows.BeatSwitch
                     Button button = InspectorUtil.CopyButton(oneshotTemplate, "SwitchBeatToClassic", "Switch to <color=#2C4EDB>Add Classic Beat</color>");
                     button.onClick = oneshotClickEvent;
 
-                    float lowestOffset = 0f;
-                    foreach (Transform child in parent)
-                    {
-                        if (child.gameObject.activeInHierarchy
-                            && child.gameObject.activeSelf)
-                        {
-                            lowestOffset = Mathf.Min(lowestOffset, ((RectTransform) child).offsetMin.y);
-                        }
-                    }
-
                     float size = oneshotTemplate.sizeDelta.y;
 
                     RectTransform transform = (RectTransform) button.transform;
-                    transform.offsetMin = new Vector2(oneshotTemplate.offsetMin.x, lowestOffset - Spacing - size * 2);
-                    transform.offsetMax = new Vector2(oneshotTemplate.offsetMax.x, lowestOffset - Spacing - size);
+                    transform.offsetMin = new Vector2(oneshotTemplate.offsetMin.x, Offset - size * 2);
+                    transform.offsetMax = new Vector2(oneshotTemplate.offsetMax.x, Offset - size);
                 }
             }
 
