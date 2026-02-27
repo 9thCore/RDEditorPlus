@@ -21,7 +21,7 @@ namespace RDEditorPlus.Patch.SubRows.Patient
                 }
                 else
                 {
-                    SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.rowsListRect, "Rows");
+                    __instance.rowsListRect.SetupWithScrollMaskIntermediary("Rows");
 
                     __instance.rowsListRect.offsetMin = Vector2.zero;
                     __instance.rowsListRect.offsetMax = Vector2.zero;

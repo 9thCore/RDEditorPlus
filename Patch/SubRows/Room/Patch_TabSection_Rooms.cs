@@ -15,7 +15,7 @@ namespace RDEditorPlus.Patch.SubRows.Room
         {
             private static void Postfix(TabSection_Rooms __instance)
             {
-                SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.listRect, "Rooms");
+                __instance.listRect.SetupWithScrollMaskIntermediary("Rooms");
                 __instance.listRect.offsetMin = Vector2.zero;
                 __instance.listRect.offsetMax = Vector2.zero;
 

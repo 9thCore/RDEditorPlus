@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Functionality.SubRow;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace RDEditorPlus.Patch.SubRows.Window
         {
             private static void Postfix(TabSection_Windows __instance)
             {
-                SubRowStorage.Instance.SetupWithScrollMaskIntermediary(__instance.listRect, "Windows");
+                __instance.listRect.SetupWithScrollMaskIntermediary("Windows");
                 __instance.listRect.offsetMin = Vector2.zero;
                 __instance.listRect.offsetMax = Vector2.zero;
             }

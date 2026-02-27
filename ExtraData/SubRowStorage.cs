@@ -261,28 +261,6 @@ namespace RDEditorPlus.ExtraData
             }
         }
 
-        public void SetupWithScrollMaskIntermediary(RectTransform rectTransform, string nameSuffix)
-        {
-            GameObject mask = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameSuffix}");
-
-            mask.EnsureComponent<Image>();
-            mask.EnsureComponent<Mask>().showMaskGraphic = false;
-            mask.layer = rectTransform.gameObject.layer;
-
-            int siblingIndex = rectTransform.GetSiblingIndex();
-
-            RectTransform maskTransform = mask.GetComponent<RectTransform>();
-            maskTransform.SetParent(rectTransform.parent);
-            rectTransform.SetParent(maskTransform);
-
-            maskTransform.SetSiblingIndex(siblingIndex);
-
-            maskTransform.anchorMin = Vector2.zero;
-            maskTransform.anchorMax = Vector2.one;
-            maskTransform.offsetMin = new Vector2(2f, 0f);
-            maskTransform.offsetMax = new Vector2(-1f, -16f);
-        }
-
         private int GetRowsAbove(LevelEvent_Base levelEvent)
         {
             switch (levelEvent.GetTab())
