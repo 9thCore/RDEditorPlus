@@ -60,8 +60,15 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
                     {
                         if (ShouldApply)
                         {
-                            //rowCount += MoreWindowManager.Instance.ExtraWindowCount;
-                            rowCount = Math.Min(rowCount, scnEditor.instance.timeline.scaledRowCellCount - 1);
+                            if (PluginConfig.SubRowsEnabled && PluginConfig.WindowSubRowsEnabled)
+                            {
+                                rowCount -= Math.Max(0, scnEditor.instance.timeline.maxUsedY - scnEditor.instance.timeline.rowCellCount) + 1;
+                            }
+                            else
+                            {
+                                rowCount += MoreWindowManager.Instance.ExtraWindowCount;
+                                rowCount = Math.Min(rowCount, scnEditor.instance.timeline.scaledRowCellCount - 1);
+                            }
                         }
 
                         return rowCount;
