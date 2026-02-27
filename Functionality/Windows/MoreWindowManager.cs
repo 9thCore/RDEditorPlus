@@ -28,13 +28,15 @@ namespace RDEditorPlus.Functionality.Windows
 
         public void AddWindow()
         {
-            extraWindowCount++;
-            UpdateTabWindows(WindowCount);
+            int value = extraWindowCount + 1;
+            UpdateTabListSize(extraWindowCount, value);
+            extraWindowCount = value;
 
-            scnEditor.instance.timeline.UpdateMaxUsedY();
+            UpdateTabWindows(WindowCount);
 
             if (PluginConfig.SubRowsEnabled && PluginConfig.WindowSubRowsEnabled)
             {
+                scnEditor.instance.timeline.UpdateMaxUsedY();
                 WindowManager.Instance.UpdateTab(force: false);
             }
             
@@ -43,13 +45,47 @@ namespace RDEditorPlus.Functionality.Windows
 
         public void RemoveWindow(int index)
         {
-            extraWindowCount--;
+            using (new SaveStateScope(clearRedo: true, skipSaving: false, skipTimelinePos: false))
+            {
+                List<LevelEventControl_Base> toBeDeleted = new();
+
+                foreach (var control in scnEditor.instance.eventControls_windows)
+                {
+                    if (control.levelEvent.y == index)
+                    {
+                        toBeDeleted.Add(control);
+                    }
+                    else if (control.levelEvent.y > index)
+                    {
+                        control.levelEvent.y--;
+                        control.UpdateUI();
+                    }
+                }
+
+                scnEditor.instance.DeleteEventControlsFromList(toBeDeleted, sound: false);
+            }
+
+            int value = extraWindowCount - 1;
+            UpdateTabListSize(extraWindowCount, value);
+            extraWindowCount = value;
+
             UpdateTabWindows(WindowCount);
+
+            if (PluginConfig.SubRowsEnabled && PluginConfig.WindowSubRowsEnabled)
+            {
+                scnEditor.instance.timeline.UpdateMaxUsedY();
+                WindowManager.Instance.UpdateTab(force: false);
+            }
+
+            scnEditor.instance.timeline.UpdateUI();
         }
 
         public void SetActiveExtraWindows(int count)
         {
-            extraWindowCount = Math.Max(0, count);
+            int value = Math.Max(0, count);
+            UpdateTabListSize(extraWindowCount, value);
+            extraWindowCount = value;
+
             UpdateTabWindows(WindowCount);
         }
 
@@ -108,14 +144,18 @@ namespace RDEditorPlus.Functionality.Windows
             }
         }
 
+        private static void UpdateTabListSize(int oldExtraWindowCount, int extraWindowCount)
+        {
+            var rect = scnEditor.instance.tabSection_windows.listRect;
+            rect.OffsetMinY(rect.offsetMin.y - scnEditor.instance.cellHeight * (extraWindowCount - oldExtraWindowCount));
+        }
+
         private static void DuplicateWindowsIfRequired(TabSection_Windows tab, int desiredWindowCount)
         {
             if (tab.labels.Length >= desiredWindowCount)
             {
                 return;
             }
-
-            int toBeAdded = desiredWindowCount - tab.labels.Length;
 
             GameObject template = tab.labels[0].gameObject;
             Transform parent = template.transform.parent;
@@ -140,6 +180,12 @@ namespace RDEditorPlus.Functionality.Windows
                 text.text = RDString.Get("editor.windowIndex").Replace("[index]", (i + 1).ToString());
                 text.horizontalOverflow = HorizontalWrapMode.Overflow; // the text might be hidden by the preview but whateverrr
 
+                int index = i;
+                clone.AddComponent<Button>().onClick.AddListener(() =>
+                {
+                    Instance.RemoveWindow(index);
+                });
+
                 var border = clone.transform.Find("previewBorder").GetComponent<Image>();
 
                 labels.Add(text);
@@ -152,9 +198,6 @@ namespace RDEditorPlus.Functionality.Windows
             tab.previewBorders = previewBorders.ToArray();
 
             currentLastSibling.SetAsLastSibling();
-
-            var rect = scnEditor.instance.tabSection_windows.listRect;
-            rect.OffsetMinY(rect.offsetMin.y - scnEditor.instance.cellHeight * toBeAdded);
         }
 
         private int extraWindowCount = 0;
