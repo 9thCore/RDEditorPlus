@@ -184,7 +184,11 @@ namespace RDEditorPlus.Functionality.SubRow
 
                 int num = SubRowStorage.Instance.GetSubRow(levelEvent) + 1;
                 int window = levelEvent.y;
-                usedSubRowCounts[window] = Math.Max(usedSubRowCounts[window], num);
+
+                if (window < usedSubRowCounts.Length)
+                {
+                    usedSubRowCounts[window] = Math.Max(usedSubRowCounts[window], num);
+                }
             }
 
             int firstWindowThatUpdated = -1;
