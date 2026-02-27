@@ -1,6 +1,7 @@
 ﻿using RDEditorPlus.Functionality.SubRow;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -46,13 +47,58 @@ namespace RDEditorPlus.Functionality.Windows
             UpdateTabWindows(WindowCount);
         }
 
+        public void SetActiveExtraWindows(int count)
+        {
+            extraWindowCount = Math.Max(0, count);
+            UpdateTabWindows(WindowCount);
+        }
+
+        public void DecodeModData(Dictionary<string, object> data)
+        {
+            if (data == null)
+            {
+                SetActiveExtraWindows(0);
+                return;
+            }
+
+            if (data.TryGetValue(ExtraWindowCountKey, out var value) && value is int count)
+            {
+                SetActiveExtraWindows(count);
+            }
+            else
+            {
+                SetActiveExtraWindows(0);
+            }
+        }
+
+        public bool TryConstructJSONData(out string data)
+        {
+            if (extraWindowCount == 0)
+            {
+                data = default;
+                return false;
+            }
+
+            data = $"\"{ExtraWindowCountKey}\": {extraWindowCount}";
+            return true;
+        }
+
         public int WindowCount => RDEditorConstants.WindowCount + extraWindowCount;
         public int ExtraWindowCount => extraWindowCount;
+
+        public const string ExtraWindowCountKey = "extraWindowCount";
 
         private static void UpdateTabWindows(int windowCount)
         {
             var tab = scnEditor.instance.tabSection_windows;
             DuplicateWindowsIfRequired(tab, windowCount);
+
+            int num = 0;
+            foreach (Transform child in tab.listRect)
+            {
+                child.gameObject.SetActive(num < windowCount);
+                num++;
+            }
         }
 
         private static void DuplicateWindowsIfRequired(TabSection_Windows tab, int desiredWindowCount)

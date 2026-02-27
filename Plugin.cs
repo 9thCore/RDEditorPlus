@@ -41,6 +41,7 @@ namespace RDEditorPlus
             Harmony harmony = new(MyPluginInfo.PLUGIN_GUID);
             PatchUtil.PatchNested(harmony, typeof(Patch_LevelEvent_Base)); // We want this patching regardless
             PatchUtil.PatchNested(harmony, typeof(Patch_scnEditor));
+            PatchUtil.PatchNested(harmony, typeof(Patch_RDLevelData));
 
             Patch.SubRows.PatchHandler.Instance.Patch(harmony);
             Patch.SubRows.Patient.PatchHandler.Instance.Patch(harmony);
