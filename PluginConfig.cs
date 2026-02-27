@@ -27,6 +27,7 @@ namespace RDEditorPlus
         public const string CATEGORY_CUSTOMMETHODS = "CustomMethods";
         public const string CATEGORY_ROWS = "Rows";
         public const string CATEGORY_SELECT = "Select";
+        public const string CATEGORY_WINDOWS = "Windows";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -68,6 +69,10 @@ namespace RDEditorPlus
             "If set to " + nameof(MultiEditColorBehaviour.AverageHSV) + ", it will be the average of all the color's hue, saturation and value, while keeping its alpha component 1.\n" +
             "If set to " + nameof(MultiEditColorBehaviour.AverageHSVA) + ", it will be the average of all the color's hue, saturation, value and alpha components.";
 
+        public const string PATCH_WINDOWS_TOGGLE = "Toggle for all window functionality.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_WINDOWS_MORE = "If it should be possible to add new windows using a new plus button, similar to the patient and sprite tabs.\n" +
+            "Extra windows can, afterwards, be removed with a button added to the window.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -88,6 +93,9 @@ namespace RDEditorPlus
         public static bool SelectionEnabled => Instance.selection.Value;
         public static bool SelectionMultiEditEnabled => Instance.selectionMultiEdit.Value;
         public static MultiEditColorBehaviour SelectionMultiEditColorBehaviour => Instance.selectionMultiEditColor.Value;
+
+        public static bool WindowsEnabled => Instance.windows.Value;
+        public static bool WindowsMoreEnabled => Instance.windowsMore.Value;
 
 
 #pragma warning disable 0649
@@ -148,6 +156,14 @@ namespace RDEditorPlus
 
         [Config<MultiEditColorBehaviour>(PATCH_SELECT_MULTI_COLOR, MultiEditColorBehaviour.JustSetToWhite)]
         public readonly ConfigEntry<MultiEditColorBehaviour> selectionMultiEditColor;
+
+
+        [Category(CATEGORY_WINDOWS)]
+        [Config<bool>(PATCH_WINDOWS_TOGGLE, false)]
+        public readonly ConfigEntry<bool> windows;
+
+        [Config<bool>(PATCH_WINDOWS_MORE, true)]
+        public readonly ConfigEntry<bool> windowsMore;
 #pragma warning restore 0649
 
 

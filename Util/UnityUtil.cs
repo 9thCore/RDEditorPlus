@@ -71,6 +71,18 @@ namespace RDEditorPlus.Util
             return destination;
         }
 
+        public static T ReplaceWithDerivative<T>(this Button source) where T : Button
+        {
+            GameObject gameObject = source.gameObject;
+            var properties = (source.colors);
+
+            GameObject.DestroyImmediate(source);
+            T destination = gameObject.AddComponent<T>();
+
+            (destination.colors) = properties;
+            return destination;
+        }
+
         public static void SetAlpha(this Graphic graphic, float alpha)
         {
             graphic.color = graphic.color.WithAlpha(alpha);
