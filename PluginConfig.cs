@@ -72,6 +72,10 @@ namespace RDEditorPlus
         public const string PATCH_WINDOWS_TOGGLE = "Toggle for all window functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_WINDOWS_MORE = "If it should be possible to add new windows using a new plus button, similar to the patient and sprite tabs.\n" +
             "Extra windows can, afterwards, be removed with a button added to the window.";
+        public const string PATCH_WINDOWS_REORDER = "How the reorder event should look in the timeline.\n" +
+            "This option is ignored if the the window multiple timeline row system is enabled and " + nameof(subRowTallEventBehaviour) + " is " + nameof(SubRowTallEventBehaviour.KeepFourRowsHigh) + " or " + nameof(SubRowTallEventBehaviour.KeepInSpecialRow) + ".\n" +
+            "If set to " + nameof(MoreWindowsReorderBehaviour.ShowOrder) + ", it will show the order of the given window, where the window with \"1\" will be in front of the others.\n" +
+            "If set to " + nameof(MoreWindowsReorderBehaviour.ShowData) + ", it will show the window indices as they are placed in the event, where the window with the topmost index will be in front of the others.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -96,6 +100,7 @@ namespace RDEditorPlus
 
         public static bool WindowsEnabled => Instance.windows.Value;
         public static bool WindowsMoreEnabled => Instance.windowsMore.Value;
+        public static MoreWindowsReorderBehaviour WindowsReorderBehaviour => Instance.windowsReorderBehaviour.Value;
 
 
 #pragma warning disable 0649
@@ -164,6 +169,9 @@ namespace RDEditorPlus
 
         [Config<bool>(PATCH_WINDOWS_MORE, true)]
         public readonly ConfigEntry<bool> windowsMore;
+
+        [Config<MoreWindowsReorderBehaviour>(PATCH_WINDOWS_REORDER, MoreWindowsReorderBehaviour.ShowOrder)]
+        public readonly ConfigEntry<MoreWindowsReorderBehaviour> windowsReorderBehaviour;
 #pragma warning restore 0649
 
 
@@ -220,6 +228,12 @@ namespace RDEditorPlus
         }
 
         public const MultiEditColorBehaviour AverageAlphaFragment = (MultiEditColorBehaviour) 1;
+
+        public enum MoreWindowsReorderBehaviour
+        {
+            ShowOrder,
+            ShowData
+        }
 
         [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
         private abstract class ConfigAttribute(int order) : Attribute

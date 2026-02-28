@@ -26,15 +26,23 @@ namespace RDEditorPlus.Functionality.Windows
                 else
                 {
                     text.gameObject.SetActive(true);
-                    int placement = Array.IndexOf(levelEvent.order, index);
 
-                    if (placement == -1)
+                    if (PluginConfig.WindowsReorderBehaviour == PluginConfig.MoreWindowsReorderBehaviour.ShowOrder)
                     {
-                        text.text = "#?";
+                        int placement = Array.IndexOf(levelEvent.order, index);
+
+                        if (placement == -1)
+                        {
+                            text.text = "?";
+                        }
+                        else
+                        {
+                            text.text = (placement + 1).ToString();
+                        }
                     }
                     else
                     {
-                        text.text = $"#{placement + 1}";
+                        text.text = (levelEvent.order[index] + 1).ToString();
                     }
                 }
 
