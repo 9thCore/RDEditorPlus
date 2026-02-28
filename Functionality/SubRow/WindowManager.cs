@@ -91,6 +91,7 @@ namespace RDEditorPlus.Functionality.SubRow
             return true;
         }
 
+        // this sucks
         public override void UpdateFullTimelineHeightEvent(LevelEventControl_Base eventControlBase)
         {
             if (eventControlBase is not LevelEventControl_Window eventControl)
@@ -132,31 +133,66 @@ namespace RDEditorPlus.Functionality.SubRow
             int verticalPadding = (int)(scnEditor.instance.timeline.zoomVertFactor * 2.0f);
 
             VerticalLayoutGroup orderGroup = eventControl.orderIcons[0].transform.parent.EnsureComponent<VerticalLayoutGroup>();
-            orderGroup.reverseArrangement = true;
             orderGroup.childScaleHeight = true;
             orderGroup.padding = new RectOffset(horizontalPadding, horizontalPadding, verticalPadding, verticalPadding);
 
             float offset = GetTimelineCellOffset();
 
-            for (int i = 0; i < WindowCount; i++)
+            if (PluginConfig.WindowsEnabled && PluginConfig.WindowsMoreEnabled)
             {
-                LayoutElement orderElement = eventControl.orderIcons[i].EnsureComponent<LayoutElement>();
-                orderElement.layoutPriority = 99;
+                float cellHeight = scnEditor.instance.cellHeight;
+                var storage = eventControl.GetComponent<ReorderWindowStorage>();
 
-                int extraRowCount = SubRowStorage.Instance.GetWindowExtraVisualRowCount(i);
-
-                if (extraRowCount > 0)
+                for (int i = 0; i < WindowCount; i++)
                 {
-                    float heightOffset = scnEditor.instance.cellHeight * extraRowCount;
+                    var text = storage.TextForWindow(i);
 
-                    orderElement.preferredHeight = eventControl.orderIcons[i].preferredHeight * (extraRowCount + 1);
-                    offset += heightOffset;
+                    LayoutElement orderElement = text.EnsureComponent<LayoutElement>();
+                    orderElement.layoutPriority = 99;
 
-                    orderElement.enabled = true;
+                    int extraRowCount = SubRowStorage.Instance.GetWindowExtraVisualRowCount(i);
+
+                    if (extraRowCount > 0)
+                    {
+                        float heightOffset = cellHeight * extraRowCount;
+
+                        orderElement.preferredHeight = text.preferredHeight * (extraRowCount + 1);
+                        offset += heightOffset;
+
+                        orderElement.enabled = true;
+                    }
+                    else
+                    {
+                        orderElement.enabled = false;
+                    }
                 }
-                else
+
+                eventControl.GetComponent<RectTransform>().OffsetMinY(-WindowCount * cellHeight);
+            }
+            else
+            {
+                orderGroup.reverseArrangement = true;
+
+                for (int i = 0; i < RDEditorConstants.WindowCount; i++)
                 {
-                    orderElement.enabled = false;
+                    LayoutElement orderElement = eventControl.orderIcons[i].EnsureComponent<LayoutElement>();
+                    orderElement.layoutPriority = 99;
+
+                    int extraRowCount = SubRowStorage.Instance.GetWindowExtraVisualRowCount(i);
+
+                    if (extraRowCount > 0)
+                    {
+                        float heightOffset = scnEditor.instance.cellHeight * extraRowCount;
+
+                        orderElement.preferredHeight = eventControl.orderIcons[i].preferredHeight * (extraRowCount + 1);
+                        offset += heightOffset;
+
+                        orderElement.enabled = true;
+                    }
+                    else
+                    {
+                        orderElement.enabled = false;
+                    }
                 }
             }
 

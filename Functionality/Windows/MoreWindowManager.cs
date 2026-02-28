@@ -58,7 +58,7 @@ namespace RDEditorPlus.Functionality.Windows
                 WindowManager.Instance.UpdateTab(force: false);
             }
             
-            scnEditor.instance.timeline.UpdateUI();
+            scnEditor.instance.timeline.UpdateUI(updateControls: false);
         }
 
         public void RemoveWindow(int index)
@@ -103,7 +103,7 @@ namespace RDEditorPlus.Functionality.Windows
                 WindowManager.Instance.UpdateTab(force: false);
             }
 
-            scnEditor.instance.timeline.UpdateUI();
+            scnEditor.instance.timeline.UpdateUI(updateControls: false);
         }
 
         public void SetActiveExtraWindows(int count)
@@ -167,6 +167,24 @@ namespace RDEditorPlus.Functionality.Windows
                 }
 
                 num++;
+            }
+
+            foreach (var eventControl in scnEditor.instance.eventControls_windows)
+            {
+                switch (eventControl.levelEvent.type)
+                {
+                    case LevelEventType.ReorderWindows:
+                    case LevelEventType.DesktopColor:
+                        eventControl.UpdateUI();
+                        break;
+                }
+            }
+
+            var panel = scnEditor.instance.inspectorPanelManager.GetCurrent();
+            if (panel is InspectorPanel_ReorderWindows
+                && scnEditor.instance.selectedControls.Count > 0)
+            {
+                panel.UpdateUI(scnEditor.instance.selectedControls[0].levelEvent);
             }
         }
 
