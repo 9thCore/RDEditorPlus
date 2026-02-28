@@ -15,7 +15,8 @@ namespace RDEditorPlus.Patch
         {
             private static void Postfix(Dictionary<string, object> rootDict)
             {
-                if (RDLevelData.decodingFailed)
+                if (scnEditor.instance == null
+                    || RDLevelData.decodingFailed)
                 {
                     return;
                 }
@@ -48,6 +49,11 @@ namespace RDEditorPlus.Patch
 
             private static void ApplyJSONData()
             {
+                if (scnEditor.instance == null)
+                {
+                    return;
+                }
+
                 StringBuilder builder = null;
 
                 if (PluginConfig.WindowsEnabled && PluginConfig.WindowsMoreEnabled
