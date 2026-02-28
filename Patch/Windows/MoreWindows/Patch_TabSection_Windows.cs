@@ -48,7 +48,7 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
 
                 cursor
                     .GotoNext(MoveType.After, instruction => instruction.MatchLdloc(0))
-                    .EmitDelegate((int index) => index % 4);
+                    .EmitDelegate((int index) => index % RDEditorConstants.windowColors.Length);
             }
         }
     }
