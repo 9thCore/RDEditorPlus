@@ -28,6 +28,8 @@ namespace RDEditorPlus.Functionality.Windows
 
         public void AddWindow()
         {
+            scnEditor.instance.LevelEditorPlaySound("sndEditorPanelCreate", "LevelEditorActive");
+
             using (new SaveStateScope(clearRedo: true, skipSaving: false, skipTimelinePos: false))
             {
                 foreach (var control in scnEditor.instance.eventControls_windows)
@@ -63,6 +65,13 @@ namespace RDEditorPlus.Functionality.Windows
 
         public void RemoveWindow(int index)
         {
+            if (extraWindowCount < 1)
+            {
+                return;
+            }
+
+            scnEditor.instance.LevelEditorPlaySound("sndEditorPanelDelete", "LevelEditorActive");
+
             using (new SaveStateScope(clearRedo: true, skipSaving: false, skipTimelinePos: false))
             {
                 List<LevelEventControl_Base> toBeDeleted = new();
@@ -150,7 +159,7 @@ namespace RDEditorPlus.Functionality.Windows
 
         public const string ExtraWindowCountKey = "extraWindowCount";
 
-        private static void UpdateTabWindows(int windowCount)
+        private void UpdateTabWindows(int windowCount)
         {
             var tab = scnEditor.instance.tabSection_windows;
             DuplicateWindowsIfRequired(tab, windowCount);
@@ -180,6 +189,14 @@ namespace RDEditorPlus.Functionality.Windows
                 }
             }
 
+            foreach (var label in tab.labels)
+            {
+                if (label.TryGetComponent(out RDEventTrigger trigger))
+                {
+                    ApplyColorModifier(trigger);
+                }
+            }
+
             var panel = scnEditor.instance.inspectorPanelManager.GetCurrent();
             if (panel is InspectorPanel_ReorderWindows
                 && scnEditor.instance.selectedControls.Count > 0)
@@ -194,14 +211,26 @@ namespace RDEditorPlus.Functionality.Windows
             rect.OffsetMinY(rect.offsetMin.y - scnEditor.instance.cellHeight * (extraWindowCount - oldExtraWindowCount));
         }
 
-        private static void DuplicateWindowsIfRequired(TabSection_Windows tab, int desiredWindowCount)
+        private void DuplicateWindowsIfRequired(TabSection_Windows tab, int desiredWindowCount)
         {
             if (tab.labels.Length >= desiredWindowCount)
             {
                 return;
             }
 
-            GameObject template = tab.labels[0].gameObject;
+            if (template == null)
+            {
+                template = tab.labels[0].gameObject;
+                templateTrigger = template.GetComponent<RDEventTrigger>();
+
+                int index = 0;
+                foreach (var label in tab.labels)
+                {
+                    ApplyOnClick(label.GetComponent<RDEventTrigger>(), index);
+                    index++;
+                }
+            }
+
             Transform parent = template.transform.parent;
             Transform currentLastSibling = parent.GetChild(parent.childCount - 1);
 
@@ -224,11 +253,10 @@ namespace RDEditorPlus.Functionality.Windows
                 text.text = RDString.Get("editor.windowIndex").Replace("[index]", (i + 1).ToString());
                 text.horizontalOverflow = HorizontalWrapMode.Overflow; // the text might be hidden by the preview but whateverrr
 
-                int index = i;
-                clone.AddComponent<Button>().onClick.AddListener(() =>
-                {
-                    Instance.RemoveWindow(index);
-                });
+                var trigger = clone.GetComponent<RDEventTrigger>();
+                trigger.onPointerEnter = templateTrigger.onPointerEnter;
+                trigger.onPointerExit = templateTrigger.onPointerExit;
+                ApplyOnClick(trigger, i);
 
                 var border = clone.transform.Find("previewBorder").GetComponent<Image>();
 
@@ -244,6 +272,38 @@ namespace RDEditorPlus.Functionality.Windows
             currentLastSibling.SetAsLastSibling();
         }
 
+        private void ApplyOnClick(RDEventTrigger trigger, int index)
+        {
+            trigger.onClick = _ => RemoveWindow(index);
+        }
+
+        private void ApplyColorModifier(RDEventTrigger trigger)
+        {
+            var button = trigger.EnsureComponent<Button>();
+
+            if (extraWindowCount == 0)
+            {
+                button.enabled = false;
+            }
+            else
+            {
+                if (canDeleteBlock == default)
+                {
+                    canDeleteBlock = ColorBlock.defaultColorBlock;
+                    canDeleteBlock.highlightedColor = "C0C0C0".HexToColor();
+                    canDeleteBlock.pressedColor = "B0B0B0".HexToColor();
+                }
+
+                button.colors = canDeleteBlock;
+                button.enabled = true;
+            }
+        }
+
         private int extraWindowCount = 0;
+
+        private static GameObject template;
+        private static RDEventTrigger templateTrigger;
+
+        private static ColorBlock canDeleteBlock = default;
     }
 }

@@ -19,23 +19,40 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
                 __instance.listRect.offsetMin = Vector2.zero;
                 __instance.listRect.offsetMax = Vector2.zero;
 
-                if (!scnEditor.instance.tabSection_sprites.spriteHeaders[0].TryGetComponent(out SpriteHeader header))
+                if (!scnEditor.instance.tabSection_rows.rowHeaders[0].TryGetComponent(out RowHeader header))
                 {
-                    Plugin.LogError($"{scnEditor.instance.tabSection_sprites.spriteHeaders[0].name} does not have a {nameof(SpriteHeader)}??");
+                    Plugin.LogError($"{scnEditor.instance.tabSection_rows.rowHeaders[0].name} does not have a {nameof(RowHeader)}??");
                     return;
                 }
 
                 GameObject template = header.addButton.gameObject;
                 GameObject clone = GameObject.Instantiate(template);
 
-                clone.AddComponent<LayoutElement>().preferredHeight = 8f;
+                GameObject root = new($"mod_{MyPluginInfo.PLUGIN_GUID}_AddButtonRoot");
+                root.SetActive(false);
 
-                clone.transform.SetParent(__instance.GetComponentInChildren<VerticalLayoutGroup>().transform);
-                clone.transform.SetAsLastSibling();
+                root.AddComponent<Image>();
+                root.AddComponent<Mask>().showMaskGraphic = false;
+                root.AddComponent<LayoutElement>().preferredHeight = 8f;
+
+                root.transform.SetParent(__instance.GetComponentInChildren<VerticalLayoutGroup>().transform);
+                clone.transform.SetParent(root.transform);
+
+                root.transform.SetAsLastSibling();
+                root.transform.localScale = Vector3.one;
+                root.transform.localPosition = Vector3.zero;
+
                 clone.transform.localScale = Vector3.one;
+                clone.transform.localPosition = Vector3.zero;
+
+                var rt = clone.transform as RectTransform;
+                rt.anchorMin = rt.anchorMin.WithX(2f / 3f);
+                rt.anchorMax = rt.anchorMax.WithX(2f / 3f);
 
                 var button = clone.GetComponent<Button>().ReplaceWithDerivative<Button>();
                 button.onClick.AddListener(MoreWindowManager.Instance.AddWindow);
+
+                root.SetActive(true);
             }
         }
 
