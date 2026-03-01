@@ -22,7 +22,7 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
                     }
                     else
                     {
-                        __result += Math.Max(0, MoreWindowManager.Instance.WindowCount - __instance.rowCellCount + 1);
+                        __result += Math.Max(0, MoreWindowManager.Instance.WindowCount - __instance.scaledRowCellCount + 1);
                     }
                 }
             }
@@ -62,7 +62,7 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
                         {
                             if (PluginConfig.SubRowsEnabled && PluginConfig.WindowSubRowsEnabled)
                             {
-                                rowCount -= Math.Max(0, scnEditor.instance.timeline.maxUsedY - scnEditor.instance.timeline.rowCellCount) + 1;
+                                rowCount -= Math.Max(0, scnEditor.instance.timeline.maxUsedY - scnEditor.instance.timeline.scaledRowCellCount) + 1;
                             }
                             else
                             {
