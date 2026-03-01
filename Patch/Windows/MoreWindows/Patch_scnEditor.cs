@@ -36,23 +36,6 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
                         (levelEvent as LevelEvent_ReorderWindows).order = order;
                     });
             }
-
-            //private static void Postfix(LevelEventType levelEventType)
-            //{
-            //    if (levelEventType == LevelEventType.ReorderWindows)
-            //    {
-            //        var levelEvent = (LevelEvent_ReorderWindows) scnEditor.instance.selectedControl.levelEvent;
-
-            //        int windows = MoreWindowManager.Instance.WindowCount;
-            //        int[] order = new int[windows];
-            //        for (int i = 0; i < windows; i++)
-            //        {
-            //            order[i] = i;
-            //        }
-
-            //        levelEvent.order = order;
-            //    }
-            //}
         }
     }
 }
