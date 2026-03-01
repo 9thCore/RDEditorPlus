@@ -3,6 +3,7 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +25,39 @@ namespace RDEditorPlus.Functionality.Windows
 
                 return instance;
             }
+        }
+
+        public void AddButtonClick()
+        {
+            string path = FileUtil.GetFilePathFromAssembly(HasGottenWarnedFile);
+
+            if (File.Exists(path))
+            {
+                AddWindow();
+                return;
+            }
+
+            scnEditor.instance.LevelEditorPlaySound("sndButtonClick", "LevelEditorActive");
+
+            string warning = "<color=yellow>WARNING</color>\n" +
+                "Using too many windows can <color=red>seriously</color> impact performance for players. " +
+                "Are you certain you want to add another window?\n" +
+                "<color=#ffffff90>(If you proceed, this warning will not appear again.)</color>";
+
+            string no = RDString.Get("editor.dialog.saveAsDiffDirectoryNo");
+            string yes = RDString.Get("editor.dialog.saveAsDiffDirectoryYes");
+
+            scnEditor.instance.dialog.Show(warning, [yes, no], option =>
+            {
+                scnEditor.instance.dialog.Hide(() =>
+                {
+                    if (option == 0)
+                    {
+                        AddWindow();
+                        File.WriteAllText(path, "h");
+                    }
+                });
+            });
         }
 
         public void AddWindow()
@@ -158,6 +192,7 @@ namespace RDEditorPlus.Functionality.Windows
         public int ExtraWindowCount => extraWindowCount;
 
         public const string ExtraWindowCountKey = "extraWindowCount";
+        public const string HasGottenWarnedFile = "_allowMoreThanFourWindows.txt";
 
         private void UpdateTabWindows(int windowCount)
         {

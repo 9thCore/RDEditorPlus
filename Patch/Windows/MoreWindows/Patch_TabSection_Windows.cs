@@ -50,7 +50,7 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows
                 rt.anchorMax = rt.anchorMax.WithX(2f / 3f);
 
                 var button = clone.GetComponent<Button>().ReplaceWithDerivative<Button>();
-                button.onClick.AddListener(MoreWindowManager.Instance.AddWindow);
+                button.onClick.AddListener(MoreWindowManager.Instance.AddButtonClick);
 
                 root.SetActive(true);
             }
