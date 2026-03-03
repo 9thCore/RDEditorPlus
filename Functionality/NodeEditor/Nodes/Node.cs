@@ -95,6 +95,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                     baseNode = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_NodeBase");
                     baseNode.SetActive(false);
 
+                    baseNode.AddComponent<FourSidedOutline>().effectColor = Color.black;
                     baseNode.AddComponent<Shadow>().effectDistance = new Vector2(2f, -2f);
 
                     var image = baseNode.AddComponent<Image>();
