@@ -15,6 +15,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             root.transform.localScale = Vector3.one;
             root.transform.localPosition = Vector3.zero;
 
+            GameObject space = new("space");
+            var spaceRT = space.AddComponent<RectTransform>();
+
+            spaceRT.SetParent(root.transform);
+            spaceRT.localPosition = Vector3.zero;
+            spaceRT.localScale = Vector3.one;
+            spaceRT.offsetMin = spaceRT.offsetMax = Vector2.zero;
+
             GameObject background = new("background");
 
             var image = background.AddComponent<Image>();
@@ -26,7 +34,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 
             var rt = background.transform as RectTransform;
             component.background = rt;
-            component.space = root.AddComponent<RectTransform>();
+            component.space = spaceRT;
+            component.root = root.AddComponent<RectTransform>();
 
             rt.SetParent(root.transform);
             rt.localPosition = Vector3.zero;
@@ -34,6 +43,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 
             rt.offsetMin = new Vector2(-300f, -200f);
             rt.offsetMax = -rt.offsetMin;
+
+            spaceRT.SetAsLastSibling();
 
             root.SetActive(true);
             return component;
@@ -57,21 +68,22 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
                 return;
             }
 
-            space.anchoredPosition += delta / space.lossyScale;
+            root.anchoredPosition += delta / root.lossyScale;
             UpdateBackground();
         }
 
         public void Reset()
         {
-            space.anchoredPosition = Vector2.zero;
+            root.anchoredPosition = Vector2.zero;
             UpdateBackground();
         }
 
         private void UpdateBackground()
         {
-            background.anchoredPosition = -space.anchoredPosition.RoundToMultiple(GridSize);
+            background.anchoredPosition = -root.anchoredPosition.RoundToMultiple(GridSize);
         }
 
+        private RectTransform root;
         private RectTransform space;
         private RectTransform background;
 

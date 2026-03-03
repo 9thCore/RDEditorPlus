@@ -11,6 +11,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             this.node = node;
         }
 
+        public override void OnPointerDown(PointerEventData eventData)
+        {
+            transform.SetAsLastSibling();
+        }
+
         public override void OnBeginDrag(PointerEventData eventData)
         {
             lastDragPosition = eventData.position;
