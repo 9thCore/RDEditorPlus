@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using RDEditorPlus.Functionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeEditor.Nodes;
+using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using RDLevelEditor;
 using System.Collections.Generic;
 using UnityEngine;
@@ -47,7 +48,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             view.AddNode(prefab, position);
         }
 
-        protected void PrepareNodePrefab(string name, IEnumerable<Node.InputData> inputs, IEnumerable<Node.OutputData> outputs)
+        protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
         {
             nodePrefabs.Add(name, Node.PreparePrefab(name, inputs, outputs));
         }
@@ -85,7 +86,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             title = clone.GetComponentInChildren<Text>();
             GameObject.DestroyImmediate(title.GetComponent<RDStringToUIText>());
             Node.Font = title.font;
-            Node.Sprite = sprite;
+            NodeOutput.Sprite = NodeInput.Sprite = Node.Sprite = sprite;
 
             var button = clone.GetComponentInChildren<Button>();
             var buttonObject = button.gameObject;
