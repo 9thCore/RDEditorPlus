@@ -4,8 +4,33 @@ using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
-    public abstract class NodeConnector<ConnectorType, Provider> : MonoBehaviour where ConnectorType : NodeConnector<ConnectorType, Provider> where Provider : IPrefabProvider, new()
+    public abstract class NodeConnector : MonoBehaviour
     {
+        public abstract void StartConnection();
+        public abstract void UpdateConnection(Vector2 pointerPosition);
+        public abstract void EndConnection(Vector2 pointerPosition);
+    }
+
+    public abstract class NodeConnector<ConnectorType, Provider> : NodeConnector where ConnectorType : NodeConnector<ConnectorType, Provider> where Provider : IPrefabProvider, new()
+    {
+        public abstract Type ConnectionType { get; }
+
+        public override void StartConnection()
+        {
+            node.VirtualConnection.SetAnchor(control);
+            node.VirtualConnection.gameObject.SetActive(true);
+        }
+
+        public override void UpdateConnection(Vector2 pointerPosition)
+        {
+            node.VirtualConnection.SetEndPoint(pointerPosition);
+        }
+
+        public override void EndConnection(Vector2 pointerPosition)
+        {
+            node.VirtualConnection.gameObject.SetActive(false);
+        }
+
         protected abstract void AddToNode(Node node);
         protected abstract void PrefabSetup();
 
@@ -14,6 +39,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             // epic line
             this.text.text = text;
         }
+
+        public static Sprite Sprite;
 
         [SerializeField]
         protected RectTransform rectTransform;
@@ -27,6 +54,9 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         [SerializeField]
         protected Node.Type type;
 
+        [SerializeField]
+        protected Node node;
+
         public readonly struct Data(Node.Type type, string name)
         {
             public readonly Node.Type type = type;
@@ -37,12 +67,17 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 var connector = Get(type, name);
                 if (connector != null)
                 {
+                    connector.node = node;
                     connector.AddToNode(node);
                 }
             }
         }
 
-        public static Sprite Sprite;
+        public enum Type
+        {
+            Input,
+            Output
+        }
 
         protected static GameObject BaseConnector(string connectorType)
         {
@@ -87,6 +122,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             baseConnector.AddComponent<TextLayoutElementPropagator>().Setup(connector.text);
 
             connector.PrefabSetup();
+            control.AddComponent<NodeConnectorControlEventTrigger>().Setup(connector);
             return baseConnector;
         }
 

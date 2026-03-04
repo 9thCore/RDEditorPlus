@@ -13,5 +13,13 @@ namespace RDEditorPlus.Util
         {
             return (vector / value).Floor() * value;
         }
+
+        public static Vector2 GetCenterFromCorners(this Vector3[] worldCorners)
+        {
+            Vector3 topLeft = worldCorners[2];
+            Vector3 bottomRight = worldCorners[0];
+
+            return new Vector2((topLeft.x + bottomRight.x) / 2f, (topLeft.y + bottomRight.y) / 2f);
+        }
     }
 }

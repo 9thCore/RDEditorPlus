@@ -1,10 +1,9 @@
-﻿using DG.Tweening;
+﻿using RDEditorPlus.Functionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static Unity.Audio.Handle;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 {
@@ -30,6 +29,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
             return root;
         }
+
+        public void Setup(NodeGrid grid)
+        {
+            this.grid = grid;
+        }
+
+        public NodeConnection CreateConnection() => grid.CreateConnection();
+        public NodeConnection VirtualConnection => grid.VirtualConnection;
 
         public void AddInput(RectTransform input) => input.SetParent(inputParent);
         public void AddOutput(RectTransform output) => output.SetParent(outputParent);
@@ -65,6 +72,9 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
             rectTransform.offsetMin -= Vector2.up * (Mathf.Max(inputParent.rect.height, outputParent.rect.height) + TextClearance + TextHeight);
         }
+
+        [SerializeField]
+        private NodeGrid grid;
 
         [SerializeField]
         private Text title;

@@ -1,4 +1,7 @@
-﻿using RDEditorPlus.Util;
+﻿using RDEditorPlus.Functionality.NodeEditor.Nodes;
+using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
+using RDEditorPlus.Util;
+using System.Drawing.Printing;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,27 +18,13 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             root.transform.localScale = Vector3.one;
             root.transform.localPosition = Vector3.zero;
 
-            GameObject space = new("space");
-            var spaceRT = space.AddComponent<RectTransform>();
-
-            spaceRT.SetParent(root.transform);
-            spaceRT.localPosition = Vector3.zero;
-            spaceRT.localScale = Vector3.one;
-            spaceRT.offsetMin = spaceRT.offsetMax = Vector2.zero;
-
             GameObject background = new("background");
 
             var image = background.AddComponent<Image>();
             image.sprite = GridSprite;
             image.type = Image.Type.Tiled;
 
-            NodeGrid component = root.AddComponent<NodeGrid>();
-            root.AddComponent<NodeGridEventTrigger>().Setup(component);
-
             var rt = background.transform as RectTransform;
-            component.background = rt;
-            component.space = spaceRT;
-            component.root = root.AddComponent<RectTransform>();
 
             rt.SetParent(root.transform);
             rt.localPosition = Vector3.zero;
@@ -44,10 +33,46 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             rt.offsetMin = new Vector2(-300f, -200f);
             rt.offsetMax = -rt.offsetMin;
 
-            spaceRT.SetAsLastSibling();
+            GameObject space = new("space");
+            var spaceRT = space.AddComponent<RectTransform>();
+
+            spaceRT.SetParent(root.transform);
+            spaceRT.localPosition = Vector3.zero;
+            spaceRT.localScale = Vector3.one;
+            spaceRT.offsetMin = spaceRT.offsetMax = Vector2.zero;
+
+            GameObject connections = new("connections");
+            var connectionsRT = connections.AddComponent<RectTransform>();
+
+            connectionsRT.SetParent(root.transform);
+            connectionsRT.localPosition = Vector3.zero;
+            connectionsRT.localScale = Vector3.one;
+            connectionsRT.offsetMin = connectionsRT.offsetMax = Vector2.zero;
+
+            NodeGrid component = root.AddComponent<NodeGrid>();
+            root.AddComponent<NodeGridEventTrigger>().Setup(component);
+            component.background = rt;
+            component.space = spaceRT;
+            component.root = root.AddComponent<RectTransform>();
+            component.connections = connectionsRT;
 
             root.SetActive(true);
             return component;
+        }
+
+        public NodeConnection CreateConnection() => NodeConnection.Create(connections);
+        public NodeConnection VirtualConnection
+        {
+            get
+            {
+                if (virtualConnection == null)
+                {
+                    virtualConnection = CreateConnection();
+                    virtualConnection.gameObject.SetActive(false);
+                }
+
+                return virtualConnection;
+            }
         }
 
         public void AddNode(GameObject prefab, Vector2 position)
@@ -57,6 +82,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             RectTransform rt = instance.transform as RectTransform;
             rt.transform.localScale = Vector3.one;
             rt.anchoredPosition = position;
+            instance.GetComponent<Node>().Setup(this);
 
             instance.SetActive(true);
         }
@@ -86,6 +112,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
         private RectTransform root;
         private RectTransform space;
         private RectTransform background;
+        private RectTransform connections;
+        private NodeConnection virtualConnection;
 
         public static Sprite GridSprite
         {
