@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.Components;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,16 +10,48 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         public abstract void StartConnection();
         public abstract void UpdateConnection(Vector2 pointerPosition);
         public abstract void EndConnection(Vector2 pointerPosition);
+        public abstract void SetColor(Node.Type nodeType, Type type, Node excludeFrom);
+        public abstract void ResetColor();
+
+        public enum Type
+        {
+            Input = 0,
+            Output = 1
+        }
+
+        protected static void SetColorToAll(Node.Type nodeType, Type type, Node excludeFrom)
+        {
+            foreach (var connector in allConnectors)
+            {
+                connector.SetColor(nodeType, type, excludeFrom);
+            }
+        }
+
+        protected static void ResetColorToAll()
+        {
+            foreach (var connector in allConnectors)
+            {
+                connector.ResetColor();
+            }
+        }
+
+        protected static readonly HashSet<NodeConnector> allConnectors = new();
+
+        protected static Type GetOppositeType(Type type)
+        {
+            return 1 - type;
+        }
     }
 
-    public abstract class NodeConnector<ConnectorType, Provider> : NodeConnector where ConnectorType : NodeConnector<ConnectorType, Provider> where Provider : IPrefabProvider, new()
+    public abstract class NodeConnector<ConnectorType, Provider>(NodeConnector.Type connectorType) : NodeConnector where ConnectorType : NodeConnector<ConnectorType, Provider> where Provider : IPrefabProvider, new()
     {
-        public abstract Type ConnectionType { get; }
-
         public override void StartConnection()
         {
             node.VirtualConnection.SetAnchor(control);
             node.VirtualConnection.gameObject.SetActive(true);
+
+            SetColorToAll(type, GetOppositeType(connectorType), node);
+            ResetColor();
         }
 
         public override void UpdateConnection(Vector2 pointerPosition)
@@ -29,6 +62,27 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         public override void EndConnection(Vector2 pointerPosition)
         {
             node.VirtualConnection.gameObject.SetActive(false);
+            ResetColorToAll();
+        }
+
+        public override void SetColor(Node.Type nodeType, Type type, Node excludeFrom)
+        {
+            if (nodeType == this.type && excludeFrom != node && connectorType == type)
+            {
+                controlImage.color = ColorDataByType[this.type].ValidControl;
+                controlOutline.effectColor = OutlineSelectableColor;
+            }
+            else
+            {
+                controlImage.color = ColorDataByType[this.type].InvalidControl;
+                controlOutline.effectColor = OutlineUnselectableColor;
+            }
+        }
+
+        public override void ResetColor()
+        {
+            controlImage.color = ColorDataByType[type].ValidControl;
+            controlOutline.effectColor = OutlineUnselectableColor;
         }
 
         protected abstract void AddToNode(Node node);
@@ -40,22 +94,40 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             this.text.text = text;
         }
 
+        protected void Start()
+        {
+            allConnectors.Add(this);
+        }
+
+        protected void OnDestroy()
+        {
+            allConnectors.Remove(this);
+        }
+
+        private void SetType(Node.Type type)
+        {
+            this.type = type;
+            ResetColor();
+        }
+
         public static Sprite Sprite;
 
         [SerializeField]
         protected RectTransform rectTransform;
-
         [SerializeField]
         protected RectTransform control;
-
         [SerializeField]
         protected Text text;
-
         [SerializeField]
         protected Node.Type type;
-
         [SerializeField]
         protected Node node;
+        [SerializeField]
+        protected Image controlImage;
+        [SerializeField]
+        protected EightSidedOutline controlOutline;
+
+        protected readonly Type connectorType = connectorType;
 
         public readonly struct Data(Node.Type type, string name)
         {
@@ -73,12 +145,6 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             }
         }
 
-        public enum Type
-        {
-            Input,
-            Output
-        }
-
         protected static GameObject BaseConnector(string connectorType)
         {
             GameObject baseConnector = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_Node{connectorType}");
@@ -90,7 +156,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
             GameObject control = new("control");
 
-            control.AddComponent<EightSidedOutline>().effectColor = Color.gray;
+            var outline = control.AddComponent<EightSidedOutline>();
+            outline.effectColor = Color.gray;
 
             var image = control.AddComponent<Image>();
             image.sprite = Sprite;
@@ -104,6 +171,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             var connector = baseConnector.AddComponent<ConnectorType>();
             connector.rectTransform = rt;
             connector.control = controlRT;
+            connector.controlImage = image;
 
             GameObject text = new("name");
 
@@ -123,6 +191,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
             connector.PrefabSetup();
             control.AddComponent<NodeConnectorControlEventTrigger>().Setup(connector);
+
+            connector.controlOutline = outline;
             return baseConnector;
         }
 
@@ -131,7 +201,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             GameObject floatConnector = GameObject.Instantiate(baseConnector);
 
             floatConnector.name = $"{baseConnector.name}Float";
-            floatConnector.GetComponent<ConnectorType>().type = Node.Type.Float;
+            floatConnector.GetComponent<ConnectorType>().SetType(Node.Type.Float);
             return floatConnector;
         }
 
@@ -150,6 +220,21 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
             instance.SetActive(true);
             return connector;
+        }
+
+        private readonly Dictionary<Node.Type, ColorData> ColorDataByType = new()
+        {
+            { Node.Type.Float, Color.green }
+        };
+
+        private readonly Color OutlineUnselectableColor = Color.gray;
+        private readonly Color OutlineSelectableColor = Color.yellow;
+
+        private readonly record struct ColorData(Color ValidControl)
+        {
+            public readonly Color InvalidControl = Color.Lerp(ValidControl, Color.black, 0.5f);
+
+            public static implicit operator ColorData(Color SelectedControl) => new(SelectedControl);
         }
     }
 }

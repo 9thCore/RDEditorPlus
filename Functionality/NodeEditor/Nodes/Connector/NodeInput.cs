@@ -4,7 +4,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
     public class NodeInput : NodeConnector<NodeInput, NodeInput.Provider>
     {
-        public override Type ConnectionType => Type.Input;
+        private NodeInput() : base(Type.Input)
+        {
+
+        }
 
         protected override void AddToNode(Node node)
         {
