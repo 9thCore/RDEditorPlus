@@ -16,10 +16,6 @@ namespace RDEditorPlus.Patch.LevelMerger
                 {
                     MergerPanelHolder.Instance.Toggle(true);
                 }
-                else if (RDEditorUtils.CheckForKeyCombo(false, false, KeyCode.T))
-                {
-                    MergerPanelHolder.Instance.AddNode("Test", new Vector2(Random.value * 20f - 10f, Random.value * 20f - 10f));
-                }
             }
         }
     }

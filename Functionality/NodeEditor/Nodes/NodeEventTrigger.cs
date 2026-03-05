@@ -11,20 +11,37 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             this.node = node;
         }
 
+        public override void OnPointerClick(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                node.Delete();
+            }
+        }
+
         public override void OnPointerDown(PointerEventData eventData)
         {
-            transform.SetAsLastSibling();
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                transform.SetAsLastSibling();
+            }
         }
 
         public override void OnBeginDrag(PointerEventData eventData)
         {
-            lastDragPosition = eventData.position;
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                lastDragPosition = eventData.position;
+            }
         }
 
         public override void OnDrag(PointerEventData eventData)
         {
-            node.Drag(eventData.position - lastDragPosition);
-            lastDragPosition = eventData.position;
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                node.Drag(eventData.position - lastDragPosition);
+                lastDragPosition = eventData.position;
+            }
         }
 
         private Vector2 lastDragPosition;

@@ -100,7 +100,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
                 Toggle(show: false);
             });
 
-            view = NodeGridView.Create(transform, sprite);
+            view = NodeGridView.Create(transform, sprite, this);
             gameObject = clone;
             rectTransform = clone.transform as RectTransform;
 

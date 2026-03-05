@@ -1,7 +1,6 @@
 ﻿using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
-using System.Drawing.Printing;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +8,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 {
     public class NodeGrid : MonoBehaviour
     {
-        public static NodeGrid Create(Transform parent)
+        public static NodeGrid Create(Transform parent, NodePanelHolder holder)
         {
             GameObject root = new(nameof(NodeGrid));
             root.SetActive(false);
@@ -55,6 +54,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             component.space = spaceRT;
             component.root = root.AddComponent<RectTransform>();
             component.connections = connectionsRT;
+            component.holder = holder;
 
             root.SetActive(true);
             return component;
@@ -87,6 +87,13 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             instance.SetActive(true);
         }
 
+        public void AddNode(string name, Vector2 position) => holder.AddNode(name, position);
+
+        public void AddNodeAtPointerPosition(string name, Vector2 position)
+        {
+            AddNode(name, (position - transform.position.xy()) / transform.lossyScale.x);
+        }
+
         public void Drag(Vector2 delta)
         {
             if (delta == Vector2.zero)
@@ -114,6 +121,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
         private RectTransform background;
         private RectTransform connections;
         private NodeConnection virtualConnection;
+        private NodePanelHolder holder;
 
         public static Sprite GridSprite
         {

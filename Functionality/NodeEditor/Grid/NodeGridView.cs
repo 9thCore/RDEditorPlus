@@ -5,7 +5,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 {
     public class NodeGridView : MonoBehaviour
     {
-        public static NodeGridView Create(Transform parent, Sprite sprite)
+        public static NodeGridView Create(Transform parent, Sprite sprite, NodePanelHolder holder)
         {
             GameObject view = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeGridView)}");
             view.SetActive(false);
@@ -44,7 +44,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             maskRectTransform.anchorMax = new Vector2(0.99f, 0.98f);
             maskRectTransform.offsetMin = maskRectTransform.offsetMax = Vector2.zero;
 
-            component.grid = NodeGrid.Create(maskRectTransform);
+            component.grid = NodeGrid.Create(maskRectTransform, holder);
             component.sprite = sprite;
 
             view.SetActive(true);

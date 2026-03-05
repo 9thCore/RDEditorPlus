@@ -51,6 +51,12 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             rectTransform.anchoredPosition += delta / rectTransform.lossyScale;
         }
 
+        public void Delete()
+        {
+            gameObject.SetActive(false);
+            GameObject.Destroy(gameObject);
+        }
+
         public enum Type
         {
             Float
