@@ -9,7 +9,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
     {
         public abstract void StartConnection();
         public abstract void UpdateConnection(Vector2 pointerPosition);
-        public abstract void EndConnection(Vector2 pointerPosition);
+        public abstract void EndConnection(NodeConnector selectedNode);
         public abstract void SetColor(Node.Type nodeType, Type type, Node excludeFrom);
         public abstract void ResetColor();
 
@@ -18,6 +18,18 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             Input = 0,
             Output = 1
         }
+
+        public record Link(NodeInput Input, NodeOutput Output, NodeConnection Connection)
+        {
+            public void Unlink()
+            {
+                Connection.Delete();
+                Output.Remove(this);
+                Input.RemoveLink();
+            }
+        }
+
+        protected internal abstract void SetupConnection(NodeConnector other);
 
         protected static void SetColorToAll(Node.Type nodeType, Type type, Node excludeFrom)
         {
@@ -34,6 +46,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 connector.ResetColor();
             }
         }
+
+        [SerializeField]
+        protected internal RectTransform control;
+        protected internal bool available = false;
 
         protected static readonly HashSet<NodeConnector> allConnectors = new();
 
@@ -59,9 +75,15 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             node.VirtualConnection.SetEndPoint(pointerPosition);
         }
 
-        public override void EndConnection(Vector2 pointerPosition)
+        public override void EndConnection(NodeConnector selectedNode)
         {
             node.VirtualConnection.gameObject.SetActive(false);
+
+            if (selectedNode != null && selectedNode != this && selectedNode.available)
+            {
+                SetupConnection(selectedNode);
+            }
+
             ResetColorToAll();
         }
 
@@ -71,11 +93,13 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             {
                 controlImage.color = ColorDataByType[this.type].ValidControl;
                 controlOutline.effectColor = OutlineSelectableColor;
+                available = true;
             }
             else
             {
                 controlImage.color = ColorDataByType[this.type].InvalidControl;
                 controlOutline.effectColor = OutlineUnselectableColor;
+                available = false;
             }
         }
 
@@ -114,8 +138,6 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         [SerializeField]
         protected RectTransform rectTransform;
-        [SerializeField]
-        protected RectTransform control;
         [SerializeField]
         protected Text text;
         [SerializeField]

@@ -1,4 +1,5 @@
-﻿using RDLevelEditor;
+﻿using RDEditorPlus.Util;
+using RDLevelEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -30,9 +31,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         public override void OnEndDrag(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left)
+            if (eventData.pointerCurrentRaycast.gameObject != null
+                && eventData.pointerCurrentRaycast.gameObject.TryGetComponentInParent(out NodeConnector other))
             {
-                connector.EndConnection(eventData.position);
+                connector.EndConnection(other);
+            }
+            else
+            {
+                connector.EndConnection(null);
             }
         }
 

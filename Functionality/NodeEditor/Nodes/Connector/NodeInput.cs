@@ -9,9 +9,32 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         }
 
+        public void SetLink(Link link)
+        {
+            if (this.link != null)
+            {
+                this.link.Unlink();
+            }
+
+            this.link = link;
+        }
+
+        public void RemoveLink()
+        {
+            link = null;
+        }
+
+        public void Drag(Vector2 delta)
+        {
+            if (link != null)
+            {
+                link.Connection.OffsetEndPoint(delta);
+            }
+        }
+
         protected override void AddToNode(Node node)
         {
-            node.AddInput(rectTransform);
+            node.AddInput(rectTransform, this);
         }
 
         protected override void PrefabSetup()
@@ -21,6 +44,13 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             text.rectTransform.anchorMin = new Vector2(0.16f, 0f);
             text.rectTransform.anchorMax = Vector2.one;
         }
+
+        protected internal override void SetupConnection(NodeConnector other)
+        {
+            other.SetupConnection(this);
+        }
+
+        private Link link;
 
         public class Provider : IPrefabProvider
         {

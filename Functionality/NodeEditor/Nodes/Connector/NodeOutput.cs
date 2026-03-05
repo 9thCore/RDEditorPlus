@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
@@ -9,9 +10,23 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         }
 
+        public void Remove(Link link)
+        {
+            links.Remove(link);
+        }
+
+        public void Drag()
+        {
+            foreach (var link in links)
+            {
+                link.Connection.SetAnchor(control);
+                link.Connection.SetEndPoint(link.Input.control.position.xy());
+            }
+        }
+
         protected override void AddToNode(Node node)
         {
-            node.AddOutput(rectTransform);
+            node.AddOutput(rectTransform, this);
         }
 
         protected override void PrefabSetup()
@@ -23,6 +38,21 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
             text.alignment = TextAnchor.MiddleRight;
         }
+
+        protected internal override void SetupConnection(NodeConnector other)
+        {
+            var input = other as NodeInput;
+
+            var connection = node.CreateConnection();
+            connection.SetAnchor(control);
+            connection.SetEndPoint(other.control.position.xy());
+            Link link = new(input, this, connection);
+
+            links.Add(link);
+            input.SetLink(link);
+        }
+
+        private readonly List<Link> links = new();
 
         public class Provider : IPrefabProvider
         {

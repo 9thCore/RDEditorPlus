@@ -25,12 +25,24 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         public void SetEndPoint(Vector2 point)
         {
+            endPoint = point;
             Vector2 delta = point - controlCenter;
             rectTransform.localEulerAngles = new(0f, 0f, -delta.GetAngle());
             line.sizeDelta = new Vector2(delta.magnitude / rectTransform.lossyScale.x, line.sizeDelta.y);
         }
 
+        public void OffsetEndPoint(Vector2 delta)
+        {
+            SetEndPoint(endPoint + delta);
+        }
+
+        public void Delete()
+        {
+            GameObject.Destroy(gameObject);
+        }
+
         private Vector2 controlCenter;
+        private Vector2 endPoint;
 
         [SerializeField]
         private RectTransform rectTransform;
@@ -55,6 +67,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                     rt2.pivot = new Vector2(0f, 0.5f);
 
                     var image = line.AddComponent<Image>();
+                    image.raycastTarget = false;
 
                     var rt = line.transform as RectTransform;
                     rt.SetParent(rt2);

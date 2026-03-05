@@ -16,6 +16,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
             var node = root.GetComponent<Node>();
             node.SetName(name);
+            node.inputs = new();
+            node.outputs = new();
 
             foreach (var input in inputs)
             {
@@ -38,8 +40,17 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         public NodeConnection CreateConnection() => grid.CreateConnection();
         public NodeConnection VirtualConnection => grid.VirtualConnection;
 
-        public void AddInput(RectTransform input) => input.SetParent(inputParent);
-        public void AddOutput(RectTransform output) => output.SetParent(outputParent);
+        public void AddInput(RectTransform transform, NodeInput input)
+        {
+            transform.SetParent(inputParent);
+            inputs.Add(input);
+        }
+
+        public void AddOutput(RectTransform transform, NodeOutput output)
+        {
+            transform.SetParent(outputParent);
+            outputs.Add(output);
+        }
 
         public void Drag(Vector2 delta)
         {
@@ -48,7 +59,18 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                 return;
             }
 
-            rectTransform.anchoredPosition += delta / rectTransform.lossyScale;
+            Vector2 scaledDelta = delta / rectTransform.lossyScale;
+            rectTransform.anchoredPosition += scaledDelta;
+
+            foreach (var input in inputs)
+            {
+                input.Drag(delta);
+            }
+
+            foreach (var output in outputs)
+            {
+                output.Drag();
+            }
         }
 
         public void Delete()
@@ -93,6 +115,12 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
         [SerializeField]
         private RectTransform outputParent;
+
+        [SerializeField]
+        private List<NodeInput> inputs;
+
+        [SerializeField]
+        private List<NodeOutput> outputs;
 
         public static Font Font;
         public static Sprite Sprite;
