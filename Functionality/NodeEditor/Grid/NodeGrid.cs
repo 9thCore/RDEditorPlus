@@ -1,6 +1,9 @@
 ﻿using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -82,12 +85,21 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             RectTransform rt = instance.transform as RectTransform;
             rt.transform.localScale = Vector3.one;
             rt.anchoredPosition = position;
-            instance.GetComponent<Node>().Setup(this);
+
+            var node = instance.GetComponent<Node>();
+            node.GenerateID();
+            node.Setup(this);
+            nodes.Add(node);
 
             instance.SetActive(true);
         }
 
         public void AddNode(string name, Vector2 position) => holder.AddNode(name, position);
+
+        public void DeleteNode(Node node)
+        {
+            nodes.Remove(node);
+        }
 
         public void AddNodeAtPointerPosition(string name, Vector2 position)
         {
@@ -111,6 +123,20 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             UpdateBackground();
         }
 
+        public async Task ExportAsync(XmlWriter writer)
+        {
+            await writer.WriteStartElementAsync(NodesKey);
+
+            foreach (var node in nodes)
+            {
+                await writer.WriteStartElementAsync(NodeKey);
+                await node.ExportAsync(writer);
+                await writer.WriteEndElementAsync();
+            }
+
+            await writer.WriteEndElementAsync();
+        }
+
         private void UpdateBackground()
         {
             background.anchoredPosition = -root.anchoredPosition.RoundToMultiple(GridSize);
@@ -122,6 +148,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
         private RectTransform connections;
         private NodeConnection virtualConnection;
         private NodePanelHolder holder;
+        private readonly List<Node> nodes = new();
+
+        public const string NodesKey = "Nodes";
+        public const string NodeKey = "Node";
 
         public static Sprite GridSprite
         {

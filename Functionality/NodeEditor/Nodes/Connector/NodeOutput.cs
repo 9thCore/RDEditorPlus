@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using RDEditorPlus.Util;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
 using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
@@ -22,6 +25,23 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 link.Connection.SetAnchor(control);
                 link.Connection.SetEndPoint(link.Input.control.position.xy());
             }
+        }
+
+        public async Task ExportAsync(XmlWriter writer)
+        {
+            await writer.WriteAttributeStringAsync(NameKey, connectorName);
+
+            foreach (var link in links)
+            {
+                await writer.WriteStartElementAsync(LinkKey);
+                await link.ExportAsync(writer);
+                await writer.WriteEndElementAsync();
+            }
+        }
+
+        public bool CanExport()
+        {
+            return links.Count > 0;
         }
 
         protected override void AddToNode(Node node)
@@ -65,6 +85,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 };
             }
         }
+
+        public const string LinkKey = "Link";
 
         private static GameObject FloatOutput
         {

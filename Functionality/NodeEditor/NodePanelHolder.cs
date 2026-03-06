@@ -2,10 +2,15 @@
 using RDEditorPlus.Functionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityFileDialog;
 
 namespace RDEditorPlus.Functionality.NodeEditor
 {
@@ -46,6 +51,55 @@ namespace RDEditorPlus.Functionality.NodeEditor
             }
 
             view.AddNode(prefab, position);
+        }
+
+        public void ScheduleExport()
+        {
+            if (state != State.Idle)
+            {
+                return;
+            }
+
+            scnEditor.PauseIfUnpaused();
+
+            string location = FileBrowser.SaveFile(
+                scnEditor.GetLastUsedFolder(),
+                DefaultFilename,
+                "Rhythm Doctor level merge data",
+                Extensions,
+                "Save level merge data");
+
+            if (location == string.Empty)
+            {
+                return;
+            }
+
+            state = State.Exporting;
+            Task.Run(() => ExportAsync(location));
+        }
+
+        public async Task ExportAsync(string location)
+        {
+            var settings = new XmlWriterSettings()
+            {
+                Indent = true,
+                Async = true
+            };
+
+            using var writer = XmlWriter.Create(location, settings);
+
+            await writer.WriteStartDocumentAsync();
+            await writer.WriteStartElementAsync(MergeDataKey);
+
+            await view.ExportAsync(writer);
+
+            await writer.WriteEndElementAsync();
+            await writer.WriteEndDocumentAsync();
+            await writer.FlushAsync();
+
+            writer.Close();
+
+            state = State.Exporting;
         }
 
         protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
@@ -118,5 +172,18 @@ namespace RDEditorPlus.Functionality.NodeEditor
         protected readonly NodeGridView view;
         protected readonly Text title;
         protected readonly Dictionary<string, GameObject> nodePrefabs = new();
+
+        private State state = State.Idle;
+
+        private enum State
+        {
+            Idle,
+            Exporting
+        }
+
+        public const string MergeDataKey = "MergeData";
+
+        private const string DefaultFilename = "level";
+        private static readonly string[] Extensions = ["rdmerge"];
     }
 }

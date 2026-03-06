@@ -16,6 +16,10 @@ namespace RDEditorPlus.Patch.LevelMerger
                 {
                     MergerPanelHolder.Instance.Toggle(true);
                 }
+                else if (RDEditorUtils.CheckForKeyCombo(false, false, KeyCode.E))
+                {
+                    MergerPanelHolder.Instance.ScheduleExport();
+                }
             }
         }
     }

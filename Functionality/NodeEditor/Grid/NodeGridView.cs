@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Threading.Tasks;
+using System.Xml;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Grid
@@ -56,6 +58,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
         public void Reset()
         {
             grid.Reset();
+        }
+
+        public async Task ExportAsync(XmlWriter writer)
+        {
+            await grid.ExportAsync(writer);
         }
 
         private NodeGrid grid;

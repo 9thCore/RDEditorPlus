@@ -1,5 +1,8 @@
 ﻿using RDEditorPlus.Functionality.Components;
+using RDEditorPlus.Util;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +10,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
     public abstract class NodeConnector : MonoBehaviour
     {
+        public string Id => node.Id;
+
         public abstract void StartConnection();
         public abstract void UpdateConnection(Vector2 pointerPosition);
         public abstract void EndConnection(NodeConnector selectedNode);
@@ -27,7 +32,18 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 Output.Remove(this);
                 Input.RemoveLink();
             }
+
+            public async Task ExportAsync(XmlWriter writer)
+            {
+                await writer.WriteAttributeStringAsync(TargetKey, Input.Id);
+                await writer.WriteAttributeStringAsync(InputKey, Input.connectorName);
+            }
+
+            public const string TargetKey = "target";
+            public const string InputKey = "input";
         }
+
+        public const string NameKey = "name";
 
         protected internal abstract void SetupConnection(NodeConnector other);
 
@@ -46,6 +62,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 connector.ResetColor();
             }
         }
+
+        [SerializeField]
+        protected Node node;
+        [SerializeField]
+        protected string connectorName;
 
         [SerializeField]
         protected internal RectTransform control;
@@ -116,6 +137,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         {
             // epic line
             this.text.text = text;
+            connectorName = text;
         }
 
         protected void Start()
@@ -142,8 +164,6 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         protected Text text;
         [SerializeField]
         protected Node.Type type;
-        [SerializeField]
-        protected Node node;
         [SerializeField]
         protected Image controlImage;
         [SerializeField]

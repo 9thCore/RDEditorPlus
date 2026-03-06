@@ -1,7 +1,11 @@
 ﻿using RDEditorPlus.Functionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
+using RDEditorPlus.Util;
+using RDLevelEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -35,6 +39,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         public void Setup(NodeGrid grid)
         {
             this.grid = grid;
+        }
+
+        public void GenerateID()
+        {
+            id = LevelEvent_MakeSprite.RandomString(8);
         }
 
         public NodeConnection CreateConnection() => grid.CreateConnection();
@@ -75,8 +84,34 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
         public void Delete()
         {
+            grid.DeleteNode(this);
             gameObject.SetActive(false);
             GameObject.Destroy(gameObject);
+        }
+
+        public async Task ExportAsync(XmlWriter writer)
+        {
+            await writer.WriteAttributeStringAsync(IDKey, id);
+            await writer.WriteAttributeStringAsync(NameKey, nodeName);
+
+            Vector2 position = rectTransform.anchoredPosition;
+
+            await writer.WriteStartElementAsync(PositionKey);
+            await writer.WriteAttributeStringAsync(PositionXKey, position.x.ToString());
+            await writer.WriteAttributeStringAsync(PositionYKey, position.y.ToString());
+            await writer.WriteEndElementAsync();
+
+            await writer.WriteStartElementAsync(OutputsKey);
+            foreach (var output in outputs)
+            {
+                if (output.CanExport())
+                {
+                    await writer.WriteStartElementAsync(OutputKey);
+                    await output.ExportAsync(writer);
+                    await writer.WriteEndElementAsync();
+                }
+            }
+            await writer.WriteEndElementAsync();
         }
 
         public enum Type
@@ -86,6 +121,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
         private void SetName(string name)
         {
+            nodeName = name;
             title.text = name;
         }
 
@@ -100,6 +136,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
             rectTransform.offsetMin -= Vector2.up * (Mathf.Max(inputParent.rect.height, outputParent.rect.height) + TextClearance + TextHeight);
         }
+
+        public string Id => id;
 
         [SerializeField]
         private NodeGrid grid;
@@ -122,6 +160,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         [SerializeField]
         private List<NodeOutput> outputs;
 
+        [SerializeField]
+        private string nodeName;
+
+        private string id;
+
         public static Font Font;
         public static Sprite Sprite;
 
@@ -129,6 +172,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         public const float TextClearance = 4f;
         public const float InterfaceSpacing = 8f;
         public const float ConnectorSpacing = 6f;
+
+        public const string IDKey = "id";
+        public const string NameKey = "name";
+        public const string PositionKey = "Position";
+        public const string PositionXKey = "x";
+        public const string PositionYKey = "y";
+        public const string OutputsKey = "Outputs";
+        public const string OutputKey = "Output";
 
         private static GameObject BaseNode
         {
