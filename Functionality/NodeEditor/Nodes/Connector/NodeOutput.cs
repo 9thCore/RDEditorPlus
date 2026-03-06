@@ -27,19 +27,19 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             }
         }
 
-        public async Task ExportAsync(XmlWriter writer)
+        public async Task SaveAsync(XmlWriter writer)
         {
             await writer.WriteAttributeStringAsync(NameKey, connectorName);
 
             foreach (var link in links)
             {
                 await writer.WriteStartElementAsync(LinkKey);
-                await link.ExportAsync(writer);
+                await link.SaveAsync(writer);
                 await writer.WriteEndElementAsync();
             }
         }
 
-        public bool CanExport()
+        public bool CanSave()
         {
             return links.Count > 0;
         }

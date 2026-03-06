@@ -33,7 +33,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 Input.RemoveLink();
             }
 
-            public async Task ExportAsync(XmlWriter writer)
+            public async Task SaveAsync(XmlWriter writer)
             {
                 await writer.WriteAttributeStringAsync(TargetKey, Input.Id);
                 await writer.WriteAttributeStringAsync(InputKey, Input.connectorName);

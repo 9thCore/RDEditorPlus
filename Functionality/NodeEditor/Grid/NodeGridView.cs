@@ -24,7 +24,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             rectTransform.localPosition = Vector3.zero;
             rectTransform.localScale = Vector3.one;
 
-            rectTransform.anchorMin = new Vector2(0.02f, 0.02f);
+            rectTransform.anchorMin = new Vector2(0.02f, 0.18f);
             rectTransform.anchorMax = new Vector2(0.98f, 0.88f);
             rectTransform.offsetMin = rectTransform.offsetMax = Vector2.zero;
 
@@ -60,9 +60,9 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             grid.Reset();
         }
 
-        public async Task ExportAsync(XmlWriter writer)
+        public async Task SaveAsync(XmlWriter writer)
         {
-            await grid.ExportAsync(writer);
+            await grid.SaveAsync(writer);
         }
 
         private NodeGrid grid;

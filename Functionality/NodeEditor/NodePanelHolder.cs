@@ -53,7 +53,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             view.AddNode(prefab, position);
         }
 
-        public void ScheduleExport()
+        public void ScheduleSave()
         {
             if (state != State.Idle)
             {
@@ -74,11 +74,11 @@ namespace RDEditorPlus.Functionality.NodeEditor
                 return;
             }
 
-            state = State.Exporting;
-            Task.Run(() => ExportAsync(location));
+            state = State.Saving;
+            Task.Run(() => SaveAsync(location));
         }
 
-        public async Task ExportAsync(string location)
+        public async Task SaveAsync(string location)
         {
             var settings = new XmlWriterSettings()
             {
@@ -91,7 +91,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             await writer.WriteStartDocumentAsync();
             await writer.WriteStartElementAsync(MergeDataKey);
 
-            await view.ExportAsync(writer);
+            await view.SaveAsync(writer);
 
             await writer.WriteEndElementAsync();
             await writer.WriteEndDocumentAsync();
@@ -99,7 +99,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
 
             writer.Close();
 
-            state = State.Exporting;
+            state = State.Saving;
         }
 
         protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
@@ -128,6 +128,11 @@ namespace RDEditorPlus.Functionality.NodeEditor
             popup.onDialogScreenBlocker.raycastTarget = true;
             popup.onDialogScreenBlocker.transform.SetAsFirstSibling();
 
+            GameObject buttonClone = GameObject.Instantiate(popup.steamPublishButton.gameObject);
+            var button2 = buttonClone.GetComponent<Button>();
+            var colors2 = button2.colors;
+            GameObject.DestroyImmediate(button2);
+
             GameObject.DestroyImmediate(popup.steamPublishButton.transform.parent.gameObject);
             GameObject.DestroyImmediate(popup.levelErrorPresentation.gameObject);
             GameObject.DestroyImmediate(popup.steamUpdateContainer.gameObject);
@@ -154,6 +159,34 @@ namespace RDEditorPlus.Functionality.NodeEditor
                 Toggle(show: false);
             });
 
+            GameObject save = GameObject.Instantiate(buttonClone, transform);
+            var button3 = save.AddComponent<Button>();
+            button3.colors = colors2;
+            button3.onClick.AddListener(ScheduleSave);
+
+            var text = save.GetComponentInChildren<Text>();
+            text.text = "Save merge data...";
+            GameObject.DestroyImmediate(text.GetComponent<RDStringToUIText>());
+
+            var rt = save.transform as RectTransform;
+            rt.anchorMin = new Vector2(0.02f, 0.01f);
+            rt.anchorMax = new Vector2(0.48f, 0.08f);
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+
+            GameObject load = GameObject.Instantiate(buttonClone, transform);
+            var button4 = load.AddComponent<Button>();
+            button4.colors = colors2;
+            //button4.onClick.AddListener(ScheduleImport);
+
+            var text2 = load.GetComponentInChildren<Text>();
+            text2.text = "Load merge data...";
+            GameObject.DestroyImmediate(text2.GetComponent<RDStringToUIText>());
+
+            var rt2 = load.transform as RectTransform;
+            rt2.anchorMin = new Vector2(0.02f, 0.10f);
+            rt2.anchorMax = new Vector2(0.48f, 0.17f);
+            rt2.offsetMin = rt2.offsetMax = Vector2.zero;
+
             view = NodeGridView.Create(transform, sprite, this);
             gameObject = clone;
             rectTransform = clone.transform as RectTransform;
@@ -178,7 +211,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
         private enum State
         {
             Idle,
-            Exporting
+            Saving
         }
 
         public const string MergeDataKey = "MergeData";

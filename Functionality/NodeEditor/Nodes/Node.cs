@@ -89,7 +89,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             GameObject.Destroy(gameObject);
         }
 
-        public async Task ExportAsync(XmlWriter writer)
+        public async Task SaveAsync(XmlWriter writer)
         {
             await writer.WriteAttributeStringAsync(IDKey, id);
             await writer.WriteAttributeStringAsync(NameKey, nodeName);
@@ -104,10 +104,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             await writer.WriteStartElementAsync(OutputsKey);
             foreach (var output in outputs)
             {
-                if (output.CanExport())
+                if (output.CanSave())
                 {
                     await writer.WriteStartElementAsync(OutputKey);
-                    await output.ExportAsync(writer);
+                    await output.SaveAsync(writer);
                     await writer.WriteEndElementAsync();
                 }
             }
