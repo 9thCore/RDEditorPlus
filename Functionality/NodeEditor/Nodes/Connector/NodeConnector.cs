@@ -17,6 +17,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         public abstract void EndConnection(NodeConnector selectedNode);
         public abstract void SetColor(Node.Type nodeType, Type type, Node excludeFrom);
         public abstract void ResetColor();
+        public abstract void Unlink();
 
         public enum Type
         {

@@ -37,6 +37,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             node.AddInput(rectTransform, this);
         }
 
+        public override void Unlink()
+        {
+            link.Unlink();
+        }
+
         protected override void PrefabSetup()
         {
             control.anchorMin = control.anchorMax = new Vector2(0f, 0.5f);

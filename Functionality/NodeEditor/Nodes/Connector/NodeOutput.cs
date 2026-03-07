@@ -49,6 +49,16 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             node.AddOutput(rectTransform, this);
         }
 
+        public override void Unlink()
+        {
+            List<Link> toBeRemoved = new(links);
+
+            foreach (var link in toBeRemoved)
+            {
+                link.Unlink();
+            }
+        }
+
         protected override void PrefabSetup()
         {
             control.anchorMin = control.anchorMax = new Vector2(1f, 0.5f);

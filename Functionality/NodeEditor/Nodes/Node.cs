@@ -84,6 +84,16 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
         public void Delete()
         {
+            foreach (var input in inputs)
+            {
+                input.Unlink();
+            }
+
+            foreach (var output in outputs)
+            {
+                output.Unlink();
+            }
+
             grid.DeleteNode(this);
             gameObject.SetActive(false);
             GameObject.Destroy(gameObject);
