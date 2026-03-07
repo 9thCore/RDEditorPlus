@@ -39,7 +39,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         public override void Unlink()
         {
-            link.Unlink();
+            if (link != null)
+            {
+                link.Unlink();
+            }
         }
 
         protected override void PrefabSetup()
