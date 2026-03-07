@@ -99,7 +99,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
 
             writer.Close();
 
-            state = State.Saving;
+            state = State.Idle;
         }
 
         protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
