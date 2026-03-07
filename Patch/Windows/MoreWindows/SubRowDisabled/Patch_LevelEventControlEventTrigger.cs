@@ -24,6 +24,11 @@ namespace RDEditorPlus.Patch.Windows.MoreWindows.SubRowDisabled
                     .Emit(OpCodes.Ldloc_S, offsetIndex)
                     .EmitDelegate((bool originalFlag, int offset) =>
                     {
+                        if (scnEditor.instance.currentTab != Tab.Windows)
+                        {
+                            return originalFlag;
+                        }
+
                         int change = offset / scnEditor.instance.cellHeight;
 
                         foreach (LevelEventControl_Base control in scnEditor.instance.selectedControls)
