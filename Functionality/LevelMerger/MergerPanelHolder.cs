@@ -1,10 +1,10 @@
-﻿using RDEditorPlus.Functionality.LevelMerger;
+﻿using RDEditorPlus.Functionality.NodeEditor;
 using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace RDEditorPlus.Functionality.NodeEditor
+namespace RDEditorPlus.Functionality.LevelMerger
 {
     public class MergerPanelHolder : NodePanelHolder
     {
