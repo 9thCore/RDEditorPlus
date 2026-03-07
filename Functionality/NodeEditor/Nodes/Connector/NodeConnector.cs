@@ -1,6 +1,7 @@
 ﻿using RDEditorPlus.Functionality.Components;
 using RDEditorPlus.Util;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
@@ -15,9 +16,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         public abstract void StartConnection();
         public abstract void UpdateConnection(Vector2 pointerPosition);
         public abstract void EndConnection(NodeConnector selectedNode);
-        public abstract void SetColor(Node.Type nodeType, Type type, Node excludeFrom);
+        public abstract void SetColor(Node.Type nodeType, Type type);
         public abstract void ResetColor();
         public abstract void Unlink();
+        public abstract void PropagateInaccessibility();
 
         public enum Type
         {
@@ -48,11 +50,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         protected internal abstract void SetupConnection(NodeConnector other);
 
-        protected static void SetColorToAll(Node.Type nodeType, Type type, Node excludeFrom)
+        protected static void SetColorToAll(Node.Type nodeType, Type type)
         {
             foreach (var connector in allConnectors)
             {
-                connector.SetColor(nodeType, type, excludeFrom);
+                connector.SetColor(nodeType, type);
             }
         }
 
@@ -65,7 +67,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         }
 
         [SerializeField]
-        protected Node node;
+        protected internal Node node;
         [SerializeField]
         protected string connectorName;
 
@@ -88,7 +90,17 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             node.VirtualConnection.SetAnchor(control);
             node.VirtualConnection.gameObject.SetActive(true);
 
-            SetColorToAll(type, GetOppositeType(connectorType), node);
+            node.SetAllNodesAsAccessible();
+            if (connectorType == Type.Input)
+            {
+                node.PropagateInaccessibilityThroughOutputs();
+            }
+            else
+            {
+                node.PropagateInaccessibilityThroughInputs();
+            }
+
+            SetColorToAll(type, GetOppositeType(connectorType));
             ResetColor();
         }
 
@@ -109,9 +121,9 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             ResetColorToAll();
         }
 
-        public override void SetColor(Node.Type nodeType, Type type, Node excludeFrom)
+        public override void SetColor(Node.Type nodeType, Type type)
         {
-            if (nodeType == this.type && excludeFrom != node && connectorType == type)
+            if (nodeType == this.type && node.Accessible && connectorType == type)
             {
                 controlImage.color = ColorDataByType[this.type].ValidControl;
                 controlOutline.effectColor = OutlineSelectableColor;

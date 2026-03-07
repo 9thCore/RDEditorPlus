@@ -59,6 +59,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             }
         }
 
+        public override void PropagateInaccessibility()
+        {
+            foreach (var link in links)
+            {
+                link.Input.node.PropagateInaccessibilityThroughOutputs();
+            }
+        }
+
         protected override void PrefabSetup()
         {
             control.anchorMin = control.anchorMax = new Vector2(1f, 0.5f);

@@ -128,6 +128,28 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             await writer.WriteEndElementAsync();
         }
 
+        public void SetAllNodesAsAccessible() => grid.SetAllNodesAsAccessible();
+
+        public void PropagateInaccessibilityThroughInputs()
+        {
+            Accessible = false;
+
+            foreach (var input in inputs)
+            {
+                input.PropagateInaccessibility();
+            }
+        }
+
+        public void PropagateInaccessibilityThroughOutputs()
+        {
+            Accessible = false;
+
+            foreach (var output in outputs)
+            {
+                output.PropagateInaccessibility();
+            }
+        }
+
         public enum Type
         {
             Float
@@ -152,6 +174,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         }
 
         public string Id => id;
+        public bool Accessible
+        {
+            get => accessible;
+            set => accessible = value;
+        }
 
         [SerializeField]
         private NodeGrid grid;
@@ -178,6 +205,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         private string nodeName;
 
         private string id;
+        private bool accessible;
 
         public static Font Font;
         public static Sprite Sprite;

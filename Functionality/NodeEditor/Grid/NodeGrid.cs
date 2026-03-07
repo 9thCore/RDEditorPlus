@@ -147,6 +147,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             nodes.Clear();
         }
 
+        public void SetAllNodesAsAccessible()
+        {
+            foreach (var node in nodes)
+            {
+                node.Accessible = true;
+            }
+        }
+
         private void UpdateBackground()
         {
             background.anchoredPosition = -root.anchoredPosition.RoundToMultiple(GridSize);
