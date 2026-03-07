@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using RDEditorPlus.Functionality.NodeEditor.Nodes;
+using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,7 +55,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             return component;
         }
 
-        public void AddNode(GameObject prefab, Vector2 position) => grid.AddNode(prefab, position);
+        public Node AddNode(GameObject prefab, Vector2 position, string id) => grid.AddNode(prefab, position, id);
 
         public void Reset()
         {
@@ -67,6 +68,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
         }
 
         public void Clear() => grid.Clear();
+
+        public bool TryGetNodeFromID(string id, out Node result) => grid.TryGetNodeFromID(id, out result);
 
         private NodeGrid grid;
         private Sprite sprite;

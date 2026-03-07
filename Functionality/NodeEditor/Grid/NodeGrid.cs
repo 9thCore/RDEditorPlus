@@ -78,7 +78,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             }
         }
 
-        public void AddNode(GameObject prefab, Vector2 position)
+        public Node AddNode(GameObject prefab, Vector2 position, string id)
         {
             GameObject instance = GameObject.Instantiate(prefab, space);
 
@@ -87,11 +87,13 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             rt.anchoredPosition = position;
 
             var node = instance.GetComponent<Node>();
-            node.GenerateID();
+            node.GenerateID(id);
             node.Setup(this);
             nodes.Add(node);
 
             instance.SetActive(true);
+
+            return node;
         }
 
         public void AddNode(string name, Vector2 position) => holder.AddNode(name, position);
@@ -186,6 +188,21 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             {
                 node.Accessible = true;
             }
+        }
+
+        public bool TryGetNodeFromID(string id, out Node result)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.Id == id)
+                {
+                    result = node;
+                    return true;
+                }
+            }
+
+            result = default;
+            return false;
         }
 
         private void UpdateBackground()

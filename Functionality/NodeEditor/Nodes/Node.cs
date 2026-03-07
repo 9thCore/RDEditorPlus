@@ -4,6 +4,7 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -42,9 +43,19 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             this.grid = grid;
         }
 
-        public void GenerateID()
+        public void GenerateID(string id)
         {
-            id = LevelEvent_MakeSprite.RandomString(8);
+            this.id = id.IsNullOrEmpty() ? LevelEvent_MakeSprite.RandomString(8) : id;
+        }
+
+        public NodeInput GetInput(string name)
+        {
+            return inputs.Where(input => input.Name == name).FirstOrDefault();
+        }
+
+        public NodeOutput GetOutput(string name)
+        {
+            return outputs.Where(output => output.Name == name).FirstOrDefault();
         }
 
         public NodeConnection CreateConnection() => grid.CreateConnection();
@@ -206,6 +217,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             yield return new WaitForEndOfFrame();
 
             rectTransform.offsetMin -= Vector2.up * (Mathf.Max(inputParent.rect.height, outputParent.rect.height) + TextClearance + TextHeight);
+
+            foreach (var output in outputs)
+            {
+                output.Drag();
+            }
         }
 
         [SerializeField]
@@ -332,6 +348,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                     var rt = baseNode.transform as RectTransform;
                     rt.offsetMin = new Vector2(-50f, 0f);
                     rt.offsetMax = -rt.offsetMin;
+                    rt.pivot = new Vector2(0.5f, 1f);
 
                     node.rectTransform = rt;
                     node.inputParent = inputsRT;

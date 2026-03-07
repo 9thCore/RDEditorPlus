@@ -76,6 +76,17 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             set => dependenciesSaved = value;
         }
 
+        public void LinkIfNotYetLinked(NodeOutput output)
+        {
+            if (link != null)
+            {
+                Plugin.LogInfo($"Node({Id}).{connectorName} already connected to Node({link.Output.Id}), skipping connecting to Node({output.Id})");
+                return;
+            }
+
+            output.SetupConnection(this);
+        }
+
         protected override void PrefabSetup()
         {
             control.anchorMin = control.anchorMax = new Vector2(0f, 0.5f);

@@ -4,19 +4,21 @@ using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityFileDialog;
 
 namespace RDEditorPlus.Functionality.NodeEditor
 {
-    public class NodePanelHolder
+    public abstract class NodePanelHolder
     {
+        public abstract void HandleDeserialization(Stream stream);
+
         public void Toggle(bool show)
         {
             if (show)
@@ -43,15 +45,15 @@ namespace RDEditorPlus.Functionality.NodeEditor
                 });
         }
 
-        public void AddNode(string name, Vector2 position)
+        public Node AddNode(string name, Vector2 position, string id = null)
         {
             if (!nodePrefabs.TryGetValue(name, out var prefab))
             {
                 Plugin.LogError($"Tried to add node '{name}', but it is not registered for {GetType().FullName}!");
-                return;
+                return null;
             }
 
-            view.AddNode(prefab, position);
+            return view.AddNode(prefab, position, id);
         }
 
         public void ScheduleSave(bool forceAskForNewLocation = false)
@@ -112,18 +114,67 @@ namespace RDEditorPlus.Functionality.NodeEditor
             SetState(State.Idle);
         }
 
-        public void Clear()
+        public void ScheduleLoad()
         {
             if (state != State.Idle)
             {
                 return;
             }
 
+            scnEditor.PauseIfUnpaused();
+
+            string location = FileBrowser.PickFile(
+                    scnEditor.GetLastUsedFolder(),
+                    "Rhythm Doctor level merge data",
+                    Extensions,
+                    "Load level merge data");
+
+            if (location.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            SetState(State.Loading);
+            Clear();
+
+            using var stream = File.OpenRead(location);
+
+            try
+            {
+                HandleDeserialization(stream);
+                savedLevelName = location;
+            }
+            catch (System.Exception e)
+            {
+                Plugin.LogError($"Failed loading {Path.GetFileName(location)}:\n{e}");
+
+                Clear();
+                savedLevelName = null;
+            }
+
+            SetLevelName();
+            SetState(State.Idle);
+        }
+
+        public void Clear()
+        {
             view.Clear();
+        }
+
+        public void NewButtonClick()
+        {
+            if (state != State.Idle)
+            {
+                return;
+            }
+
+            Clear();
 
             savedLevelName = string.Empty;
             SetLevelName();
         }
+
+        public bool TryGetNodeFromID(string id, out Node result) => view.TryGetNodeFromID(id, out result);
 
         protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
         {
@@ -244,7 +295,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             GameObject newObj = GameObject.Instantiate(buttonClone, transform);
             var button6 = newObj.AddComponent<Button>();
             button6.colors = colors2;
-            button6.onClick.AddListener(Clear);
+            button6.onClick.AddListener(NewButtonClick);
 
             var text4 = newObj.GetComponentInChildren<Text>();
             text4.text = "New";
@@ -258,6 +309,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             GameObject load = GameObject.Instantiate(buttonClone, transform);
             var button4 = load.AddComponent<Button>();
             button4.colors = colors2;
+            button4.onClick.AddListener(ScheduleLoad);
 
             var text2 = load.GetComponentInChildren<Text>();
             text2.text = "Load";
@@ -319,7 +371,8 @@ namespace RDEditorPlus.Functionality.NodeEditor
         private enum State
         {
             Idle,
-            Saving
+            Saving,
+            Loading
         }
 
         public const string MergeDataKey = "MergeData";

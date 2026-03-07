@@ -12,6 +12,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
     public abstract class NodeConnector : MonoBehaviour
     {
         public string Id => node.Id;
+        public string Name => connectorName;
 
         public abstract void StartConnection();
         public abstract void UpdateConnection(Vector2 pointerPosition);
