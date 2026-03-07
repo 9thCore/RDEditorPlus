@@ -112,6 +112,14 @@ namespace RDEditorPlus.Functionality.NodeEditor
             state = State.Idle;
         }
 
+        public void Clear()
+        {
+            view.Clear();
+
+            savedLevelName = string.Empty;
+            SetLevelName();
+        }
+
         protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
         {
             nodePrefabs.Add(name, Node.PreparePrefab(name, inputs, outputs));
@@ -214,18 +222,31 @@ namespace RDEditorPlus.Functionality.NodeEditor
             rt4.anchorMax = new Vector2(0.49f, 0.08f);
             rt4.offsetMin = rt4.offsetMax = Vector2.zero;
 
+            GameObject newObj = GameObject.Instantiate(buttonClone, transform);
+            var button6 = newObj.AddComponent<Button>();
+            button6.colors = colors2;
+            button6.onClick.AddListener(Clear);
+
+            var text4 = newObj.GetComponentInChildren<Text>();
+            text4.text = "New";
+            GameObject.DestroyImmediate(text4.GetComponent<RDStringToUIText>());
+
+            var rt5 = newObj.transform as RectTransform;
+            rt5.anchorMin = new Vector2(0.02f, 0.10f);
+            rt5.anchorMax = new Vector2(0.24f, 0.17f);
+            rt5.offsetMin = rt5.offsetMax = Vector2.zero;
+
             GameObject load = GameObject.Instantiate(buttonClone, transform);
             var button4 = load.AddComponent<Button>();
             button4.colors = colors2;
-            //button4.onClick.AddListener(ScheduleImport);
 
             var text2 = load.GetComponentInChildren<Text>();
             text2.text = "Load";
             GameObject.DestroyImmediate(text2.GetComponent<RDStringToUIText>());
 
             var rt2 = load.transform as RectTransform;
-            rt2.anchorMin = new Vector2(0.02f, 0.10f);
-            rt2.anchorMax = new Vector2(0.24f, 0.17f);
+            rt2.anchorMin = new Vector2(0.26f, 0.10f);
+            rt2.anchorMax = new Vector2(0.49f, 0.17f);
             rt2.offsetMin = rt2.offsetMax = Vector2.zero;
 
             view = NodeGridView.Create(transform, sprite, this);

@@ -82,7 +82,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             }
         }
 
-        public void Delete()
+        public void Delete(bool dontDeleteFromGrid)
         {
             foreach (var input in inputs)
             {
@@ -94,7 +94,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                 output.Unlink();
             }
 
-            grid.DeleteNode(this);
+            if (!dontDeleteFromGrid)
+            {
+                grid.DeleteNode(this);
+            }
+
             gameObject.SetActive(false);
             GameObject.Destroy(gameObject);
         }

@@ -66,6 +66,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             await grid.SaveAsync(writer);
         }
 
+        public void Clear() => grid.Clear();
+
         private NodeGrid grid;
         private Sprite sprite;
     }

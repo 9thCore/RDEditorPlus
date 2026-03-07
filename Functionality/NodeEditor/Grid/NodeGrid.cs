@@ -137,6 +137,16 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
             await writer.WriteEndElementAsync();
         }
 
+        public void Clear()
+        {
+            foreach (var node in nodes)
+            {
+                node.Delete(dontDeleteFromGrid: true);
+            }
+
+            nodes.Clear();
+        }
+
         private void UpdateBackground()
         {
             background.anchoredPosition = -root.anchoredPosition.RoundToMultiple(GridSize);
