@@ -4,6 +4,7 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
@@ -115,17 +116,17 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             await writer.WriteAttributeStringAsync(PositionYKey, position.y.ToString());
             await writer.WriteEndElementAsync();
 
-            await writer.WriteStartElementAsync(OutputsKey);
-            foreach (var output in outputs)
+            if (inputs.Any(input => input.CanSave()))
             {
-                if (output.CanSave())
+                await writer.WriteStartElementAsync(InputsKey);
+                foreach (var input in inputs.Where(input => input.CanSave()))
                 {
-                    await writer.WriteStartElementAsync(OutputKey);
-                    await output.SaveAsync(writer);
+                    await writer.WriteStartElementAsync(InputKey);
+                    await input.SaveAsync(writer);
                     await writer.WriteEndElementAsync();
                 }
+                await writer.WriteEndElementAsync();
             }
-            await writer.WriteEndElementAsync();
         }
 
         public void SetAllNodesAsAccessible() => grid.SetAllNodesAsAccessible();
@@ -150,6 +151,40 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             }
         }
 
+        public void PropagateDependenciesSaved()
+        {
+            foreach (var output in outputs)
+            {
+                output.PropagateDependenciesSaved();
+            }
+        }
+
+        public bool InputDependenciesSaved
+        {
+            get => inputs.All(input => input.DependenciesSaved);
+            set
+            {
+                foreach (var input in inputs)
+                {
+                    input.DependenciesSaved = value;
+                }
+            }
+        }
+
+        public string Id => id;
+
+        public bool Accessible
+        {
+            get => accessible;
+            set => accessible = value;
+        }
+
+        public bool AlreadySaved
+        {
+            get => alreadySaved;
+            set => alreadySaved = value;
+        }
+
         public enum Type
         {
             Float
@@ -171,13 +206,6 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             yield return new WaitForEndOfFrame();
 
             rectTransform.offsetMin -= Vector2.up * (Mathf.Max(inputParent.rect.height, outputParent.rect.height) + TextClearance + TextHeight);
-        }
-
-        public string Id => id;
-        public bool Accessible
-        {
-            get => accessible;
-            set => accessible = value;
         }
 
         [SerializeField]
@@ -206,6 +234,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
         private string id;
         private bool accessible;
+        private bool alreadySaved;
 
         public static Font Font;
         public static Sprite Sprite;
@@ -220,8 +249,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         public const string PositionKey = "Position";
         public const string PositionXKey = "x";
         public const string PositionYKey = "y";
-        public const string OutputsKey = "Outputs";
-        public const string OutputKey = "Output";
+        public const string InputsKey = "Inputs";
+        public const string InputKey = "Input";
 
         private static GameObject BaseNode
         {

@@ -27,23 +27,6 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             }
         }
 
-        public async Task SaveAsync(XmlWriter writer)
-        {
-            await writer.WriteAttributeStringAsync(NameKey, connectorName);
-
-            foreach (var link in links)
-            {
-                await writer.WriteStartElementAsync(LinkKey);
-                await link.SaveAsync(writer);
-                await writer.WriteEndElementAsync();
-            }
-        }
-
-        public bool CanSave()
-        {
-            return links.Count > 0;
-        }
-
         protected override void AddToNode(Node node)
         {
             node.AddOutput(rectTransform, this);
@@ -64,6 +47,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             foreach (var link in links)
             {
                 link.Input.node.PropagateInaccessibilityThroughOutputs();
+            }
+        }
+
+        public void PropagateDependenciesSaved()
+        {
+            foreach (var link in links)
+            {
+                link.Input.DependenciesSaved = true;
             }
         }
 
@@ -103,8 +94,6 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 };
             }
         }
-
-        public const string LinkKey = "Link";
 
         private static GameObject FloatOutput
         {

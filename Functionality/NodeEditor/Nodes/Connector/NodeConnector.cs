@@ -38,12 +38,12 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
             public async Task SaveAsync(XmlWriter writer)
             {
-                await writer.WriteAttributeStringAsync(TargetKey, Input.Id);
-                await writer.WriteAttributeStringAsync(InputKey, Input.connectorName);
+                await writer.WriteAttributeStringAsync(TargetKey, Output.Id);
+                await writer.WriteAttributeStringAsync(OutputKey, Output.connectorName);
             }
 
             public const string TargetKey = "target";
-            public const string InputKey = "input";
+            public const string OutputKey = "output";
         }
 
         public const string NameKey = "name";

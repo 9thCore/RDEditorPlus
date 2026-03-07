@@ -129,6 +129,39 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 
             foreach (var node in nodes)
             {
+                node.InputDependenciesSaved = false;
+                node.AlreadySaved = false;
+            }
+
+            int length = nodes.Count;
+            Node[] orderedNodes = new Node[length];
+            int index = 0;
+
+            while (index < length)
+            {
+                bool savedAnythingThisIteration = false;
+
+                foreach (var node in nodes)
+                {
+                    if (!node.AlreadySaved && node.InputDependenciesSaved)
+                    {
+                        orderedNodes[index++] = node;
+                        node.PropagateDependenciesSaved();
+                        node.AlreadySaved = true;
+                        savedAnythingThisIteration = true;
+                    }
+                }
+
+                if (!savedAnythingThisIteration)
+                {
+                    Plugin.LogError("Something went wrong while saving nodes, as we did not save anything for an iteration. Exitting node saving early");
+                    await writer.WriteEndElementAsync();
+                    return;
+                }
+            }
+
+            foreach (var node in orderedNodes)
+            {
                 await writer.WriteStartElementAsync(NodeKey);
                 await node.SaveAsync(writer);
                 await writer.WriteEndElementAsync();

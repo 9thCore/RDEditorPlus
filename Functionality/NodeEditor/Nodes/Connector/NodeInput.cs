@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using RDEditorPlus.Util;
+using System.Threading.Tasks;
+using System.Xml;
+using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
@@ -53,6 +56,26 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             }
         }
 
+        public async Task SaveAsync(XmlWriter writer)
+        {
+            await writer.WriteAttributeStringAsync(NameKey, connectorName);
+
+            await writer.WriteStartElementAsync(LinkKey);
+            await link.SaveAsync(writer);
+            await writer.WriteEndElementAsync();
+        }
+
+        public bool CanSave()
+        {
+            return link != null;
+        }
+
+        public bool DependenciesSaved
+        {
+            get => link == null || dependenciesSaved;
+            set => dependenciesSaved = value;
+        }
+
         protected override void PrefabSetup()
         {
             control.anchorMin = control.anchorMax = new Vector2(0f, 0.5f);
@@ -66,7 +89,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             other.SetupConnection(this);
         }
 
-        private Link link;
+        public const string LinkKey = "Link";
 
         public class Provider : IPrefabProvider
         {
@@ -79,6 +102,9 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 };
             }
         }
+
+        private Link link;
+        private bool dependenciesSaved = false;
 
         private static GameObject FloatInput
         {
