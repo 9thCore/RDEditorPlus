@@ -84,7 +84,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
 
             SetLevelName();
 
-            state = State.Saving;
+            SetState(State.Saving);
             Task.Run(SaveAsync);
         }
 
@@ -109,11 +109,16 @@ namespace RDEditorPlus.Functionality.NodeEditor
 
             writer.Close();
 
-            state = State.Idle;
+            SetState(State.Idle);
         }
 
         public void Clear()
         {
+            if (state != State.Idle)
+            {
+                return;
+            }
+
             view.Clear();
 
             savedLevelName = string.Empty;
@@ -134,6 +139,20 @@ namespace RDEditorPlus.Functionality.NodeEditor
             }
 
             levelName.text = Path.GetFileName(savedLevelName);
+        }
+
+        private void SetState(State state)
+        {
+            this.state = state;
+
+            if (state == State.Idle)
+            {
+                blocker.SetActive(false);
+                return;
+            }
+
+            blocker.SetActive(true);
+            blockerText.text = state.ToString();
         }
 
         protected NodePanelHolder()
@@ -253,6 +272,27 @@ namespace RDEditorPlus.Functionality.NodeEditor
             gameObject = clone;
             rectTransform = clone.transform as RectTransform;
 
+            blocker = new("blocker");
+            blocker.SetActive(false);
+            blocker.transform.SetParent(view.transform);
+            var image = blocker.AddComponent<Image>();
+            image.type = Image.Type.Tiled;
+            image.sprite = sprite;
+            image.color = Color.black.WithAlpha(0.5f);
+
+            GameObject titleClone = GameObject.Instantiate(title.gameObject, blocker.transform);
+            blockerText = titleClone.GetComponent<Text>();
+            blockerText.color = Color.white;
+            blockerText.fontSize = 16;
+            var rt6 = titleClone.transform as RectTransform;
+            rt6.anchorMin = rt6.offsetMin = rt6.offsetMax = Vector2.zero;
+            rt6.anchorMax = Vector2.one;
+
+            var rt7 = blocker.transform as RectTransform;
+            rt7.anchorMin = rt7.offsetMin = rt7.offsetMax = Vector2.zero;
+            rt7.anchorMax = Vector2.one;
+            rt7.localScale = Vector3.one;
+
             SetLevelName();
 
             PrepareNodePrefab("Test",
@@ -269,6 +309,8 @@ namespace RDEditorPlus.Functionality.NodeEditor
         protected readonly NodeGridView view;
         protected readonly Text title;
         protected readonly Text levelName;
+        protected readonly GameObject blocker;
+        protected readonly Text blockerText;
         protected readonly Dictionary<string, GameObject> nodePrefabs = new();
 
         private string savedLevelName = string.Empty;
