@@ -5,6 +5,7 @@ using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -53,7 +54,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             view.AddNode(prefab, position);
         }
 
-        public void ScheduleSave()
+        public void ScheduleSave(bool forceAskForNewLocation = false)
         {
             if (state != State.Idle)
             {
@@ -62,23 +63,32 @@ namespace RDEditorPlus.Functionality.NodeEditor
 
             scnEditor.PauseIfUnpaused();
 
-            string location = FileBrowser.SaveFile(
-                scnEditor.GetLastUsedFolder(),
-                DefaultFilename,
-                "Rhythm Doctor level merge data",
-                Extensions,
-                "Save level merge data");
-
-            if (location == string.Empty)
+            if (forceAskForNewLocation
+                || savedLevelName.IsNullOrEmpty()
+                || !Directory.Exists(Path.GetDirectoryName(savedLevelName)))
             {
-                return;
+                string location = FileBrowser.SaveFile(
+                    scnEditor.GetLastUsedFolder(),
+                    DefaultFilename,
+                    "Rhythm Doctor level merge data",
+                    Extensions,
+                    "Save level merge data");
+
+                if (location.IsNullOrEmpty())
+                {
+                    return;
+                }
+
+                savedLevelName = location;
             }
 
+            SetLevelName();
+
             state = State.Saving;
-            Task.Run(() => SaveAsync(location));
+            Task.Run(SaveAsync);
         }
 
-        public async Task SaveAsync(string location)
+        public async Task SaveAsync()
         {
             var settings = new XmlWriterSettings()
             {
@@ -86,7 +96,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
                 Async = true
             };
 
-            using var writer = XmlWriter.Create(location, settings);
+            using var writer = XmlWriter.Create(savedLevelName, settings);
 
             await writer.WriteStartDocumentAsync();
             await writer.WriteStartElementAsync(MergeDataKey);
@@ -105,6 +115,17 @@ namespace RDEditorPlus.Functionality.NodeEditor
         protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
         {
             nodePrefabs.Add(name, Node.PreparePrefab(name, inputs, outputs));
+        }
+
+        private void SetLevelName()
+        {
+            if (savedLevelName.IsNullOrEmpty())
+            {
+                levelName.text = "unsaved";
+                return;
+            }
+
+            levelName.text = Path.GetFileName(savedLevelName);
         }
 
         protected NodePanelHolder()
@@ -147,6 +168,12 @@ namespace RDEditorPlus.Functionality.NodeEditor
             Node.Font = title.font;
             NodeOutput.Sprite = NodeInput.Sprite = Node.Sprite = sprite;
 
+            GameObject levelName = GameObject.Instantiate(title.gameObject, title.transform.parent);
+            var rt3 = levelName.transform as RectTransform;
+            rt3.anchoredPosition += Vector2.down * 10f;
+            this.levelName = levelName.GetComponent<Text>();
+            this.levelName.color = Color.gray;
+
             var button = clone.GetComponentInChildren<Button>();
             var buttonObject = button.gameObject;
             var colors = button.colors;
@@ -162,16 +189,30 @@ namespace RDEditorPlus.Functionality.NodeEditor
             GameObject save = GameObject.Instantiate(buttonClone, transform);
             var button3 = save.AddComponent<Button>();
             button3.colors = colors2;
-            button3.onClick.AddListener(ScheduleSave);
+            button3.onClick.AddListener(() => ScheduleSave(forceAskForNewLocation: false));
 
             var text = save.GetComponentInChildren<Text>();
-            text.text = "Save merge data...";
+            text.text = "Save";
             GameObject.DestroyImmediate(text.GetComponent<RDStringToUIText>());
 
             var rt = save.transform as RectTransform;
             rt.anchorMin = new Vector2(0.02f, 0.01f);
-            rt.anchorMax = new Vector2(0.48f, 0.08f);
+            rt.anchorMax = new Vector2(0.24f, 0.08f);
             rt.offsetMin = rt.offsetMax = Vector2.zero;
+
+            GameObject saveAs = GameObject.Instantiate(buttonClone, transform);
+            var button5 = saveAs.AddComponent<Button>();
+            button5.colors = colors2;
+            button5.onClick.AddListener(() => ScheduleSave(forceAskForNewLocation: true));
+
+            var text3 = saveAs.GetComponentInChildren<Text>();
+            text3.text = "Save As";
+            GameObject.DestroyImmediate(text3.GetComponent<RDStringToUIText>());
+
+            var rt4 = saveAs.transform as RectTransform;
+            rt4.anchorMin = new Vector2(0.26f, 0.01f);
+            rt4.anchorMax = new Vector2(0.49f, 0.08f);
+            rt4.offsetMin = rt4.offsetMax = Vector2.zero;
 
             GameObject load = GameObject.Instantiate(buttonClone, transform);
             var button4 = load.AddComponent<Button>();
@@ -179,17 +220,19 @@ namespace RDEditorPlus.Functionality.NodeEditor
             //button4.onClick.AddListener(ScheduleImport);
 
             var text2 = load.GetComponentInChildren<Text>();
-            text2.text = "Load merge data...";
+            text2.text = "Load";
             GameObject.DestroyImmediate(text2.GetComponent<RDStringToUIText>());
 
             var rt2 = load.transform as RectTransform;
             rt2.anchorMin = new Vector2(0.02f, 0.10f);
-            rt2.anchorMax = new Vector2(0.48f, 0.17f);
+            rt2.anchorMax = new Vector2(0.24f, 0.17f);
             rt2.offsetMin = rt2.offsetMax = Vector2.zero;
 
             view = NodeGridView.Create(transform, sprite, this);
             gameObject = clone;
             rectTransform = clone.transform as RectTransform;
+
+            SetLevelName();
 
             PrepareNodePrefab("Test",
                 [
@@ -204,8 +247,10 @@ namespace RDEditorPlus.Functionality.NodeEditor
         protected readonly RectTransform rectTransform;
         protected readonly NodeGridView view;
         protected readonly Text title;
+        protected readonly Text levelName;
         protected readonly Dictionary<string, GameObject> nodePrefabs = new();
 
+        private string savedLevelName = string.Empty;
         private State state = State.Idle;
 
         private enum State

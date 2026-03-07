@@ -26,7 +26,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 
             rectTransform.anchorMin = new Vector2(0.02f, 0.18f);
             rectTransform.anchorMax = new Vector2(0.98f, 0.88f);
-            rectTransform.offsetMin = rectTransform.offsetMax = Vector2.zero;
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = new Vector2(0f, -10f);
 
             GameObject mask = new("mask");
 
