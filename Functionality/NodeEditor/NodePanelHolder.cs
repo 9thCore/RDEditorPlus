@@ -5,11 +5,11 @@ using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityFileDialog;
@@ -18,7 +18,10 @@ namespace RDEditorPlus.Functionality.NodeEditor
 {
     public abstract class NodePanelHolder
     {
-        public abstract void HandleDeserialization(Stream stream);
+        public abstract string DefaultFilename { get; }
+        public abstract string[] Extensions { get; }
+
+        protected abstract Task SaveAsync();
 
         public void Toggle(bool show)
         {
@@ -91,30 +94,6 @@ namespace RDEditorPlus.Functionality.NodeEditor
             Task.Run(SaveAsync);
         }
 
-        public async Task SaveAsync()
-        {
-            var settings = new XmlWriterSettings()
-            {
-                Indent = true,
-                Async = true
-            };
-
-            using var writer = XmlWriter.Create(savedLevelName, settings);
-
-            await writer.WriteStartDocumentAsync();
-            await writer.WriteStartElementAsync(MergeDataKey);
-
-            await view.SaveAsync(writer);
-
-            await writer.WriteEndElementAsync();
-            await writer.WriteEndDocumentAsync();
-            await writer.FlushAsync();
-
-            writer.Close();
-
-            SetState(State.Idle);
-        }
-
         public void ScheduleLoad()
         {
             if (state != State.Idle)
@@ -176,6 +155,8 @@ namespace RDEditorPlus.Functionality.NodeEditor
         }
 
         public bool TryGetNodeFromID(string id, out Node result) => view.TryGetNodeFromID(id, out result);
+        protected abstract void HandleDeserialization(Stream stream);
+        
 
         protected void AllowNodes(params string[] names)
         {
@@ -185,7 +166,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             }
         }
 
-        private void SetLevelName()
+        protected void SetLevelName()
         {
             if (savedLevelName.IsNullOrEmpty())
             {
@@ -196,7 +177,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
             levelName.text = Path.GetFileName(savedLevelName);
         }
 
-        private void SetState(State state)
+        protected void SetState(State state)
         {
             this.state = state;
 
@@ -363,19 +344,53 @@ namespace RDEditorPlus.Functionality.NodeEditor
         protected readonly Text blockerText;
         protected readonly Dictionary<string, GameObject> nodePrefabs = new();
 
-        private string savedLevelName = string.Empty;
-        private State state = State.Idle;
+        protected string savedLevelName = string.Empty;
+        protected State state = State.Idle;
 
-        private enum State
+        protected enum State
         {
             Idle,
             Saving,
             Loading
         }
+    }
 
-        public const string MergeDataKey = "MergeData";
+    public abstract class NodePanelHolder<XMLData> : NodePanelHolder where XMLData : NodeDataRoot
+    {
+        protected override async Task SaveAsync()
+        {
+            var settings = new XmlWriterSettings()
+            {
+                Indent = true,
+                Async = true
+            };
 
-        private const string DefaultFilename = "level";
-        private static readonly string[] Extensions = ["rdmerge"];
+            using var writer = XmlWriter.Create(savedLevelName, settings);
+
+            await writer.WriteStartDocumentAsync();
+            await writer.WriteStartElementAsync(typeof(XMLData).Name);
+
+            await view.SaveAsync(writer);
+
+            await writer.WriteEndElementAsync();
+            await writer.WriteEndDocumentAsync();
+            await writer.FlushAsync();
+
+            writer.Close();
+
+            SetState(State.Idle);
+        }
+
+        protected override void HandleDeserialization(Stream stream)
+        {
+            var serializer = new XmlSerializer(typeof(XMLData));
+
+            if (serializer.Deserialize(stream) is not XMLData result)
+            {
+                throw new InvalidDataException($"Could not deserialise as {typeof(XMLData).FullName}");
+            }
+
+            result.Deserialize(this);
+        }
     }
 }
