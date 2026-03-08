@@ -102,11 +102,13 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
         private static readonly Input[] InputFields = Fields
             .Select(field => new Input(field, field.GetCustomAttribute<InputAttribute>()))
             .Where(input => input.Attribute != null)
+            .OrderBy(input => input.Attribute.Order)
             .ToArray();
 
         private static readonly Output[] OutputFields = Fields
             .Select(field => new Output(field, field.GetCustomAttribute<OutputAttribute>()))
             .Where(output => output.Attribute != null)
+            .OrderBy(output => output.Attribute.Order)
             .ToArray();
 
         private static readonly Dictionary<string, Input> InputByName = new();
