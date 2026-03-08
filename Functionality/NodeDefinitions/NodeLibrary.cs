@@ -48,7 +48,10 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
                     var prefab = (GameObject)method.Invoke(null, [name]);
                     nodeData.Add(name, new(prefab, type));
                 }
-                catch { }
+                catch (Exception e)
+                {
+                    Plugin.LogError($"Could not cache type {type.FullName} because:\n{e}");
+                }
             }
         }
 

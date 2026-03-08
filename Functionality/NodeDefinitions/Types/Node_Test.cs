@@ -1,21 +1,17 @@
 ﻿namespace RDEditorPlus.Functionality.NodeDefinitions.Types
 {
-    public class Node_Test : Node_Base<Node_Test.InputStorage, Node_Test.OutputStorage>
+    public class Node_Test : Node_Base<Node_Test>
     {
         public override void PostDeserialise()
         {
-            output.result = input.param + 3f;
-            Plugin.LogInfo($"Result = {output.result}");
+            result = param + 3f;
+            Plugin.LogInfo($"(param = {param}, result = {result})");
         }
 
-        public class InputStorage
-        {
-            public float param;
-        }
+        [Input("in")]
+        public float param;
 
-        public class OutputStorage
-        {
-            public float result;
-        }
+        [Output("out")]
+        public float result;
     }
 }

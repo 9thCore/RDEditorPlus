@@ -2,8 +2,11 @@
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeDefinitions.Types
 {
@@ -14,32 +17,56 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
         public abstract object GetOutput(string name);
 
         public static GameObject PreparePrefab(string name) => throw new NotImplementedException();
+
+        [AttributeUsage(AttributeTargets.Field)]
+        protected class InputAttribute(string nameOverride = null, [CallerLineNumber] int order = 0) : Attribute
+        {
+            public readonly string NameOverride = nameOverride;
+            public readonly int Order = order;
+        }
+
+        [AttributeUsage(AttributeTargets.Field)]
+        protected class OutputAttribute(string nameOverride = null, [CallerLineNumber] int order = 0) : Attribute
+        {
+            public readonly string NameOverride = nameOverride;
+            public readonly int Order = order;
+        }
     }
 
-    public abstract class Node_Base<InputStorage, OutputStorage> : Node_Base
-        where InputStorage : class, new()
-        where OutputStorage : class, new()
+    public abstract class Node_Base<T> : Node_Base where T : Node_Base<T>
     {
         public override void SetInput(string name, object value)
         {
-            if (InputFieldByName.TryGetValue(name, out var field))
+            if (!InputByName.TryGetValue(name, out var input))
             {
-                field.SetValue(input, value);
+                return;
             }
+
+            input.Field.SetValue(this, value);
         }
 
         public override object GetOutput(string name)
         {
-            if (OutputFieldByName.TryGetValue(name, out var field))
+            if (!OutputByName.TryGetValue(name, out var output))
             {
-                return field.GetValue(output);
+                return null;
             }
 
-            return default;
+            return output.Field.GetValue(this);
         }
 
-        protected readonly InputStorage input = new();
-        protected readonly OutputStorage output = new();
+        static Node_Base()
+        {
+            foreach (var input in InputFields)
+            {
+                InputByName.Add(input.Name, input);
+            }
+
+            foreach (var output in OutputFields)
+            {
+                OutputByName.Add(output.Name, output);
+            }
+        }
 
         public new static GameObject PreparePrefab(string name)
         {
@@ -48,9 +75,9 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
 
             for (int i = InputFields.Length - 1; i >= 0; i--)
             {
-                if (!TryGetTypeFrom(InputFields[i].FieldType, out Node.Type type))
+                if (!TryGetTypeFrom(InputFields[i].Type, out Node.Type type))
                 {
-                    Plugin.LogError($"Type {InputFields[i].FieldType} is not recognized as a node type");
+                    Plugin.LogError($"Type {InputFields[i].Type} is not recognized as a node type");
                     return null;
                 }
 
@@ -59,9 +86,9 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
 
             for (int i = OutputFields.Length - 1; i >= 0; i--)
             {
-                if (!TryGetTypeFrom(OutputFields[i].FieldType, out Node.Type type))
+                if (!TryGetTypeFrom(OutputFields[i].Type, out Node.Type type))
                 {
-                    Plugin.LogError($"Type {OutputFields[i].FieldType} is not recognized as a node type");
+                    Plugin.LogError($"Type {OutputFields[i].Type} is not recognized as a node type");
                     return null;
                 }
 
@@ -83,22 +110,31 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
             return false;
         }
 
-        static Node_Base()
-        {
-            foreach (var field in InputFields)
-            {
-                InputFieldByName.Add(field.Name, field);
-            }
+        private static readonly FieldInfo[] Fields = typeof(T).GetFields();
 
-            foreach (var field in OutputFields)
-            {
-                OutputFieldByName.Add(field.Name, field);
-            }
+        private static readonly Input[] InputFields = Fields
+            .Select(field => new Input(field, field.GetCustomAttribute<InputAttribute>()))
+            .Where(input => input.Attribute != null)
+            .ToArray();
+
+        private static readonly Output[] OutputFields = Fields
+            .Select(field => new Output(field, field.GetCustomAttribute<OutputAttribute>()))
+            .Where(output => output.Attribute != null)
+            .ToArray();
+
+        private static readonly Dictionary<string, Input> InputByName = new();
+        private static readonly Dictionary<string, Output> OutputByName = new();
+
+        private record Input(FieldInfo Field, InputAttribute Attribute)
+        {
+            public string Name => Attribute.NameOverride ?? Field.Name;
+            public Type Type => Field.FieldType;
         }
 
-        private static readonly FieldInfo[] InputFields = typeof(InputStorage).GetFields();
-        private static readonly FieldInfo[] OutputFields = typeof(OutputStorage).GetFields();
-        private static readonly Dictionary<string, FieldInfo> InputFieldByName = new();
-        private static readonly Dictionary<string, FieldInfo> OutputFieldByName = new();
+        private record Output(FieldInfo Field, OutputAttribute Attribute)
+        {
+            public string Name => Attribute.NameOverride ?? Field.Name;
+            public Type Type => Field.FieldType;
+        }
     }
 }
