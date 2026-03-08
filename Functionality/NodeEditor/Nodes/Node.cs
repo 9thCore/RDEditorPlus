@@ -170,6 +170,11 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             }
         }
 
+        public void PostDeserialise()
+        {
+            
+        }
+
         public bool InputDependenciesSaved
         {
             get => inputs.All(input => input.DependenciesSaved);

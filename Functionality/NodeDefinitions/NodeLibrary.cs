@@ -19,7 +19,17 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
         }
 
         public GameObject GetPrefab(string name) => nodeData[name]?.Prefab;
-        public Node_Base GetInstance(string name) => ((Node_Base) Activator.CreateInstance(nodeData[name]?.Type)) ?? null;
+        public bool TryGetInstance(string name, out Node_Base instance)
+        {
+            if (!nodeData.TryGetValue(name, out var data))
+            {
+                instance = default;
+                return false;
+            }
+
+            instance = (Node_Base)Activator.CreateInstance(data.Type);
+            return true;
+        }
 
         private NodeLibrary()
         {

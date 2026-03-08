@@ -39,6 +39,7 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
                     }
                 }
 
+                node.PostDeserialise();
                 index++;
             }
         }
