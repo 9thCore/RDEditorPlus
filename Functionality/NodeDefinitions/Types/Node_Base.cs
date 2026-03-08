@@ -3,7 +3,7 @@ using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using System;
 using UnityEngine;
 
-namespace RDEditorPlus.Functionality.NodeDefinitions
+namespace RDEditorPlus.Functionality.NodeDefinitions.Types
 {
     public abstract class Node_Base
     {

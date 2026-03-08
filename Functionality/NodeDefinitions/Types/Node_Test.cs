@@ -1,4 +1,4 @@
-﻿namespace RDEditorPlus.Functionality.NodeDefinitions
+﻿namespace RDEditorPlus.Functionality.NodeDefinitions.Types
 {
     public class Node_Test : Node_Base<Node_Test.InputStorage, Node_Test.OutputStorage>
     {
