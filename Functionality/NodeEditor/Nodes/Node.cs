@@ -1,10 +1,10 @@
-﻿using RDEditorPlus.Functionality.NodeEditor.Grid;
+﻿using RDEditorPlus.Functionality.NodeDefinitions;
+using RDEditorPlus.Functionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 {
-    public class Node : MonoBehaviour
+    public class Node : MonoBehaviour, INodeWorkspace.INode
     {
         public static GameObject PreparePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
         {

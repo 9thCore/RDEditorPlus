@@ -16,7 +16,7 @@ using UnityFileDialog;
 
 namespace RDEditorPlus.Functionality.NodeEditor
 {
-    public abstract class NodePanelHolder
+    public abstract class NodePanelHolder : INodeWorkspace
     {
         public abstract string DefaultFilename { get; }
         public abstract string[] Extensions { get; }
@@ -49,7 +49,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
                 });
         }
 
-        public Node AddNode(string name, Vector2 position, string id = null)
+        public INodeWorkspace.INode AddNode(string name, Vector2 position, string id = null)
         {
             if (!nodePrefabs.TryGetValue(name, out var prefab))
             {
@@ -154,10 +154,34 @@ namespace RDEditorPlus.Functionality.NodeEditor
             SetLevelName();
         }
 
-        public bool TryGetNodeFromID(string id, out Node result) => view.TryGetNodeFromID(id, out result);
+        public bool TryGetNodeFromID(string id, out INodeWorkspace.INode result)
+        {
+            if (view.TryGetNodeFromID(id, out var node))
+            {
+                result = node;
+                return true;
+            }
+
+            result = default;
+            return false;
+        }
+
+        public void HandleLink(INodeWorkspace.INode input, string inputName, INodeWorkspace.INode output, string outputName)
+        {
+            var inputNode = (Node)input;
+            var outputNode = (Node)output;
+
+            var inputSide = inputNode.GetInput(inputName);
+            var outputSide = outputNode.GetOutput(outputName);
+
+            if (inputSide != null && outputSide != null)
+            {
+                inputSide.LinkIfNotYetLinked(outputSide);
+            }
+        }
+
         protected abstract void HandleDeserialization(Stream stream);
         
-
         protected void AllowNodes(params string[] names)
         {
             foreach (var name in names)

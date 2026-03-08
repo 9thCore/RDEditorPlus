@@ -80,7 +80,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         {
             if (link != null)
             {
-                Plugin.LogInfo($"Node({Id}).{connectorName} already connected to Node({link.Output.Id}), skipping connecting to Node({output.Id})");
+                Plugin.LogInfo($"Node({Id}).{connectorName} already connected to Node({link.Output.Id}), skipping new connection");
                 return;
             }
 

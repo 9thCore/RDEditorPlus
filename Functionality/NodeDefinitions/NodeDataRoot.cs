@@ -1,5 +1,4 @@
-﻿using RDEditorPlus.Functionality.NodeEditor;
-using System.IO;
+﻿using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
 {
     public class NodeDataRoot
     {
-        public virtual void Deserialize(NodePanelHolder holder)
+        public virtual void Deserialize(INodeWorkspace workspace)
         {
             int index = 0;
             foreach (var nodeData in Nodes)
@@ -17,7 +16,7 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
                     throw new InvalidDataException($"Node #{index} is missing an ID");
                 }
 
-                var node = holder.AddNode(nodeData.name, nodeData.Position ?? Vector2.zero, nodeData.id);
+                var node = workspace.AddNode(nodeData.name, nodeData.Position ?? Vector2.zero, nodeData.id);
                 if (node == null)
                 {
                     throw new InvalidDataException();
@@ -30,17 +29,12 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
                         var link = inputData.Link;
                         if (link != null)
                         {
-                            if (!holder.TryGetNodeFromID(link.target, out var other))
+                            if (!workspace.TryGetNodeFromID(link.target, out var other))
                             {
                                 throw new InvalidDataException($"Node {link.target} does not exist before {nodeData.id} needs it. Definition order of nodes in the save matters");
                             }
 
-                            var input = node.GetInput(inputData.name);
-                            var output = other.GetOutput(link.output);
-                            if (input != null && output != null)
-                            {
-                                input.LinkIfNotYetLinked(output);
-                            }
+                            workspace.HandleLink(node, inputData.name, other, link.output);
                         }
                     }
                 }
