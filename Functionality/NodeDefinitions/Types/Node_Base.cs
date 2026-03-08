@@ -1,4 +1,5 @@
-﻿using RDEditorPlus.Functionality.NodeEditor.Nodes;
+﻿using RDEditorPlus.Functionality.NodeDefinitions.Attributes;
+using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
 using System;
 using System.Collections.Generic;
@@ -17,20 +18,6 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
         public abstract object GetOutput(string name);
 
         public static GameObject PreparePrefab(string name) => throw new NotImplementedException();
-
-        [AttributeUsage(AttributeTargets.Field)]
-        protected class InputAttribute(string nameOverride = null, [CallerLineNumber] int order = 0) : Attribute
-        {
-            public readonly string NameOverride = nameOverride;
-            public readonly int Order = order;
-        }
-
-        [AttributeUsage(AttributeTargets.Field)]
-        protected class OutputAttribute(string nameOverride = null, [CallerLineNumber] int order = 0) : Attribute
-        {
-            public readonly string NameOverride = nameOverride;
-            public readonly int Order = order;
-        }
     }
 
     public abstract class Node_Base<T> : Node_Base where T : Node_Base<T>

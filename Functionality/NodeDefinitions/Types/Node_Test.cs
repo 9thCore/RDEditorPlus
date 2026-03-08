@@ -1,4 +1,6 @@
-﻿namespace RDEditorPlus.Functionality.NodeDefinitions.Types
+﻿using RDEditorPlus.Functionality.NodeDefinitions.Attributes;
+
+namespace RDEditorPlus.Functionality.NodeDefinitions.Types
 {
     public class Node_Test : Node_Base<Node_Test>
     {
