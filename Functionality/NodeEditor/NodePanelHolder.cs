@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using RDEditorPlus.Functionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
@@ -176,9 +177,12 @@ namespace RDEditorPlus.Functionality.NodeEditor
 
         public bool TryGetNodeFromID(string id, out Node result) => view.TryGetNodeFromID(id, out result);
 
-        protected void PrepareNodePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
+        protected void AllowNodes(params string[] names)
         {
-            nodePrefabs.Add(name, Node.PreparePrefab(name, inputs, outputs));
+            foreach (var name in names)
+            {
+                nodePrefabs.Add(name, NodeLibrary.Instance.GetPrefab(name));
+            }
         }
 
         private void SetLevelName()
@@ -347,13 +351,7 @@ namespace RDEditorPlus.Functionality.NodeEditor
 
             SetLevelName();
 
-            PrepareNodePrefab("Test",
-                [
-                    new(Node.Type.Float, "in")
-                ],
-                [
-                    new(Node.Type.Float, "out")
-                ]);
+            AllowNodes("Test");
         }
 
         protected readonly GameObject gameObject;
