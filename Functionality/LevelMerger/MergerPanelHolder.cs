@@ -1,4 +1,5 @@
-﻿using RDEditorPlus.Functionality.NodeEditor;
+﻿using RDEditorPlus.Functionality.NodeDefinitions;
+using RDEditorPlus.Functionality.NodeEditor;
 using System.IO;
 using UnityEngine;
 
@@ -27,6 +28,9 @@ namespace RDEditorPlus.Functionality.LevelMerger
         {
             title.text = "Level Merger Utility";
             title.color = Color.yellow;
+
+            CloneButton(rectTransform, "Export", Simulate,
+                anchorMin: new Vector2(0.51f, 0.01f), anchorMax: new Vector2(0.98f, 0.08f));
         }
     }
 }

@@ -129,37 +129,12 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
         {
             await writer.WriteStartElementAsync(NodesKey);
 
-            foreach (var node in nodes)
+            var orderedNodes = GetDependencyOrderedNodes();
+            if (orderedNodes == null)
             {
-                node.InputDependenciesSaved = false;
-                node.AlreadySaved = false;
-            }
-
-            int length = nodes.Count;
-            Node[] orderedNodes = new Node[length];
-            int index = 0;
-
-            while (index < length)
-            {
-                bool savedAnythingThisIteration = false;
-
-                foreach (var node in nodes)
-                {
-                    if (!node.AlreadySaved && node.InputDependenciesSaved)
-                    {
-                        orderedNodes[index++] = node;
-                        node.PropagateDependenciesSaved();
-                        node.AlreadySaved = true;
-                        savedAnythingThisIteration = true;
-                    }
-                }
-
-                if (!savedAnythingThisIteration)
-                {
-                    Plugin.LogError("Something went wrong while saving nodes, as we did not save anything for an iteration. Exitting node saving early");
-                    await writer.WriteEndElementAsync();
-                    return;
-                }
+                Plugin.LogError("Something went wrong while saving nodes, as we did not save anything for an iteration. Exitting node saving early");
+                await writer.WriteEndElementAsync();
+                return;
             }
 
             foreach (var node in orderedNodes)
@@ -203,6 +178,42 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 
             result = default;
             return false;
+        }
+
+        public Node[] GetDependencyOrderedNodes()
+        {
+            foreach (var node in nodes)
+            {
+                node.InputDependenciesSaved = false;
+                node.AlreadySaved = false;
+            }
+
+            int length = nodes.Count;
+            var orderedNodes = new Node[length];
+            int index = 0;
+
+            while (index < length)
+            {
+                bool savedAnythingThisIteration = false;
+
+                foreach (var node in nodes)
+                {
+                    if (!node.AlreadySaved && node.InputDependenciesSaved)
+                    {
+                        orderedNodes[index++] = node;
+                        node.PropagateDependenciesSaved();
+                        node.AlreadySaved = true;
+                        savedAnythingThisIteration = true;
+                    }
+                }
+
+                if (!savedAnythingThisIteration)
+                {
+                    return null;
+                }
+            }
+
+            return orderedNodes;
         }
 
         private void UpdateBackground()

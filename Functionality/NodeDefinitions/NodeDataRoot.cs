@@ -44,6 +44,53 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
             }
         }
 
+        public virtual void Serialize(ISerializableNodeWorkspace workspace)
+        {
+            var orderedNodes = workspace.GetDependencyOrderedNodes();
+            int nodeCount = orderedNodes.Length;
+
+            Nodes = new Node[nodeCount];
+
+            for (int i = 0; i < nodeCount; i++)
+            {
+                var node = orderedNodes[i];
+                var inputs = node.Inputs;
+                int inputCount = inputs.Length;
+                
+                Node serialisedNode = new()
+                {
+                    id = node.Id,
+                    name = node.Name,
+                    Position = node.Position,
+                    Inputs = new Input[inputCount]
+                };
+
+                for (int j = 0; j < inputCount; j++)
+                {
+                    var input = inputs[j];
+
+                    Input serialisedInput = new()
+                    {
+                        name = input.Name,
+                        Link = null
+                    };
+
+                    if (input.IsLinked)
+                    {
+                        serialisedInput.Link = new()
+                        {
+                            target = input.Target,
+                            output = input.Output
+                        };
+                    }
+
+                    serialisedNode.Inputs[j] = serialisedInput;
+                }
+
+                Nodes[i] = serialisedNode;
+            }
+        }
+
         public Node[] Nodes;
 
         public class Node
@@ -62,6 +109,7 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
             public float x, y;
 
             public static implicit operator Vector2(Position p) => new(p.x, p.y);
+            public static implicit operator Position(Vector2 v) => new() { x = v.x, y = v.y };
         }
 
         public class Input

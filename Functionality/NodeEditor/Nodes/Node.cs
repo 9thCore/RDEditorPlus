@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 {
-    public class Node : MonoBehaviour, INodeWorkspace.INode
+    public class Node : MonoBehaviour, INodeWorkspace.INode, ISerializableNodeWorkspace.INode
     {
         public static GameObject PreparePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
         {
@@ -200,6 +200,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             get => alreadySaved;
             set => alreadySaved = value;
         }
+
+        public ISerializableNodeWorkspace.INode.IInput[] Inputs => inputs.ToArray();
+        public string Name => nodeName;
+        public Vector2 Position => rectTransform.anchoredPosition;
 
         public enum Type
         {

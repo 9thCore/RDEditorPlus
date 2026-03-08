@@ -1,11 +1,12 @@
-﻿using RDEditorPlus.Util;
+﻿using RDEditorPlus.Functionality.NodeDefinitions;
+using RDEditorPlus.Util;
 using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
-    public class NodeInput : NodeConnector<NodeInput, NodeInput.Provider>
+    public class NodeInput : NodeConnector<NodeInput, NodeInput.Provider>, ISerializableNodeWorkspace.INode.IInput
     {
         private NodeInput() : base(Type.Input)
         {
@@ -86,6 +87,10 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
             output.SetupConnection(this);
         }
+
+        public bool IsLinked => link != null;
+        public string Target => link.Output.Id;
+        public string Output => link.Output.Name;
 
         protected override void PrefabSetup()
         {

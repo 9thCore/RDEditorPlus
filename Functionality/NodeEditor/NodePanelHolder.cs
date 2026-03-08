@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityFileDialog;
 
 namespace RDEditorPlus.Functionality.NodeEditor
 {
-    public abstract class NodePanelHolder : INodeWorkspace
+    public abstract class NodePanelHolder : INodeWorkspace, ISerializableNodeWorkspace
     {
         public abstract string DefaultFilename { get; }
         public abstract string[] Extensions { get; }
@@ -180,6 +181,8 @@ namespace RDEditorPlus.Functionality.NodeEditor
             }
         }
 
+        public ISerializableNodeWorkspace.INode[] GetDependencyOrderedNodes() => view.GetDependencyOrderedNodes();
+
         protected abstract void HandleDeserialization(Stream stream);
         
         protected void AllowNodes(params string[] names)
@@ -236,10 +239,12 @@ namespace RDEditorPlus.Functionality.NodeEditor
             popup.onDialogScreenBlocker.raycastTarget = true;
             popup.onDialogScreenBlocker.transform.SetAsFirstSibling();
 
-            GameObject buttonClone = GameObject.Instantiate(popup.steamPublishButton.gameObject);
-            var button2 = buttonClone.GetComponent<Button>();
-            var colors2 = button2.colors;
+            grayButtonClone = GameObject.Instantiate(popup.steamPublishButton.gameObject);
+            grayButtonClone.SetActive(false);
+            var button2 = grayButtonClone.GetComponent<Button>();
+            grayButtonCloneColorBlock = button2.colors;
             GameObject.DestroyImmediate(button2);
+            GameObject.DestroyImmediate(grayButtonClone.GetComponentInChildren<RDStringToUIText>());
 
             GameObject.DestroyImmediate(popup.steamPublishButton.transform.parent.gameObject);
             GameObject.DestroyImmediate(popup.levelErrorPresentation.gameObject);
@@ -273,61 +278,17 @@ namespace RDEditorPlus.Functionality.NodeEditor
                 Toggle(show: false);
             });
 
-            GameObject save = GameObject.Instantiate(buttonClone, transform);
-            var button3 = save.AddComponent<Button>();
-            button3.colors = colors2;
-            button3.onClick.AddListener(() => ScheduleSave(forceAskForNewLocation: false));
+            CloneButton(transform, "Save", () => ScheduleSave(forceAskForNewLocation: false),
+                anchorMin: new Vector2(0.02f, 0.01f), anchorMax: new Vector2(0.24f, 0.08f));
 
-            var text = save.GetComponentInChildren<Text>();
-            text.text = "Save";
-            GameObject.DestroyImmediate(text.GetComponent<RDStringToUIText>());
+            CloneButton(transform, "Save As", () => ScheduleSave(forceAskForNewLocation: true),
+                anchorMin: new Vector2(0.26f, 0.01f), anchorMax: new Vector2(0.49f, 0.08f));
 
-            var rt = save.transform as RectTransform;
-            rt.anchorMin = new Vector2(0.02f, 0.01f);
-            rt.anchorMax = new Vector2(0.24f, 0.08f);
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            CloneButton(transform, "New", NewButtonClick,
+                anchorMin: new Vector2(0.02f, 0.10f), anchorMax: new Vector2(0.24f, 0.17f));
 
-            GameObject saveAs = GameObject.Instantiate(buttonClone, transform);
-            var button5 = saveAs.AddComponent<Button>();
-            button5.colors = colors2;
-            button5.onClick.AddListener(() => ScheduleSave(forceAskForNewLocation: true));
-
-            var text3 = saveAs.GetComponentInChildren<Text>();
-            text3.text = "Save As";
-            GameObject.DestroyImmediate(text3.GetComponent<RDStringToUIText>());
-
-            var rt4 = saveAs.transform as RectTransform;
-            rt4.anchorMin = new Vector2(0.26f, 0.01f);
-            rt4.anchorMax = new Vector2(0.49f, 0.08f);
-            rt4.offsetMin = rt4.offsetMax = Vector2.zero;
-
-            GameObject newObj = GameObject.Instantiate(buttonClone, transform);
-            var button6 = newObj.AddComponent<Button>();
-            button6.colors = colors2;
-            button6.onClick.AddListener(NewButtonClick);
-
-            var text4 = newObj.GetComponentInChildren<Text>();
-            text4.text = "New";
-            GameObject.DestroyImmediate(text4.GetComponent<RDStringToUIText>());
-
-            var rt5 = newObj.transform as RectTransform;
-            rt5.anchorMin = new Vector2(0.02f, 0.10f);
-            rt5.anchorMax = new Vector2(0.24f, 0.17f);
-            rt5.offsetMin = rt5.offsetMax = Vector2.zero;
-
-            GameObject load = GameObject.Instantiate(buttonClone, transform);
-            var button4 = load.AddComponent<Button>();
-            button4.colors = colors2;
-            button4.onClick.AddListener(ScheduleLoad);
-
-            var text2 = load.GetComponentInChildren<Text>();
-            text2.text = "Load";
-            GameObject.DestroyImmediate(text2.GetComponent<RDStringToUIText>());
-
-            var rt2 = load.transform as RectTransform;
-            rt2.anchorMin = new Vector2(0.26f, 0.10f);
-            rt2.anchorMax = new Vector2(0.49f, 0.17f);
-            rt2.offsetMin = rt2.offsetMax = Vector2.zero;
+            CloneButton(transform, "Load", ScheduleLoad,
+                anchorMin: new Vector2(0.26f, 0.10f), anchorMax: new Vector2(0.49f, 0.17f));
 
             view = NodeGridView.Create(transform, sprite, this);
             gameObject = clone;
@@ -345,14 +306,14 @@ namespace RDEditorPlus.Functionality.NodeEditor
             blockerText = titleClone.GetComponent<Text>();
             blockerText.color = Color.white;
             blockerText.fontSize = 16;
-            var rt6 = titleClone.transform as RectTransform;
-            rt6.anchorMin = rt6.offsetMin = rt6.offsetMax = Vector2.zero;
-            rt6.anchorMax = Vector2.one;
+            var rt = titleClone.transform as RectTransform;
+            rt.anchorMin = rt.offsetMin = rt.offsetMax = Vector2.zero;
+            rt.anchorMax = Vector2.one;
 
-            var rt7 = blocker.transform as RectTransform;
-            rt7.anchorMin = rt7.offsetMin = rt7.offsetMax = Vector2.zero;
-            rt7.anchorMax = Vector2.one;
-            rt7.localScale = Vector3.one;
+            var rt2 = blocker.transform as RectTransform;
+            rt2.anchorMin = rt2.offsetMin = rt2.offsetMax = Vector2.zero;
+            rt2.anchorMax = Vector2.one;
+            rt2.localScale = Vector3.one;
 
             SetLevelName();
 
@@ -377,10 +338,43 @@ namespace RDEditorPlus.Functionality.NodeEditor
             Saving,
             Loading
         }
+
+        protected static GameObject CloneButton(Transform parent, string name, UnityAction call, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            GameObject clone = GameObject.Instantiate(grayButtonClone, parent);
+            var button = clone.AddComponent<Button>();
+            button.colors = grayButtonCloneColorBlock;
+            button.onClick.AddListener(call);
+
+            clone.GetComponentInChildren<Text>().text = name;
+
+            var rt = clone.transform as RectTransform;
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+
+            clone.SetActive(true);
+            return clone;
+        }
+
+        private static GameObject grayButtonClone;
+        private static ColorBlock grayButtonCloneColorBlock;
     }
 
-    public abstract class NodePanelHolder<XMLData> : NodePanelHolder where XMLData : NodeDataRoot
+    public abstract class NodePanelHolder<XMLData> : NodePanelHolder where XMLData : NodeDataRoot, new()
     {
+        public XMLData CreateXMLData()
+        {
+            XMLData data = new();
+            data.Serialize(this);
+            return data;
+        }
+
+        public void Simulate()
+        {
+            CreateXMLData().Deserialize(new NodeSimulator());
+        }
+
         protected override async Task SaveAsync()
         {
             var settings = new XmlWriterSettings()

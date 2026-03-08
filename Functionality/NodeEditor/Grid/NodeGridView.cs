@@ -71,6 +71,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Grid
 
         public bool TryGetNodeFromID(string id, out Node result) => grid.TryGetNodeFromID(id, out result);
 
+        public Node[] GetDependencyOrderedNodes() => grid.GetDependencyOrderedNodes();
+
         private NodeGrid grid;
         private Sprite sprite;
     }
