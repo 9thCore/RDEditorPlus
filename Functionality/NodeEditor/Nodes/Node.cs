@@ -15,7 +15,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 {
     public class Node : MonoBehaviour, INodeWorkspace.INode, ISerializableNodeWorkspace.INode
     {
-        public static GameObject PreparePrefab(string name, IEnumerable<NodeInput.Data> inputs, IEnumerable<NodeOutput.Data> outputs)
+        public static GameObject PreparePrefab(string name, NodeInput.Data[] inputs, NodeOutput.Data[] outputs)
         {
             GameObject root = Instantiate(BaseNode);
             root.name = $"Mod_{MyPluginInfo.PLUGIN_GUID}_Node{name}";
@@ -35,6 +35,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                 output.Setup(node);
             }
 
+            node.ScheduleUIUpdate();
             return root;
         }
 
@@ -215,22 +216,20 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             nodeName = name;
             title.text = name;
         }
-
-        private void Start()
+        
+        // This should only be run on the prefab to ensure the UI is setup properly
+        private void ScheduleUIUpdate()
         {
-            StartCoroutine(SetupVisualsProperly());
+            gameObject.SetActive(true);
+            StartCoroutine(DeactivateImmediatelyAterUIUpdate());
         }
 
-        private IEnumerator SetupVisualsProperly()
+        private IEnumerator DeactivateImmediatelyAterUIUpdate()
         {
-            yield return new WaitForEndOfFrame();
-
-            rectTransform.offsetMin -= Vector2.up * (Mathf.Max(inputParent.rect.height, outputParent.rect.height) + TextClearance + TextHeight);
-
-            foreach (var output in outputs)
-            {
-                output.Drag();
-            }
+            // idk why it has to wait twice
+            yield return null;
+            yield return null;
+            gameObject.SetActive(false);
         }
 
         [SerializeField]
@@ -264,8 +263,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         public static Font Font;
         public static Sprite Sprite;
 
-        public const float TextHeight = 18f;
-        public const float TextClearance = 4f;
+        public const int TopPadding = 4;
+        public const int BottomPadding = 4;
         public const float InterfaceSpacing = 8f;
         public const float ConnectorSpacing = 6f;
 
@@ -286,83 +285,122 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                     baseNode = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_NodeBase");
                     baseNode.SetActive(false);
 
+                    var node = baseNode.AddComponent<Node>();
+                    baseNode.AddComponent<NodeEventTrigger>().Setup(node);
+
                     baseNode.AddComponent<FourSidedOutline>().effectColor = Color.black;
                     baseNode.AddComponent<Shadow>().effectDistance = new Vector2(2f, -2f);
 
-                    var image = baseNode.AddComponent<Image>();
-                    image.sprite = Sprite;
-                    image.color = Color.gray.WithBrightness(0.8f);
-                    image.type = Image.Type.Tiled;
+                    baseNode.AddComponent<VerticalLayoutGroup>();
+                    baseNode.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-                    GameObject controls = new("controls");
-                    var group = controls.AddComponent<HorizontalLayoutGroup>();
-                    group.childAlignment = TextAnchor.UpperCenter;
-                    group.childForceExpandHeight = false;
-                    group.childControlHeight = false;
-                    group.spacing = InterfaceSpacing;
+                    var background = baseNode.AddComponent<Image>();
+                    background.sprite = Sprite;
+                    background.color = Color.gray.WithBrightness(0.8f);
+                    background.type = Image.Type.Tiled;
 
-                    var controlsRT = controls.transform as RectTransform;
-                    controlsRT.SetParent(baseNode.transform);
-                    controlsRT.offsetMin = Vector2.zero;
-                    controlsRT.offsetMax = new Vector2(0f, -(TextHeight + TextClearance));
-                    controlsRT.anchorMin = Vector2.zero;
-                    controlsRT.anchorMax = Vector2.one;
+                    var transform = node.transform as RectTransform;
 
-                    GameObject inputs = new("inputs");
-                    var inputGroup = inputs.AddComponent<VerticalLayoutGroup>();
-                    inputGroup.childAlignment = TextAnchor.UpperLeft;
-                    inputGroup.childForceExpandHeight = false;
-                    inputGroup.spacing = ConnectorSpacing;
+                    node.rectTransform = transform;
 
-                    inputs.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    #region Node layout root
+                    GameObject root = new("layoutRoot");
+                    root.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-                    var inputsRT = inputs.transform as RectTransform;
-                    inputsRT.SetParent(controlsRT);
-                    inputsRT.offsetMin = inputsRT.offsetMax = Vector2.zero;
-                    inputsRT.pivot = new Vector2(0.5f, 1f);
+                    var layoutRoot = root.AddComponent<VerticalLayoutGroup>();
+                    layoutRoot.childForceExpandWidth = true;
+                    layoutRoot.childForceExpandHeight = false;
+                    layoutRoot.childControlWidth = true;
+                    layoutRoot.childControlHeight = false;
+                    layoutRoot.padding = new(0, 0, TopPadding, BottomPadding);
 
-                    GameObject outputs = new("outputs");
-                    var outputGroup = outputs.AddComponent<VerticalLayoutGroup>();
-                    outputGroup.childAlignment = TextAnchor.UpperRight;
-                    outputGroup.childForceExpandHeight = false;
-                    outputGroup.spacing = ConnectorSpacing;
+                    var layoutRT = root.transform as RectTransform;
+                    layoutRT.SetParent(transform);
+                    layoutRT.pivot = new Vector2(0.5f, 1f);
+                    layoutRT.anchorMin = Vector2.zero;
+                    layoutRT.anchorMax = Vector2.one;
+                    layoutRT.offsetMin = layoutRT.offsetMax = Vector2.zero;
+                    #endregion
 
-                    outputs.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-                    var outputsRT = outputs.transform as RectTransform;
-                    outputsRT.SetParent(controlsRT);
-                    outputsRT.offsetMin = outputsRT.offsetMax = Vector2.zero;
-                    outputsRT.pivot = new Vector2(0.5f, 1f);
-
+                    #region Node title
                     GameObject title = new("title");
+                    title.AddComponent<EightSidedOutline>().effectColor = Color.black;
+                    title.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
                     title.transform.SetParent(baseNode.transform);
                     title.transform.localPosition = Vector3.zero;
                     title.transform.localScale = Vector3.one;
-
-                    var node = baseNode.AddComponent<Node>();
 
                     node.title = title.AddComponent<Text>();
                     node.title.font = Font;
                     node.title.alignment = TextAnchor.UpperCenter;
                     node.title.fontSize = 8;
 
-                    title.AddComponent<EightSidedOutline>().effectColor = Color.black;
-
                     var titleRT = node.title.rectTransform;
+                    titleRT.SetParent(layoutRT);
                     titleRT.anchorMin = new Vector2(0f, 1f);
                     titleRT.anchorMax = Vector2.one;
-                    titleRT.offsetMin = new Vector2(0f, -TextHeight);
-                    titleRT.offsetMax = Vector2.zero;
+                    titleRT.offsetMin = titleRT.offsetMax = Vector2.zero;
+                    #endregion
 
-                    var rt = baseNode.transform as RectTransform;
-                    rt.offsetMin = new Vector2(-50f, 0f);
-                    rt.offsetMax = -rt.offsetMin;
-                    rt.pivot = new Vector2(0.5f, 1f);
+                    #region Node connectors
+                    GameObject connectors = new("connectors");
+                    connectors.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-                    node.rectTransform = rt;
+                    var connectorGroup = connectors.AddComponent<HorizontalLayoutGroup>();
+                    connectorGroup.childAlignment = TextAnchor.UpperCenter;
+                    connectorGroup.childForceExpandWidth = true;
+                    connectorGroup.childForceExpandHeight = false;
+                    connectorGroup.childControlWidth = true;
+                    connectorGroup.childControlHeight = false;
+                    connectorGroup.spacing = InterfaceSpacing;
+
+                    var connectorsRT = connectors.transform as RectTransform;
+                    connectorsRT.SetParent(layoutRT);
+                    connectorsRT.anchorMin = Vector2.zero;
+                    connectorsRT.anchorMax = Vector2.one;
+                    connectorsRT.offsetMin = connectorsRT.offsetMax = Vector2.zero;
+                    #endregion
+
+                    #region Node inputs
+                    GameObject inputs = new("inputs");
+                    inputs.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                    var inputGroup = inputs.AddComponent<VerticalLayoutGroup>();
+                    inputGroup.childAlignment = TextAnchor.UpperLeft;
+                    inputGroup.childForceExpandWidth = true;
+                    inputGroup.childForceExpandHeight = false;
+                    inputGroup.childControlWidth = true;
+                    inputGroup.childControlHeight = true;
+                    inputGroup.spacing = ConnectorSpacing;
+
+                    var inputsRT = inputs.transform as RectTransform;
+                    inputsRT.SetParent(connectorsRT);
+                    inputsRT.offsetMin = inputsRT.offsetMax = Vector2.zero;
+                    inputsRT.pivot = new Vector2(0.5f, 1f);
+
                     node.inputParent = inputsRT;
+                    #endregion
+
+                    #region Node outputs
+                    GameObject outputs = new("outputs");
+                    outputs.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                    var outputGroup = outputs.AddComponent<VerticalLayoutGroup>();
+                    outputGroup.childAlignment = TextAnchor.UpperRight;
+                    outputGroup.childForceExpandWidth = true;
+                    outputGroup.childForceExpandHeight = false;
+                    outputGroup.childControlWidth = true;
+                    outputGroup.childControlHeight = true;
+                    outputGroup.spacing = ConnectorSpacing;
+
+                    var outputsRT = outputs.transform as RectTransform;
+                    outputsRT.SetParent(connectorsRT);
+                    outputsRT.offsetMin = outputsRT.offsetMax = Vector2.zero;
+                    outputsRT.pivot = new Vector2(0.5f, 1f);
+
                     node.outputParent = outputsRT;
-                    baseNode.AddComponent<NodeEventTrigger>().Setup(node);
+                    #endregion
                 }
 
                 return baseNode;
