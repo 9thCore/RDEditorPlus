@@ -206,9 +206,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             GameObject baseConnector = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_Node{connectorType}");
             baseConnector.SetActive(false);
 
-            baseConnector.AddComponent<LayoutElement>();
-
-            var rt = baseConnector.transform as RectTransform;
+            var rt = baseConnector.AddComponent<RectTransform>();
 
             GameObject control = new("control");
 
