@@ -12,6 +12,7 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
         public interface INode
         {
             public void PostDeserialise();
+            public void SetVariable(string name, object value);
         }
     }
 }

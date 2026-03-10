@@ -22,6 +22,14 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
                     throw new InvalidDataException();
                 }
 
+                if (nodeData.Variables != null)
+                {
+                    foreach (var variableData in nodeData.Variables)
+                    {
+                        node.SetVariable(variableData.name, variableData.Value);
+                    }
+                }
+
                 if (nodeData.Inputs != null)
                 {
                     foreach (var inputData in nodeData.Inputs)
@@ -54,7 +62,9 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
             for (int i = 0; i < nodeCount; i++)
             {
                 var node = orderedNodes[i];
+                var variables = node.Variables;
                 var inputs = node.Inputs;
+                int variableCount = variables.Length;
                 int inputCount = inputs.Length;
                 
                 Node serialisedNode = new()
@@ -62,8 +72,20 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
                     id = node.Id,
                     name = node.Name,
                     Position = node.Position,
+                    Variables = new Variable[variableCount],
                     Inputs = new Input[inputCount]
                 };
+
+                for (int j = 0; j < variableCount; j++)
+                {
+                    var variable = variables[j];
+
+                    serialisedNode.Variables[j] = new()
+                    {
+                        name = variable.Name,
+                        Value = variable.Value.ToString()
+                    };
+                }
 
                 for (int j = 0; j < inputCount; j++)
                 {
@@ -99,7 +121,7 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
             public string id, name;
 
             public Position Position;
-
+            public Variable[] Variables;
             public Input[] Inputs;
         }
 
@@ -110,6 +132,14 @@ namespace RDEditorPlus.Functionality.NodeDefinitions
 
             public static implicit operator Vector2(Position p) => new(p.x, p.y);
             public static implicit operator Position(Vector2 v) => new() { x = v.x, y = v.y };
+        }
+
+        public class Variable
+        {
+            [XmlAttribute]
+            public string name;
+
+            public string Value;
         }
 
         public class Input

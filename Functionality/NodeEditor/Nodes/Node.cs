@@ -1,6 +1,7 @@
 ﻿using RDEditorPlus.Functionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeEditor.Nodes.Connector;
+using RDEditorPlus.Functionality.NodeEditor.Nodes.Variable;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections;
@@ -15,15 +16,21 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 {
     public class Node : MonoBehaviour, INodeWorkspace.INode, ISerializableNodeWorkspace.INode
     {
-        public static GameObject PreparePrefab(string name, NodeInput.Data[] inputs, NodeOutput.Data[] outputs)
+        public static GameObject PreparePrefab(string name, NodeVariable.Data[] variables, NodeInput.Data[] inputs, NodeOutput.Data[] outputs)
         {
             GameObject root = Instantiate(BaseNode);
             root.name = $"Mod_{MyPluginInfo.PLUGIN_GUID}_Node{name}";
 
             var node = root.GetComponent<Node>();
             node.SetName(name);
+            node.variables = new();
             node.inputs = new();
             node.outputs = new();
+
+            foreach (var variable in variables)
+            {
+                variable.Setup(node);
+            }
 
             foreach (var input in inputs)
             {
@@ -61,6 +68,12 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
         public NodeConnection CreateConnection() => grid.CreateConnection();
         public NodeConnection VirtualConnection => grid.VirtualConnection;
+
+        public void AddVariable(RectTransform transform, NodeVariable variable)
+        {
+            transform.SetParent(variableParent);
+            variables.Add(variable);
+        }
 
         public void AddInput(RectTransform transform, NodeInput input)
         {
@@ -128,6 +141,18 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             await writer.WriteAttributeStringAsync(PositionYKey, position.y.ToString());
             await writer.WriteEndElementAsync();
 
+            if (variables.Any(variable => variable.CanSave()))
+            {
+                await writer.WriteStartElementAsync(VariablesKey);
+                foreach (var variable in variables.Where(variable => variable.CanSave()))
+                {
+                    await writer.WriteStartElementAsync(VariableKey);
+                    await variable.SaveAsync(writer);
+                    await writer.WriteEndElementAsync();
+                }
+                await writer.WriteEndElementAsync();
+            }
+
             if (inputs.Any(input => input.CanSave()))
             {
                 await writer.WriteStartElementAsync(InputsKey);
@@ -176,6 +201,17 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
             
         }
 
+        public void SetVariable(string name, object value)
+        {
+            var variable = variables.Where(variable => variable.Name == name).FirstOrDefault();
+            if (variable == null)
+            {
+                return;
+            }
+
+            variable.SetValue(value.ToString());
+        }
+
         public bool InputDependenciesSaved
         {
             get => inputs.All(input => input.DependenciesSaved);
@@ -203,6 +239,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         }
 
         public ISerializableNodeWorkspace.INode.IInput[] Inputs => inputs.ToArray();
+        public ISerializableNodeWorkspace.INode.IVariable[] Variables => variables.ToArray();
         public string Name => nodeName;
         public Vector2 Position => rectTransform.anchoredPosition;
 
@@ -242,10 +279,16 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         private RectTransform rectTransform;
 
         [SerializeField]
+        private RectTransform variableParent;
+
+        [SerializeField]
         private RectTransform inputParent;
 
         [SerializeField]
         private RectTransform outputParent;
+
+        [SerializeField]
+        private List<NodeVariable> variables;
 
         [SerializeField]
         private List<NodeInput> inputs;
@@ -265,6 +308,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
 
         public const int TopPadding = 4;
         public const int BottomPadding = 4;
+        public const float RootSpacing = 4f;
         public const float InterfaceSpacing = 8f;
         public const float ConnectorSpacing = 6f;
 
@@ -273,6 +317,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         public const string PositionKey = "Position";
         public const string PositionXKey = "x";
         public const string PositionYKey = "y";
+        public const string VariablesKey = "Variables";
+        public const string VariableKey = "Variable";
         public const string InputsKey = "Inputs";
         public const string InputKey = "Input";
 
@@ -313,6 +359,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                     layoutRoot.childControlWidth = true;
                     layoutRoot.childControlHeight = false;
                     layoutRoot.padding = new(0, 0, TopPadding, BottomPadding);
+                    layoutRoot.spacing = RootSpacing;
 
                     var layoutRT = root.transform as RectTransform;
                     layoutRT.SetParent(transform);
@@ -341,6 +388,28 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
                     titleRT.anchorMin = new Vector2(0f, 1f);
                     titleRT.anchorMax = Vector2.one;
                     titleRT.offsetMin = titleRT.offsetMax = Vector2.zero;
+                    #endregion
+
+                    #region Node variables
+                    GameObject variables = new("variables");
+                    variables.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                    var variableGroup = variables.AddComponent<VerticalLayoutGroup>();
+                    variableGroup.childAlignment = TextAnchor.UpperLeft;
+                    variableGroup.childForceExpandWidth = true;
+                    variableGroup.childForceExpandHeight = false;
+                    variableGroup.childControlWidth = true;
+                    variableGroup.childControlHeight = true;
+                    variableGroup.spacing = ConnectorSpacing;
+
+                    var variablesRT = variables.transform as RectTransform;
+                    variablesRT.SetParent(layoutRT);
+                    variablesRT.anchorMin = Vector2.zero;
+                    variablesRT.anchorMax = Vector2.one;
+                    variablesRT.offsetMin = variablesRT.offsetMax = Vector2.zero;
+                    variablesRT.pivot = new Vector2(0.5f, 1f);
+
+                    node.variableParent = variablesRT;
                     #endregion
 
                     #region Node connectors
