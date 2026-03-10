@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using MonoMod.Cil;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Reflection;
@@ -8,6 +9,15 @@ namespace RDEditorPlus.Patch
 {
     internal static class Patch_scnEditor
     {
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Awake))]
+        private static class Awake
+        {
+            private static void Postfix()
+            {
+                AssetUtil.FetchEditorAssets();
+            }
+        }
+
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.SetLevelEventControlType))]
         private static class SetLevelEventControlType
         {
