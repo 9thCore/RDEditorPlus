@@ -1,7 +1,6 @@
 ﻿using RDEditorPlus.Functionality.Components;
 using RDEditorPlus.Util;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
@@ -84,7 +83,9 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         }
     }
 
-    public abstract class NodeConnector<ConnectorType, Provider>(NodeConnector.Type connectorType) : NodeConnector where ConnectorType : NodeConnector<ConnectorType, Provider> where Provider : IPrefabProvider, new()
+    public abstract class NodeConnector<ConnectorType, PrefabProvider>(NodeConnector.Type connectorType) : NodeConnector
+        where ConnectorType : NodeConnector<ConnectorType, PrefabProvider>
+        where PrefabProvider : IPrefabProvider, new()
     {
         public override void StartConnection()
         {
@@ -268,9 +269,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             return connector;
         }
 
-        private static NodeConnector<ConnectorType, Provider> Get(Node.Type type, string name)
+        private static NodeConnector<ConnectorType, PrefabProvider> Get(Node.Type type, string name)
         {
-            GameObject prefab = new Provider().GetPrefab(type);
+            GameObject prefab = type switch
+            {
+                Node.Type.Float => FloatConnector,
+                Node.Type.Integer => IntegerConnector,
+                _ => null
+            };
 
             if (prefab == null)
             {
@@ -300,5 +306,48 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
             public static implicit operator ColorData(Color SelectedControl) => new(SelectedControl);
         }
+
+        private static GameObject IntegerConnector
+        {
+            get
+            {
+                if (integerConnector == null)
+                {
+                    integerConnector = SetupIntegerConnector(BaseConnectorPrefab);
+                }
+
+                return integerConnector;
+            }
+        }
+
+        private static GameObject FloatConnector
+        {
+            get
+            {
+                if (floatConnector == null)
+                {
+                    floatConnector = SetupFloatConnector(BaseConnectorPrefab);
+                }
+
+                return floatConnector;
+            }
+        }
+
+        private static GameObject BaseConnectorPrefab
+        {
+            get
+            {
+                if (baseConnector == null)
+                {
+                    baseConnector = BaseConnector(new PrefabProvider().ConnectorType.ToString());
+                }
+
+                return baseConnector;
+            }
+        }
+
+        private static GameObject integerConnector;
+        private static GameObject floatConnector;
+        private static GameObject baseConnector;
     }
 }

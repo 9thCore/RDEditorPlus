@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-
-namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
+﻿namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
     public interface IPrefabProvider
     {
-        GameObject GetPrefab(Node.Type type);
+        public NodeConnector.Type ConnectorType { get; }
     }
 }

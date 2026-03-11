@@ -6,8 +6,13 @@ using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
-    public class NodeInput : NodeConnector<NodeInput, NodeInput.Provider>, ISerializableNodeWorkspace.INode.IInput
+    public class NodeInput : NodeConnector<NodeInput, NodeInput.PrefabProvider>, ISerializableNodeWorkspace.INode.IInput
     {
+        public class PrefabProvider : IPrefabProvider
+        {
+            public Type ConnectorType => Type.Input;
+        }
+
         private NodeInput() : base(Type.Input)
         {
 
@@ -107,63 +112,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         public const string LinkKey = "Link";
 
-        public class Provider : IPrefabProvider
-        {
-            public GameObject GetPrefab(Node.Type type)
-            {
-                return type switch
-                {
-                    Node.Type.Float => FloatInput,
-                    Node.Type.Integer => IntegerInput,
-                    _ => null
-                };
-            }
-        }
-
         private Link link;
         private bool dependenciesSaved = false;
-
-        private static GameObject IntegerInput
-        {
-            get
-            {
-                if (integerInput == null)
-                {
-                    integerInput = SetupIntegerConnector(BaseInput);
-                }
-
-                return integerInput;
-            }
-        }
-
-        private static GameObject FloatInput
-        {
-            get
-            {
-                if (floatInput == null)
-                {
-                    floatInput = SetupFloatConnector(BaseInput);
-                }
-
-                return floatInput;
-            }
-        }
-
-        private static GameObject BaseInput
-        {
-            get
-            {
-                if (baseInput == null)
-                {
-                    baseInput = BaseConnector("input");
-                }
-
-                return baseInput;
-            }
-        }
-
-        private static GameObject integerInput;
-        private static GameObject floatInput;
-        private static GameObject baseInput;
     }
 }

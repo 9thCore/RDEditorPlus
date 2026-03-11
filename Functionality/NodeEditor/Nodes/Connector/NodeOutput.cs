@@ -3,8 +3,13 @@ using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 {
-    public class NodeOutput : NodeConnector<NodeOutput, NodeOutput.Provider>
+    public class NodeOutput : NodeConnector<NodeOutput, NodeOutput.PrefabProvider>
     {
+        public class PrefabProvider : IPrefabProvider
+        {
+            public Type ConnectorType => Type.Output;
+        }
+
         private NodeOutput() : base(Type.Output)
         {
 
@@ -79,61 +84,5 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
         }
 
         private readonly List<Link> links = new();
-
-        public class Provider : IPrefabProvider
-        {
-            public GameObject GetPrefab(Node.Type type)
-            {
-                return type switch
-                {
-                    Node.Type.Float => FloatOutput,
-                    Node.Type.Integer => IntegerOutput,
-                    _ => null
-                };
-            }
-        }
-
-        private static GameObject IntegerOutput
-        {
-            get
-            {
-                if (integerOutput == null)
-                {
-                    integerOutput = SetupIntegerConnector(BaseOutput);
-                }
-
-                return integerOutput;
-            }
-        }
-
-        private static GameObject FloatOutput
-        {
-            get
-            {
-                if (floatOutput == null)
-                {
-                    floatOutput = SetupFloatConnector(BaseOutput);
-                }
-
-                return floatOutput;
-            }
-        }
-
-        private static GameObject BaseOutput
-        {
-            get
-            {
-                if (baseOutput == null)
-                {
-                    baseOutput = BaseConnector("output");
-                }
-
-                return baseOutput;
-            }
-        }
-
-        private static GameObject integerOutput;
-        private static GameObject floatOutput;
-        private static GameObject baseOutput;
     }
 }
