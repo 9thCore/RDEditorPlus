@@ -87,8 +87,22 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
                 return type switch
                 {
                     Node.Type.Float => FloatOutput,
+                    Node.Type.Integer => IntegerOutput,
                     _ => null
                 };
+            }
+        }
+
+        private static GameObject IntegerOutput
+        {
+            get
+            {
+                if (integerOutput == null)
+                {
+                    integerOutput = SetupIntegerConnector(BaseOutput);
+                }
+
+                return integerOutput;
             }
         }
 
@@ -118,6 +132,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             }
         }
 
+        private static GameObject integerOutput;
         private static GameObject floatOutput;
         private static GameObject baseOutput;
     }

@@ -1,14 +1,13 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Variable
 {
-    public class FloatNodeVariable : NodeVariable<FloatNodeVariable, float>
+    public class IntegerNodeVariable : NodeVariable<IntegerNodeVariable, int>
     {
         protected override void OnVariableChange(string text)
         {
-            if (float.TryParse(text, out var result))
+            if (int.TryParse(text, out var result))
             {
                 currentValue = result;
             }
@@ -38,14 +37,14 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Variable
                 if (variablePrefab == null)
                 {
                     variablePrefab = Instantiate(InputFieldTextPlaceholderVariable);
-                    variablePrefab.name += "Float";
+                    variablePrefab.name += "Integer";
 
-                    var variable = variablePrefab.GetComponent<FloatNodeVariable>();
-                    variable.type = Node.Type.Float;
+                    var variable = variablePrefab.GetComponent<IntegerNodeVariable>();
+                    variable.type = Node.Type.Integer;
 
                     var inputField = variable.inputField;
-                    inputField.characterValidation = InputField.CharacterValidation.Decimal;
-                    inputField.contentType = InputField.ContentType.DecimalNumber;
+                    inputField.characterValidation = InputField.CharacterValidation.Integer;
+                    inputField.contentType = InputField.ContentType.IntegerNumber;
                     inputField.lineType = InputField.LineType.SingleLine;
                     inputField.characterLimit = 7;
                 }

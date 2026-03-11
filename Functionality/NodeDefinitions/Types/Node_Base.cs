@@ -127,6 +127,16 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
                 result = Node.Type.Float;
                 return true;
             }
+            else if (type == typeof(int))
+            {
+                result = Node.Type.Integer;
+                return true;
+            }
+            //else if (type == typeof(bool))
+            //{
+            //    result = Node.Type.Boolean;
+            //    return true;
+            //}
 
             result = default;
             return false;

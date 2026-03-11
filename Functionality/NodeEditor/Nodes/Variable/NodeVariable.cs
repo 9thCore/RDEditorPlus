@@ -68,6 +68,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Variable
             var prefab = type switch
             {
                 Node.Type.Float => FloatNodeVariable.VariablePrefab,
+                Node.Type.Integer => IntegerNodeVariable.VariablePrefab,
+                //Node.Type.Boolean => BooleanNodeVariable.VariablePrefab,
                 _ => null
             };
 

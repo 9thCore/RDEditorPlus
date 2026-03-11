@@ -250,13 +250,22 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
             return baseConnector;
         }
 
+        protected static GameObject SetupIntegerConnector(GameObject baseConnector)
+        {
+            GameObject connector = GameObject.Instantiate(baseConnector);
+
+            connector.name = $"{baseConnector.name}Int";
+            connector.GetComponent<ConnectorType>().SetType(Node.Type.Integer);
+            return connector;
+        }
+
         protected static GameObject SetupFloatConnector(GameObject baseConnector)
         {
-            GameObject floatConnector = GameObject.Instantiate(baseConnector);
+            GameObject connector = GameObject.Instantiate(baseConnector);
 
-            floatConnector.name = $"{baseConnector.name}Float";
-            floatConnector.GetComponent<ConnectorType>().SetType(Node.Type.Float);
-            return floatConnector;
+            connector.name = $"{baseConnector.name}Float";
+            connector.GetComponent<ConnectorType>().SetType(Node.Type.Float);
+            return connector;
         }
 
         private static NodeConnector<ConnectorType, Provider> Get(Node.Type type, string name)
@@ -278,7 +287,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Connector
 
         private readonly Dictionary<Node.Type, ColorData> ColorDataByType = new()
         {
-            { Node.Type.Float, Color.green }
+            { Node.Type.Float, Color.green },
+            { Node.Type.Integer, Color.blue }
         };
 
         private readonly Color OutlineUnselectableColor = Color.gray;
