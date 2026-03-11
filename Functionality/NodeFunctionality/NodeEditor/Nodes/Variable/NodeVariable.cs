@@ -1,11 +1,13 @@
 ﻿using RDEditorPlus.Functionality.Components;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable.RDLevelNode;
 using RDEditorPlus.Util;
 using System;
 using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
@@ -22,11 +24,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
             await writer.WriteElementStringAsync(ValueKey, Value.ToString());
         }
 
-        public void SetValue(string value)
-        {
-            OnVariableChange(value);
-            SetRepresentation(Value.ToString());
-        }
+        public void SetValue(string value) => OnVariableChange(value);
 
         public readonly struct Data(Node.Type type, string name, object initialValue)
         {
@@ -71,6 +69,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                 Node.Type.Float => FloatNodeVariable.VariablePrefab,
                 Node.Type.Integer => IntegerNodeVariable.VariablePrefab,
                 Node.Type.String => StringNodeVariable.VariablePrefab,
+                Node.Type.RDLevelFile => RDLevelNodeVariable.VariablePrefab,
                 _ => null
             };
 
@@ -95,6 +94,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
     {
         public override object Value => currentValue;
         public override bool CanSave() => !initialValue.Equals(currentValue);
+
+        protected override void OnVariableChange(string text)
+        {
+            SetRepresentation(currentValue.ToString());
+        }
 
         protected override void SetInitialValue(object initialValue)
         {
@@ -125,6 +129,30 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         private const float NodeLayoutRightPadding = 2f;
         private const float InputFieldLeftPadding = 4f;
         private const float InputFieldRightPadding = 4f;
+
+        protected static GameObject AddBrowseButton(RectTransform inputField)
+        {
+            var sprite = AssetUtil.Browse1Sprite;
+            float width = sprite.bounds.size.x;
+
+            inputField.offsetMax -= new Vector2(width + 2f, 0f);
+
+            GameObject browse = new("browse");
+
+            var image = browse.AddComponent<Image>();
+            image.sprite = sprite;
+
+            var transform = browse.transform as RectTransform;
+            transform.SetParent(inputField.parent);
+            transform.localScale = Vector3.one;
+            transform.anchorMin = new Vector2(1f, 0f);
+            transform.anchorMax = Vector2.one;
+            transform.offsetMin = new Vector2(-width, 0f);
+            transform.offsetMax = Vector2.zero;
+            transform.anchoredPosition -= new Vector2(2f, 0f);
+
+            return browse;
+        }
 
         protected static GameObject InputFieldTextPlaceholderVariable
         {
@@ -209,7 +237,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
             }
         }
 
-        private static GameObject BaseVariable
+        protected static GameObject BaseVariable
         {
             get
             {

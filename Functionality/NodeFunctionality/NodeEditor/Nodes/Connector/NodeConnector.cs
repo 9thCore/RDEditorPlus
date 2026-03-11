@@ -252,21 +252,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             return baseConnector;
         }
 
-        protected static GameObject SetupIntegerConnector(GameObject baseConnector)
+        protected static GameObject SetupConnector(GameObject baseConnector, Node.Type type)
         {
             GameObject connector = Instantiate(baseConnector);
 
-            connector.name = $"{baseConnector.name}Int";
-            connector.GetComponent<ConnectorType>().SetType(Node.Type.Integer);
-            return connector;
-        }
-
-        protected static GameObject SetupFloatConnector(GameObject baseConnector)
-        {
-            GameObject connector = Instantiate(baseConnector);
-
-            connector.name = $"{baseConnector.name}Float";
-            connector.GetComponent<ConnectorType>().SetType(Node.Type.Float);
+            connector.name = $"{baseConnector.name}{type}";
+            connector.GetComponent<ConnectorType>().SetType(type);
             return connector;
         }
 
@@ -276,6 +267,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             {
                 Node.Type.Float => FloatConnector,
                 Node.Type.Integer => IntegerConnector,
+                Node.Type.String => StringConnector,
+                Node.Type.RDLevelFile => RDLevelConnector,
                 _ => null
             };
 
@@ -295,7 +288,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         private readonly Dictionary<Node.Type, ColorData> ColorDataByType = new()
         {
             { Node.Type.Float, Color.green },
-            { Node.Type.Integer, Color.blue }
+            { Node.Type.Integer, Color.blue },
+            { Node.Type.String, Color.yellow },
+            { Node.Type.RDLevelFile, Color.gray }
         };
 
         private readonly Color OutlineUnselectableColor = Color.gray;
@@ -308,13 +303,39 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             public static implicit operator ColorData(Color SelectedControl) => new(SelectedControl);
         }
 
+        private static GameObject RDLevelConnector
+        {
+            get
+            {
+                if (rdlevelConnector == null)
+                {
+                    rdlevelConnector = SetupConnector(BaseConnectorPrefab, Node.Type.RDLevelFile);
+                }
+
+                return rdlevelConnector;
+            }
+        }
+
+        private static GameObject StringConnector
+        {
+            get
+            {
+                if (stringConnector == null)
+                {
+                    stringConnector = SetupConnector(BaseConnectorPrefab, Node.Type.String);
+                }
+
+                return stringConnector;
+            }
+        }
+
         private static GameObject IntegerConnector
         {
             get
             {
                 if (integerConnector == null)
                 {
-                    integerConnector = SetupIntegerConnector(BaseConnectorPrefab);
+                    integerConnector = SetupConnector(BaseConnectorPrefab, Node.Type.Integer);
                 }
 
                 return integerConnector;
@@ -327,7 +348,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             {
                 if (floatConnector == null)
                 {
-                    floatConnector = SetupFloatConnector(BaseConnectorPrefab);
+                    floatConnector = SetupConnector(BaseConnectorPrefab, Node.Type.Float);
                 }
 
                 return floatConnector;
@@ -347,6 +368,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             }
         }
 
+        private static GameObject rdlevelConnector;
+        private static GameObject stringConnector;
         private static GameObject integerConnector;
         private static GameObject floatConnector;
         private static GameObject baseConnector;

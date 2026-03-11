@@ -2,7 +2,7 @@
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes
 {
-    public abstract class VariableAttribute(object defaultValue, string nameOverride, int order)
+    public class VariableAttribute(object defaultValue = null, string nameOverride = null, [CallerLineNumber] int order = 0)
         : BaseAttribute(nameOverride, order)
     {
         public readonly object DefaultValue = defaultValue;

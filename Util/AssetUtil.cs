@@ -11,6 +11,9 @@ namespace RDEditorPlus.Util
         [Filename("editor-inputfield-2px")]
         public static Sprite InputFieldSprite { get; private set; }
 
+        [Filename("editor_browse1")]
+        public static Sprite Browse1Sprite { get; private set; }
+
         public static void FetchEditorAssets()
         {
             if (fetched)

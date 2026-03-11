@@ -1,4 +1,4 @@
-﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeClasses;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
@@ -30,15 +30,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                 return;
             }
 
-            try
+            if (TryCast(value.ToString(), variable.Type, out object cast))
             {
-                variable.Field.SetValue(this, Convert.ChangeType(value, variable.Type));
-            }
-            catch
-            {
-                variable.Field.SetValue(this, variable.DefaultValue);
+                variable.Field.SetValue(this, cast);
+                return;
             }
 
+            variable.Field.SetValue(this, variable.DefaultValue);
         }
 
         public override void SetInput(string name, object value)
@@ -138,8 +136,46 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                 result = Node.Type.String;
                 return true;
             }
+            else if (type == typeof(RDLevelFile))
+            {
+                result = Node.Type.RDLevelFile;
+                return true;
+            }
 
             result = default;
+            return false;
+        }
+
+        private static bool TryCast(string value, Type type, out object cast)
+        {
+            if (type == typeof(float))
+            {
+                if (float.TryParse(value, out var result))
+                {
+                    cast = result;
+                    return true;
+                }
+            }
+            else if (type == typeof(int))
+            {
+                if (int.TryParse(value, out var result))
+                {
+                    cast = result;
+                    return true;
+                }
+            }
+            else if (type == typeof(string))
+            {
+                cast = value;
+                return true;
+            }
+            else if (type == typeof(RDLevelFile))
+            {
+                cast = new RDLevelFile(value);
+                return true;
+            }
+
+            cast = null;
             return false;
         }
 

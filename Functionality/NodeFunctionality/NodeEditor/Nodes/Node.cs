@@ -247,7 +247,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         {
             Float,
             Integer,
-            String
+            String,
+
+            RDLevelFile
         }
 
         private void SetName(string name)

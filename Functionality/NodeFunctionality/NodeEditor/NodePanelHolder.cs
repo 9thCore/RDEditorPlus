@@ -1,5 +1,4 @@
 ﻿using DG.Tweening;
-using RDEditorPlus.Functionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;

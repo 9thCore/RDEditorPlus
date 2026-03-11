@@ -1,4 +1,5 @@
-﻿using RDEditorPlus.Functionality.NodeDefinitions.Attributes;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeClasses;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
 {
@@ -7,8 +8,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
         public override void PostDeserialise()
         {
             result = param + 3f;
+            Plugin.LogInfo($"(level = {level})");
             Plugin.LogInfo($"(param = {param}, result = {result})");
         }
+
+        [Variable]
+        public RDLevelFile level;
 
         [Input("in")]
         public float param;
