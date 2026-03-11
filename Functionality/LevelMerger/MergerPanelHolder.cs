@@ -1,5 +1,5 @@
 ﻿using RDEditorPlus.Functionality.NodeDefinitions;
-using RDEditorPlus.Functionality.NodeEditor;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor;
 using System.IO;
 using UnityEngine;
 

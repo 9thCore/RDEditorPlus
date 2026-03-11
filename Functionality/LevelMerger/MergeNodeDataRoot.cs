@@ -1,5 +1,5 @@
-﻿using RDEditorPlus.Functionality.NodeDefinitions;
-using RDEditorPlus.Functionality.NodeEditor;
+﻿using RDEditorPlus.Functionality.NodeEditor;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 
 namespace RDEditorPlus.Functionality.LevelMerger
 {
