@@ -189,9 +189,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public readonly struct Data(Node.Type type, string name)
         {
-            public readonly Node.Type type = type;
-            public readonly string name = name;
-
             public readonly void Setup(Node node)
             {
                 var connector = Get(type, name);
