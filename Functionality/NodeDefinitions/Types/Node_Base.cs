@@ -132,11 +132,11 @@ namespace RDEditorPlus.Functionality.NodeDefinitions.Types
                 result = Node.Type.Integer;
                 return true;
             }
-            //else if (type == typeof(bool))
-            //{
-            //    result = Node.Type.Boolean;
-            //    return true;
-            //}
+            else if (type == typeof(string))
+            {
+                result = Node.Type.String;
+                return true;
+            }
 
             result = default;
             return false;

@@ -69,7 +69,7 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes.Variable
             {
                 Node.Type.Float => FloatNodeVariable.VariablePrefab,
                 Node.Type.Integer => IntegerNodeVariable.VariablePrefab,
-                //Node.Type.Boolean => BooleanNodeVariable.VariablePrefab,
+                Node.Type.String => StringNodeVariable.VariablePrefab,
                 _ => null
             };
 

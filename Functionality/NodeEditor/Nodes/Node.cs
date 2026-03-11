@@ -246,7 +246,8 @@ namespace RDEditorPlus.Functionality.NodeEditor.Nodes
         public enum Type
         {
             Float,
-            Integer
+            Integer,
+            String
         }
 
         private void SetName(string name)
