@@ -52,12 +52,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
 
         public INodeWorkspace.INode AddNode(string name, Vector2 position, string id = null)
         {
-            if (!nodePrefabs.TryGetValue(name, out var prefab))
+            var prefab = NodeLibrary.Instance.GetPrefab(name);
+            if (prefab == null)
             {
-                Plugin.LogError($"Tried to add node '{name}', but it is not registered for {GetType().FullName}!");
                 return null;
             }
-
+            
             return view.AddNode(prefab, position, id);
         }
 
@@ -184,14 +184,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
         public ISerializableNodeWorkspace.INode[] GetDependencyOrderedNodes() => view.GetDependencyOrderedNodes();
 
         protected abstract void HandleDeserialization(Stream stream);
-        
-        protected void AllowNodes(params string[] names)
-        {
-            foreach (var name in names)
-            {
-                nodePrefabs.Add(name, NodeLibrary.Instance.GetPrefab(name));
-            }
-        }
 
         protected void SetLevelName()
         {
@@ -318,8 +310,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             rt2.localScale = Vector3.one;
 
             SetLevelName();
-
-            AllowNodes("Test");
         }
 
         protected readonly GameObject gameObject;
@@ -329,7 +319,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
         protected readonly Text levelName;
         protected readonly GameObject blocker;
         protected readonly Text blockerText;
-        protected readonly Dictionary<string, GameObject> nodePrefabs = new();
 
         protected string savedLevelName = string.Empty;
         protected State state = State.Idle;

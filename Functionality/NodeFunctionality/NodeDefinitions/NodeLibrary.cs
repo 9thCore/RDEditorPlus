@@ -14,7 +14,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
         {
             get
             {
-                return instance ??= new();
+                if (instance == null || !instance.Valid())
+                {
+                    instance = new();
+                }
+
+                return instance;
             }
         }
 
@@ -30,6 +35,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
             instance = (Node_Base)Activator.CreateInstance(data.Type);
             return true;
         }
+
+        private bool Valid() => nodeData[aNode].Prefab != null;
 
         private NodeLibrary()
         {
@@ -47,6 +54,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
                 {
                     var prefab = (GameObject)method.Invoke(null, [name]);
                     nodeData.Add(name, new(prefab, type));
+                    aNode = name;
                 }
                 catch (Exception e)
                 {
@@ -56,6 +64,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
         }
 
         private readonly Dictionary<string, NodeData> nodeData = new();
+        private readonly string aNode;
 
         private record NodeData(GameObject Prefab, Type Type);
     }
