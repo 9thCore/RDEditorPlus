@@ -310,6 +310,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             rt2.localScale = Vector3.one;
 
             SetLevelName();
+
+            NodeLibrary.Instance.Prime();
         }
 
         protected readonly GameObject gameObject;

@@ -23,6 +23,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
             }
         }
 
+        public void Prime()
+        {
+            // No-op, used to prime the prefabs to be ready
+        }
+
         public GameObject GetPrefab(string name) => nodeData[name]?.Prefab;
         public bool TryGetInstance(string name, out Node_Base instance)
         {
