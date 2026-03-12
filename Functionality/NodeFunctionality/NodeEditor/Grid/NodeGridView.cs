@@ -1,5 +1,6 @@
-﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor;
-using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+using RDEditorPlus.Util;
+using RDLevelEditor;
 using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
@@ -9,6 +10,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 {
     public class NodeGridView : MonoBehaviour
     {
+        public static void ShowDescription(string text) => Description.Show(text);
+        public static void HideDescription() => Description.Hide();
+        public static void MoveDescription(Vector2 position) => Description.Move(position);
+
         public static NodeGridView Create(Transform parent, Sprite sprite, NodePanelHolder holder)
         {
             GameObject view = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeGridView)}");
@@ -50,7 +55,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             maskRectTransform.offsetMin = maskRectTransform.offsetMax = Vector2.zero;
 
             component.grid = NodeGrid.Create(maskRectTransform, holder);
-            component.sprite = sprite;
 
             view.SetActive(true);
             return component;
@@ -60,6 +64,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
         public void Reset()
         {
+            Description.Hide();
             grid.Reset();
         }
 
@@ -75,6 +80,90 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         public Node[] GetDependencyOrderedNodes() => grid.GetDependencyOrderedNodes();
 
         private NodeGrid grid;
-        private Sprite sprite;
+
+        private static DescriptionHolder Description
+        {
+            get
+            {
+                if (description == null || !description.Valid())
+                {
+                    description = DescriptionHolder.Create();
+                }
+
+                return description;
+            }
+        }
+        private static DescriptionHolder description;
+
+        private record DescriptionHolder(GameObject GameObject, RectTransform Transform, Text Text)
+        {
+            public bool Valid() => GameObject != null;
+
+            public void Show(string text)
+            {
+                if (text.IsNullOrEmpty())
+                {
+                    Hide();
+                    return;
+                }
+
+                Text.text = text;
+                GameObject.SetActive(true);
+            }
+
+            public void Hide()
+            {
+                GameObject.SetActive(false);
+            }
+
+            public void Move(Vector2 position)
+            {
+                Transform.position = position;
+            }
+
+            public static DescriptionHolder Create()
+            {
+                GameObject description = new("description");
+                description.SetActive(false);
+
+                var descriptionImage = description.AddComponent<Image>();
+                descriptionImage.sprite = AssetUtil.ButtonSprite;
+                descriptionImage.type = Image.Type.Sliced;
+                descriptionImage.color = "363636FF".HexToColor();
+                descriptionImage.raycastTarget = false;
+
+                description.AddComponent<EightSidedOutline>().effectColor = Color.black;
+                description.AddComponent<Shadow>().effectDistance = new Vector2(2f, -2f);
+                description.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                var descriptionGroup = description.AddComponent<HorizontalLayoutGroup>();
+                descriptionGroup.childForceExpandWidth = true;
+                descriptionGroup.childForceExpandHeight = false;
+                descriptionGroup.childControlWidth = true;
+                descriptionGroup.childControlHeight = true;
+                descriptionGroup.padding = new RectOffset(4, 4, 4, 4);
+
+                var descriptionRT = description.transform as RectTransform;
+                descriptionRT.SetParent(scnEditor.instance.canvasRectTransform);
+                descriptionRT.localScale = Vector3.one;
+                descriptionRT.pivot = new Vector2(0f, 1f);
+
+                GameObject descriptionTextObject = new("text");
+
+                var descriptionText = descriptionTextObject.AddComponent<Text>();
+                descriptionText.ApplyRDFont();
+                descriptionText.alignment = TextAnchor.UpperCenter;
+
+                descriptionTextObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                var descriptionTextRT = descriptionTextObject.transform as RectTransform;
+                descriptionTextRT.SetParent(descriptionRT);
+                descriptionTextRT.localScale = Vector3.one;
+                descriptionTextRT.offsetMin = descriptionTextRT.offsetMax = Vector2.zero;
+                descriptionTextRT.pivot = new Vector2(0.5f, 1f);
+
+                return new(description, descriptionRT, descriptionText);
+            }
+        }
     }
 }

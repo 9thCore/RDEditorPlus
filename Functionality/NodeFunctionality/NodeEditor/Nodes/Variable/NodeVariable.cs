@@ -26,14 +26,14 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 
         public void SetValue(string value) => OnVariableChange(value);
 
-        public readonly struct Data(Node.Type type, string name, object initialValue)
+        public readonly struct Data(Node.Type type, string name, object initialValue, string description)
         {
             public readonly void Setup(Node node)
             {
                 var variable = Get(type, name, initialValue);
                 if (variable != null)
                 {
-                    node.AddVariable(variable.rectTransform, variable);
+                    node.AddVariable(variable.rectTransform, variable, description);
                 }
             }
         }

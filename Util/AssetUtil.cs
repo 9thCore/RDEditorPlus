@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RDEditorPlus.Util
 {
@@ -11,8 +12,20 @@ namespace RDEditorPlus.Util
         [Filename("editor-inputfield-2px")]
         public static Sprite InputFieldSprite { get; private set; }
 
+        [Filename("editor-button-2px")]
+        public static Sprite ButtonSprite { get; private set; }
+
         [Filename("editor_browse1")]
         public static Sprite Browse1Sprite { get; private set; }
+
+        [Filename("RDLatinFontPoint")]
+        public static Font StandardFont { get; private set; }
+
+        public static void ApplyRDFont(this Text text)
+        {
+            text.font = StandardFont;
+            text.fontSize = 8;
+        }
 
         public static void FetchEditorAssets()
         {
@@ -24,6 +37,7 @@ namespace RDEditorPlus.Util
             fetched = true;
 
             FetchEditorAssets<Sprite>();
+            FetchEditorAssets<Font>();
         }
 
         private static void FetchEditorAssets<T>() where T : UnityEngine.Object

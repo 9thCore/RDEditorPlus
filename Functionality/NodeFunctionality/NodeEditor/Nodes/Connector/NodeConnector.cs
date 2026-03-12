@@ -146,7 +146,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             controlOutline.effectColor = OutlineUnselectableColor;
         }
 
-        protected abstract void AddToNode(Node node);
+        protected abstract void AddToNode(Node node, string description);
         protected abstract void PrefabSetup();
 
         protected void SetName(string text)
@@ -187,7 +187,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         protected readonly Type connectorType = connectorType;
 
-        public readonly struct Data(Node.Type type, string name)
+        public readonly struct Data(Node.Type type, string name, string description)
         {
             public readonly void Setup(Node node)
             {
@@ -195,7 +195,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 if (connector != null)
                 {
                     connector.node = node;
-                    connector.AddToNode(node);
+                    connector.AddToNode(node, description);
                 }
             }
         }

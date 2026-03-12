@@ -1,5 +1,4 @@
-﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor;
-using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using System.Collections.Generic;

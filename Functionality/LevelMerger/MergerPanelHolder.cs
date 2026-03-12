@@ -1,5 +1,4 @@
-﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
-using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor;
 using UnityEngine;
 
 namespace RDEditorPlus.Functionality.LevelMerger
@@ -11,7 +10,7 @@ namespace RDEditorPlus.Functionality.LevelMerger
         {
             get
             {
-                if (instance == null)
+                if (instance == null || !instance.Valid())
                 {
                     instance = new();
                 }

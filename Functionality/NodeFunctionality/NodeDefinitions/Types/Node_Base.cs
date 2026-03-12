@@ -91,7 +91,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                     return null;
                 }
 
-                nodeVariables[i] = new(type, VariableFields[i].Name, VariableFields[i].DefaultValue);
+                nodeVariables[i] = new(type, VariableFields[i].Name, VariableFields[i].DefaultValue, VariableFields[i].Description);
             }
 
             for (int i = InputFields.Length - 1; i >= 0; i--)
@@ -102,7 +102,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                     return null;
                 }
 
-                nodeInputs[i] = new(type, InputFields[i].Name);
+                nodeInputs[i] = new(type, InputFields[i].Name, InputFields[i].Description);
             }
 
             for (int i = OutputFields.Length - 1; i >= 0; i--)
@@ -113,7 +113,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                     return null;
                 }
 
-                nodeOutputs[i] = new(type, OutputFields[i].Name);
+                nodeOutputs[i] = new(type, OutputFields[i].Name, OutputFields[i].Description);
             }
 
             return Node.PreparePrefab(name, nodeVariables, nodeInputs, nodeOutputs);
@@ -182,19 +182,19 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
         private static readonly FieldInfo[] Fields = typeof(T).GetFields();
 
         private static readonly Variable[] VariableFields = Fields
-            .Select(field => new Variable(field, field.GetCustomAttribute<VariableAttribute>()))
+            .Select(field => new Variable(field, field.GetCustomAttribute<VariableAttribute>(), GetDescription(field)))
             .Where(input => input.Attribute != null)
             .OrderBy(input => input.Attribute.Order)
             .ToArray();
 
         private static readonly Input[] InputFields = Fields
-            .Select(field => new Input(field, field.GetCustomAttribute<InputAttribute>()))
+            .Select(field => new Input(field, field.GetCustomAttribute<InputAttribute>(), GetDescription(field)))
             .Where(input => input.Attribute != null)
             .OrderBy(input => input.Attribute.Order)
             .ToArray();
 
         private static readonly Output[] OutputFields = Fields
-            .Select(field => new Output(field, field.GetCustomAttribute<OutputAttribute>()))
+            .Select(field => new Output(field, field.GetCustomAttribute<OutputAttribute>(), GetDescription(field)))
             .Where(output => output.Attribute != null)
             .OrderBy(output => output.Attribute.Order)
             .ToArray();
@@ -203,23 +203,25 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
         private static readonly Dictionary<string, Input> InputByName = new();
         private static readonly Dictionary<string, Output> OutputByName = new();
 
-        private record Variable(FieldInfo Field, VariableAttribute Attribute)
+        private record Variable(FieldInfo Field, VariableAttribute Attribute, string Description)
         {
             public string Name => Attribute.NameOverride ?? Field.Name;
             public Type Type => Field.FieldType;
             public object DefaultValue => Attribute.DefaultValue;
         }
 
-        private record Input(FieldInfo Field, InputAttribute Attribute)
+        private record Input(FieldInfo Field, InputAttribute Attribute, string Description)
         {
             public string Name => Attribute.NameOverride ?? Field.Name;
             public Type Type => Field.FieldType;
         }
 
-        private record Output(FieldInfo Field, OutputAttribute Attribute)
+        private record Output(FieldInfo Field, OutputAttribute Attribute, string Description)
         {
             public string Name => Attribute.NameOverride ?? Field.Name;
             public Type Type => Field.FieldType;
         }
+
+        private static string GetDescription(FieldInfo field) => field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
     }
 }

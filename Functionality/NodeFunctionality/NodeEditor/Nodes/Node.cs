@@ -69,20 +69,23 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         public NodeConnection CreateConnection() => grid.CreateConnection();
         public NodeConnection VirtualConnection => grid.VirtualConnection;
 
-        public void AddVariable(RectTransform transform, NodeVariable variable)
+        public void AddVariable(RectTransform transform, NodeVariable variable, string description)
         {
+            transform.gameObject.AddComponent<NodeDescriptionEventTrigger>().Setup(description);
             transform.SetParent(variableParent);
             variables.Add(variable);
         }
 
-        public void AddInput(RectTransform transform, NodeInput input)
+        public void AddInput(RectTransform transform, NodeInput input, string description)
         {
+            transform.gameObject.AddComponent<NodeDescriptionEventTrigger>().Setup(description);
             transform.SetParent(inputParent);
             inputs.Add(input);
         }
 
-        public void AddOutput(RectTransform transform, NodeOutput output)
+        public void AddOutput(RectTransform transform, NodeOutput output, string description)
         {
+            transform.gameObject.AddComponent<NodeDescriptionEventTrigger>().Setup(description);
             transform.SetParent(outputParent);
             outputs.Add(output);
         }

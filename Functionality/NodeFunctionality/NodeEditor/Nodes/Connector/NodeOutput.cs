@@ -30,9 +30,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             }
         }
 
-        protected override void AddToNode(Node node)
+        protected override void AddToNode(Node node, string description)
         {
-            node.AddOutput(rectTransform, this);
+            node.AddOutput(rectTransform, this, description);
         }
 
         public override void Unlink()

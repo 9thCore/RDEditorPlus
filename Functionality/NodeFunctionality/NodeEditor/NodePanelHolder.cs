@@ -218,6 +218,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             blockerText.text = state.ToString();
         }
 
+        protected bool Valid() => gameObject != null;
+
         protected NodePanelHolder()
         {
             var template = scnEditor.instance.publishPopup.gameObject;
