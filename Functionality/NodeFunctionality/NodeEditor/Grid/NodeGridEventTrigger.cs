@@ -15,7 +15,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         {
             if (eventData.button == PointerEventData.InputButton.Right)
             {
-                grid.AddNodeAtPointerPosition("Test", eventData.position);
+                NodeDropdown.Instance.Activate(eventData.position, grid);
             }
         }
 

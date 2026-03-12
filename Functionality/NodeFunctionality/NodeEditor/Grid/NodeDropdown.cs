@@ -1,0 +1,235 @@
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
+using RDEditorPlus.Util;
+using RDLevelEditor;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+
+namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
+{
+    public class NodeDropdown : MonoBehaviour
+    {
+        private static NodeDropdown instance;
+        public static NodeDropdown Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    GameObject holder = CreateDropdown("Root");
+                    instance = holder.AddComponent<NodeDropdown>();
+
+                    Transform transform = holder.transform;
+
+                    #region file
+                    GameObject file = CreateDropdown("File");
+                    AddButton(file.transform, "Load RD Level", instance.CreateNode<Node_Test>);
+
+                    AddCategoryButton(transform, "File I/O", file);
+                    #endregion
+
+                    GameObject blocker = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeDropdown)}_Blocker");
+                    blocker.SetActive(false);
+                    blocker.transform.SetParent(scnEditor.instance.canvasRectTransform);
+
+                    var blockerImage = blocker.AddComponent<Image>();
+                    blockerImage.color = Color.white.WithAlpha(0f);
+
+                    blocker.AddComponent<Button>().onClick.AddListener(instance.BlockerClick);
+                    blocker.transform.localScale *= 2000f;
+                    instance.blocker = blocker.transform;
+                }
+
+                return instance;
+            }
+        }
+
+        public void Activate(Vector2 position, NodeGrid grid)
+        {
+            transform.position = position;
+            this.grid = grid;
+            gameObject.SetActive(true);
+            blocker.gameObject.SetActive(true);
+
+            instance.blocker.SetAsLastSibling();
+            transform.SetAsLastSibling();
+        }
+
+        public GameObject CurrentSubtree { get; set; }
+
+        private void CreateNode<T>()
+            where T : Node_Base
+        {
+            string name = typeof(T).Name.Substring("Node_".Length);
+            grid.AddNodeAtPointerPosition(name, Input.mousePosition);
+
+            CurrentSubtree.SetActive(false);
+            blocker.gameObject.SetActive(false);
+        }
+
+        private void BlockerClick()
+        {
+            if (CurrentSubtree != null)
+            {
+                CurrentSubtree.SetActive(false);
+            }
+
+            gameObject.SetActive(false);
+            blocker.gameObject.SetActive(false);
+        }
+
+        private NodeGrid grid;
+        private Transform blocker;
+
+        private static void AddButton(Transform dropdown, string name, UnityAction action)
+        {
+            GameObject button = GameObject.Instantiate(Button, dropdown);
+
+            var text = button.GetComponent<Text>();
+            text.text = name;
+
+            button.AddComponent<Button>().onClick.AddListener(action);
+        }
+
+        private static void AddCategoryButton(Transform dropdown, string name, GameObject target)
+        {
+            GameObject categoryButton = GameObject.Instantiate(CategoryButton, dropdown);
+
+            var child = categoryButton.transform.Find("name");
+            var text = child.GetComponent<Text>();
+            text.text = name;
+
+            categoryButton.AddComponent<NodeDropdownCategoryEventTrigger>()
+                .Setup(instance, dropdown.gameObject, target);
+        }
+
+        private static GameObject CreateDropdown(string name)
+        {
+            GameObject dropdown = GameObject.Instantiate(Dropdown, scnEditor.instance.canvasRectTransform);
+            dropdown.name = $"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeDropdown)}_{name}";
+            return dropdown;
+        }
+
+        private static GameObject Dropdown
+        {
+            get
+            {
+                if (dropdown == null)
+                {
+                    dropdown = new();
+                    dropdown.SetActive(false);
+
+                    dropdown.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    dropdown.AddComponent<EightSidedOutline>().effectColor = Color.black;
+                    dropdown.AddComponent<Shadow>().effectDistance = new Vector2(2f, -2f);
+
+                    var image = dropdown.AddComponent<Image>();
+                    image.sprite = AssetUtil.ButtonSprite;
+                    image.type = Image.Type.Sliced;
+                    image.color = "7F7F7FFF".HexToColor();
+
+                    var group = dropdown.AddComponent<VerticalLayoutGroup>();
+                    group.childForceExpandWidth = true;
+                    group.childForceExpandHeight = false;
+                    group.childControlWidth = true;
+                    group.childControlHeight = true;
+                    group.padding = new RectOffset(2, 2, 2, 2);
+                    group.spacing = 4f;
+
+                    var transform = dropdown.transform as RectTransform;
+                    transform.pivot = new Vector2(0.5f, 1f);
+                    transform.sizeDelta = new Vector2(50f, 0f);
+                }
+
+                return dropdown;
+            }
+        }
+
+        private static GameObject Button
+        {
+            get
+            {
+                if (button == null)
+                {
+                    GameObject go = new();
+
+                    go.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                    var text = go.AddComponent<Text>();
+                    text.font = AssetUtil.StandardFont;
+                    text.fontSize = 8;
+                    text.alignment = TextAnchor.MiddleCenter;
+
+                    var transform = go.transform as RectTransform;
+                    transform.anchorMin = Vector2.zero;
+                    transform.anchorMax = Vector2.one;
+
+                    go.AddComponent<EightSidedOutline>().effectColor = Color.black;
+
+                    button = go;
+                }
+
+                return button;
+            }
+        }
+
+        private static GameObject CategoryButton
+        {
+            get
+            {
+                if (categoryButton == null)
+                {
+                    GameObject category = new();
+
+                    category.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                    var group = category.AddComponent<HorizontalLayoutGroup>();
+                    group.childForceExpandWidth = true;
+                    group.childForceExpandHeight = false;
+                    group.childControlWidth = true;
+                    group.childControlHeight = true;
+                    group.reverseArrangement = true;
+
+                    GameObject arrow = new(">");
+
+                    var arrowText = arrow.AddComponent<Text>();
+                    arrowText.text = ">";
+                    arrowText.font = AssetUtil.StandardFont;
+                    arrowText.fontSize = 8;
+                    arrowText.alignment = TextAnchor.MiddleRight;
+
+                    var arrowRT = arrow.transform as RectTransform;
+                    arrowRT.SetParent(category.transform);
+                    arrowRT.pivot = new Vector2(1f, 0.5f);
+                    arrowRT.anchorMin = new Vector2(1f, 0f);
+                    arrowRT.anchorMax = Vector2.one;
+
+                    GameObject name = new("name");
+
+                    var nameText = name.AddComponent<Text>();
+                    nameText.font = AssetUtil.StandardFont;
+                    nameText.fontSize = 8;
+                    nameText.alignment = TextAnchor.MiddleCenter;
+
+                    var nameRT = name.transform as RectTransform;
+                    nameRT.SetParent(category.transform);
+                    nameRT.pivot = new Vector2(0f, 0.5f);
+                    nameRT.anchorMin = Vector2.zero;
+                    nameRT.anchorMax = new Vector2(0f, 1f);
+                    nameRT.offsetMin = nameRT.offsetMax = Vector2.zero;
+
+                    name.AddComponent<EightSidedOutline>().effectColor = Color.black;
+                    arrow.AddComponent<EightSidedOutline>().effectColor = Color.black;
+
+                    categoryButton = category;
+                }
+
+                return categoryButton;
+            }
+        }
+
+        private static GameObject dropdown;
+        private static GameObject button;
+        private static GameObject categoryButton;
+    }
+}
