@@ -64,21 +64,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 
         private static NodeVariable Get(Node.Type type, string name, object initialValue)
         {
-            var prefab = type switch
-            {
-                Node.Type.Float => FloatNodeVariable.VariablePrefab,
-                Node.Type.Integer => IntegerNodeVariable.VariablePrefab,
-                Node.Type.String => StringNodeVariable.VariablePrefab,
-                Node.Type.RDLevelFile => RDLevelNodeVariable.VariablePrefab,
-                _ => null
-            };
-
-            if (prefab == null)
-            {
-                return null;
-            }
-
-            var instance = Instantiate(prefab);
+            var instance = Instantiate(Node.GetVariableType(type).Prefab);
             var variable = instance.GetComponent<NodeVariable>();
             variable.SetInitialValue(initialValue);
             variable.SetName(name);

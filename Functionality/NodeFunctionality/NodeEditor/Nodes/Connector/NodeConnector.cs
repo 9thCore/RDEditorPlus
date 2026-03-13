@@ -128,13 +128,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         {
             if (nodeType == this.type && node.Accessible && connectorType == type)
             {
-                controlImage.color = ColorDataByType[this.type].ValidControl;
+                controlImage.color = Node.GetColor(this.type).ValidControl;
                 controlOutline.effectColor = OutlineSelectableColor;
                 available = true;
             }
             else
             {
-                controlImage.color = ColorDataByType[this.type].InvalidControl;
+                controlImage.color = Node.GetColor(this.type).InvalidControl;
                 controlOutline.effectColor = OutlineUnselectableColor;
                 available = false;
             }
@@ -142,7 +142,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public override void ResetColor()
         {
-            controlImage.color = ColorDataByType[type].ValidControl;
+            controlImage.color = Node.GetColor(type).ValidControl;
             controlOutline.effectColor = OutlineUnselectableColor;
         }
 
@@ -268,23 +268,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             return connector;
         }
 
-        private readonly Dictionary<Node.Type, ColorData> ColorDataByType = new()
-        {
-            { Node.Type.Float, Color.green },
-            { Node.Type.Integer, Color.blue },
-            { Node.Type.String, Color.yellow },
-            { Node.Type.RDLevelFile, Color.gray }
-        };
-
         private readonly Color OutlineUnselectableColor = Color.gray;
         private readonly Color OutlineSelectableColor = Color.yellow;
-
-        private readonly record struct ColorData(Color ValidControl)
-        {
-            public readonly Color InvalidControl = Color.Lerp(ValidControl, Color.black, 0.5f);
-
-            public static implicit operator ColorData(Color SelectedControl) => new(SelectedControl);
-        }
 
         private static GameObject GetPrefab(Node.Type type)
         {

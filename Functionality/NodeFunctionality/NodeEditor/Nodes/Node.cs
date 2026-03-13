@@ -1,9 +1,12 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Attributes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable.RDLevelNode;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +48,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             node.ScheduleUIUpdate();
             return root;
         }
+
+        public static ConnectorColorAttribute GetColor(Type type) => information[type].Color;
+        public static VariableTypeAttribute GetVariableType(Type type) => information[type].VariableType;
 
         public void Setup(NodeGrid grid)
         {
@@ -248,11 +254,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         public enum Type
         {
-            Float,
-            Integer,
-            String,
+            [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>] Float,
+            [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>] Integer,
+            [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
 
-            RDLevelFile
+            [VariableType<RDLevelNodeVariable>] RDLevelFile
         }
 
         private void SetName(string name)
@@ -328,6 +334,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         public const string VariableKey = "Variable";
         public const string InputsKey = "Inputs";
         public const string InputKey = "Input";
+
+        static Node()
+        {
+            foreach(var value in Enum.GetValues(typeof(Type)).Cast<Type>())
+            {
+                information.Add(
+                    value,
+                    new(value.GetAttributeOfType<ConnectorColorAttribute>(), value.GetAttributeOfType<VariableTypeAttribute>()));
+            }
+        }
 
         private static GameObject BaseNode
         {
@@ -484,5 +500,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         }
 
         private static GameObject baseNode;
+        private static readonly Dictionary<Type, TypeInformation> information = new();
+
+        private record struct TypeInformation(ConnectorColorAttribute Color, VariableTypeAttribute VariableType);
     }
 }
