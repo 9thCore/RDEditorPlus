@@ -16,7 +16,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             if (!LevelUtil.TryLevelLoad(path,
                 out RDLevelSettings settings,
                 out List<LevelEvent_MakeRow> rows,
-                out List<LevelEvent_MakeSprite> decorations,
+                out List<LevelEvent_MakeSprite> sprites,
                 out List<LevelEvent_Base> events,
                 out List<Conditional> conditionals,
                 out List<BookmarkData> bookmarks,
@@ -26,6 +26,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             }
 
             this.settings = settings;
+            this.rows = new(rows);
+            this.sprites = new(sprites);
             this.events = new(events);
             this.palette = new(palette);
         }
@@ -35,6 +37,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
         [Output]
         public RDLevelSettings settings;
+
+        [Output]
+        public RDLevelRows rows;
+
+        [Output]
+        public RDLevelSprites sprites;
 
         [Output]
         public RDLevelEvents events;

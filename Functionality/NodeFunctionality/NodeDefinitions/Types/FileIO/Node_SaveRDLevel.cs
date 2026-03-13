@@ -19,10 +19,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
             RDLevelData data = new(
                 settings: settings,
-                rows: [],
+                rows: rows,
                 levelEvents: events.Apply(),
                 conditionals: [],
-                sprites: [],
+                sprites: sprites,
                 bookmarks: [],
                 colorPalette: palette.Palette);
 
@@ -36,6 +36,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
         [Input]
         public RDLevelSettings settings;
+
+        [Input]
+        public RDLevelRows rows;
+
+        [Input]
+        public RDLevelSprites sprites;
 
         [Input]
         public RDLevelEvents events;
