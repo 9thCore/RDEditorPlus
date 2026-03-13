@@ -298,10 +298,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         private static readonly Dictionary<Node.Type, GameObject> prefabCache = new();
 
-        private static GameObject rdlevelConnector;
-        private static GameObject stringConnector;
-        private static GameObject integerConnector;
-        private static GameObject floatConnector;
         private static GameObject baseConnector;
     }
 }
