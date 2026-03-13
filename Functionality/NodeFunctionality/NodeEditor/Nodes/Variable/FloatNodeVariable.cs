@@ -42,7 +42,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                     variablePrefab.name += "Float";
 
                     var variable = variablePrefab.GetComponent<FloatNodeVariable>();
-                    variable.type = Node.Type.Float;
+                    variable.type = Node.Type.Single;
 
                     var inputField = variable.inputField;
                     inputField.characterValidation = InputField.CharacterValidation.Decimal;

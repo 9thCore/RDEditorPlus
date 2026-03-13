@@ -41,7 +41,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                     variablePrefab.name += "Integer";
 
                     var variable = variablePrefab.GetComponent<IntegerNodeVariable>();
-                    variable.type = Node.Type.Integer;
+                    variable.type = Node.Type.Int32;
 
                     var inputField = variable.inputField;
                     inputField.characterValidation = InputField.CharacterValidation.Integer;

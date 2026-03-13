@@ -119,32 +119,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
             return Node.PreparePrefab(name, nodeVariables, nodeInputs, nodeOutputs);
         }
 
-        private static bool TryGetTypeFrom(Type type, out Node.Type result)
-        {
-            if (type == typeof(float))
-            {
-                result = Node.Type.Float;
-                return true;
-            }
-            else if (type == typeof(int))
-            {
-                result = Node.Type.Integer;
-                return true;
-            }
-            else if (type == typeof(string))
-            {
-                result = Node.Type.String;
-                return true;
-            }
-            else if (type == typeof(RDLevelFile))
-            {
-                result = Node.Type.RDLevelFile;
-                return true;
-            }
-
-            result = default;
-            return false;
-        }
+        private static bool TryGetTypeFrom(Type type, out Node.Type result) => Enum.TryParse(type.Name, ignoreCase: true, out result);
 
         private static bool TryCast(string value, Type type, out object cast)
         {

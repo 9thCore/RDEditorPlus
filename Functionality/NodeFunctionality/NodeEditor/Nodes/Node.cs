@@ -254,8 +254,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         public enum Type
         {
-            [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>] Float,
-            [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>] Integer,
+            [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>] Single,
+            [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>] Int32,
             [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
 
             [VariableType<RDLevelNodeVariable>] RDLevelFile
