@@ -26,10 +26,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             }
 
             this.settings = settings;
-            this.rows = new(rows);
-            this.sprites = new(sprites);
-            this.events = new(events);
-            this.palette = new(palette);
+            this.rows = rows;
+            this.sprites = sprites;
+            this.events = events;
+            this.palette = palette;
         }
 
         [Variable]

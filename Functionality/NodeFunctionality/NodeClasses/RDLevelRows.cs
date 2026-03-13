@@ -11,5 +11,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
 
         public static implicit operator List<LevelEvent_MakeRow>(RDLevelRows instance)
             => instance.Rows != null ? [.. instance.Rows] : [];
+
+        public static implicit operator RDLevelRows(List<LevelEvent_MakeRow> list) => new(list);
     }
 }

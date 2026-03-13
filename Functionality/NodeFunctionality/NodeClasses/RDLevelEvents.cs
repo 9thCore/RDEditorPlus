@@ -30,6 +30,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
             return new(events, changes, changesToPerform + 1);
         }
 
+        public static implicit operator RDLevelEvents(List<LevelEvent_Base> events) => new(events);
+        public static implicit operator List<LevelEvent_Base>(RDLevelEvents instance) => instance.Apply();
+
         private RDLevelEvents(IReadOnlyList<LevelEvent_Base> events, List<IEventsChange> changes, int changesToPerform)
         {
             this.events = events;

@@ -20,11 +20,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             RDLevelData data = new(
                 settings: settings,
                 rows: rows,
-                levelEvents: events.Apply(),
+                levelEvents: events,
                 conditionals: [],
                 sprites: sprites,
                 bookmarks: [],
-                colorPalette: palette.Palette);
+                colorPalette: palette);
 
             string text = data.Encode();
 

@@ -11,5 +11,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
 
         public static implicit operator List<LevelEvent_MakeSprite>(RDLevelSprites instance)
             => instance.Sprites != null ? [.. instance.Sprites] : [];
+
+        public static implicit operator RDLevelSprites(List<LevelEvent_MakeSprite> list) => new(list);
     }
 }
