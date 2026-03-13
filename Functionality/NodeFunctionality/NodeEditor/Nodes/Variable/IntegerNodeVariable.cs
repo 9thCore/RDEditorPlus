@@ -16,6 +16,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
             {
                 currentValue = initialValue;
             }
+
+            base.OnVariableChange(text);
         }
 
         protected override void SetInitialValue(object initialValue)
