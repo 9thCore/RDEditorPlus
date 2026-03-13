@@ -1,4 +1,6 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Events;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.FileIO;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using UnityEngine;
@@ -23,9 +25,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
                     #region file
                     GameObject file = CreateDropdown("File");
-                    AddButton(file.transform, "Load RD Level", instance.CreateNode<Node_Test>);
+                    AddButton(file.transform, "Load RD Level", instance.CreateNode<Node_LoadRDLevel>);
 
                     AddCategoryButton(transform, "File I/O", file);
+                    #endregion
+
+                    #region events
+                    GameObject events = CreateDropdown("Event");
+                    AddButton(events.transform, "Bar Filter", instance.CreateNode<Node_BarFilter>);
+
+                    AddCategoryButton(transform, "Events", events);
                     #endregion
 
                     GameObject blocker = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeDropdown)}_Blocker");

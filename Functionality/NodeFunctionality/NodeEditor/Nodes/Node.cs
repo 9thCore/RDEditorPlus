@@ -258,7 +258,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>] Int32,
             [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
 
-            [VariableType<RDLevelNodeVariable>] RDLevelFile
+            [VariableType<RDLevelNodeVariable>] RDLevelFile,
+            [ConnectorColor("FF00FF")] RDLevelEvents
         }
 
         private void SetName(string name)
