@@ -260,21 +260,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         private static NodeConnector<ConnectorType, PrefabProvider> Get(Node.Type type, string name)
         {
-            GameObject prefab = type switch
-            {
-                Node.Type.Float => FloatConnector,
-                Node.Type.Integer => IntegerConnector,
-                Node.Type.String => StringConnector,
-                Node.Type.RDLevelFile => RDLevelConnector,
-                _ => null
-            };
-
-            if (prefab == null)
-            {
-                return null;
-            }
-
-            var instance = Instantiate(prefab);
+            var instance = Instantiate(GetPrefab(type));
             var connector = instance.GetComponent<ConnectorType>();
             connector.SetName(name);
 
@@ -300,56 +286,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             public static implicit operator ColorData(Color SelectedControl) => new(SelectedControl);
         }
 
-        private static GameObject RDLevelConnector
+        private static GameObject GetPrefab(Node.Type type)
         {
-            get
+            if (prefabCache.TryGetValue(type, out var prefab))
             {
-                if (rdlevelConnector == null)
-                {
-                    rdlevelConnector = SetupConnector(BaseConnectorPrefab, Node.Type.RDLevelFile);
-                }
-
-                return rdlevelConnector;
+                return prefab;
             }
-        }
 
-        private static GameObject StringConnector
-        {
-            get
-            {
-                if (stringConnector == null)
-                {
-                    stringConnector = SetupConnector(BaseConnectorPrefab, Node.Type.String);
-                }
-
-                return stringConnector;
-            }
-        }
-
-        private static GameObject IntegerConnector
-        {
-            get
-            {
-                if (integerConnector == null)
-                {
-                    integerConnector = SetupConnector(BaseConnectorPrefab, Node.Type.Integer);
-                }
-
-                return integerConnector;
-            }
-        }
-
-        private static GameObject FloatConnector
-        {
-            get
-            {
-                if (floatConnector == null)
-                {
-                    floatConnector = SetupConnector(BaseConnectorPrefab, Node.Type.Float);
-                }
-
-                return floatConnector;
-            }
+            prefab = SetupConnector(BaseConnectorPrefab, type);
+            prefabCache.Add(type, prefab);
+            return prefab;
         }
 
         private static GameObject BaseConnectorPrefab
@@ -364,6 +310,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 return baseConnector;
             }
         }
+
+        private static readonly Dictionary<Node.Type, GameObject> prefabCache = new();
 
         private static GameObject rdlevelConnector;
         private static GameObject stringConnector;
