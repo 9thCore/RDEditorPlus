@@ -24,7 +24,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
                 conditionals: [],
                 sprites: [],
                 bookmarks: [],
-                colorPalette: new string[21]);
+                colorPalette: palette.Palette);
 
             string text = data.Encode();
 
@@ -39,5 +39,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
         [Input]
         public RDLevelEvents events;
+
+        [Input]
+        public RDLevelPalette palette;
     }
 }

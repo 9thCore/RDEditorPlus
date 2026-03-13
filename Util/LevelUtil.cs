@@ -8,50 +8,96 @@ namespace RDEditorPlus.Util
 {
     public static class LevelUtil
     {
-        public static bool TryLevelLoad(string path, out RDLevelSettings settings, out List<LevelEvent_Base> events)
+        public static bool TryLevelLoad(string path,
+            out RDLevelSettings settings,
+            out List<LevelEvent_MakeRow> rows,
+            out List<LevelEvent_MakeSprite> decorations,
+            out List<LevelEvent_Base> events,
+            out List<Conditional> conditionals,
+            out List<BookmarkData> bookmarks,
+            out string[] palette)
         {
-            events = [];
-            settings = new(version: 1);
-
             if (!File.Exists(path))
             {
                 Plugin.LogError($"Error loading level from {path}, as it does not exist");
+
+                settings = default;
+                rows = default;
+                decorations = default;
+                events = default;
+                palette = default;
+                conditionals = default;
+                bookmarks = default;
                 return false;
             }
+
+            settings = new(version: 1);
+            rows = [];
+            decorations = [];
+            events = [];
+            conditionals = [];
+            bookmarks = [];
+            palette = RDEditorConstants.defaultColorPalette;
 
             try
             {
                 var text = RDFile.ReadAllText(path, null);
                 var root = Json.Deserialize(text) as Dictionary<string, object>;
 
-                if (root.TryGetValue("settings", out var settingsObject)
+                if (root.TryGetValue(RDEditorConstants.SettingsKey, out var settingsObject)
                     && settingsObject is Dictionary<string, object> settingsDict)
                 {
                     settings.Decode(settingsDict);
                 }
 
-                if (root.TryGetValue("events", out var eventObject)
-                    && eventObject is List<object> eventList)
+                foreach (var data in GetObjects(root, RDEditorConstants.RowsKey))
                 {
-                    foreach (var levelEvent in eventList)
+                    LevelEvent_MakeRow makeRow = new();
+                    makeRow.Decode(data);
+                    rows.Add(makeRow);
+                }
+
+                foreach (var data in GetObjects(root, RDEditorConstants.DecorationsKey))
+                {
+                    LevelEvent_MakeSprite makeSprite = new();
+                    makeSprite.Decode(data);
+                    decorations.Add(makeSprite);
+                }
+
+                foreach (var data in GetObjects(root, RDEditorConstants.EventsKey))
+                {
+                    string type = data[RDEditorConstants.EventsTypeKey] as string;
+                    string fullType = RDEditorConstants.LevelEventClassFullName + type;
+
+                    Type eventType = GameAssembly.GetType(fullType);
+                    if (eventType == null)
                     {
-                        if (levelEvent is not Dictionary<string, object> dict)
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        string type = dict["type"] as string;
-                        string fullType = $"RDLevelEditor.LevelEvent_{type}";
+                    var instance = Activator.CreateInstance(eventType) as LevelEvent_Base;
+                    instance.Decode(data);
+                    events.Add(instance);
+                }
 
-                        Type eventType = GameAssembly.GetType(fullType);
-                        if (eventType == null)
-                        {
-                            continue;
-                        }
+                foreach (var data in GetObjects(root, RDEditorConstants.BookmarksKey))
+                {
+                    if (int.TryParse(data["bar"].ToString(), out var bar)
+                        && float.TryParse(data["beat"].ToString(), out var beat)
+                        && int.TryParse(data["color"].ToString(), out var color))
+                    {
+                        BarAndBeat position = new(bar, beat);
+                        BookmarkData bookmark = new(position, color);
+                        bookmarks.Add(bookmark);
+                    }
+                }
 
-                        var instance = Activator.CreateInstance(eventType) as LevelEvent_Base;
-                        instance.Decode(dict);
-                        events.Add(instance);
+                if (root.TryGetValue(RDEditorConstants.ColorPaletteKey, out var paletteObject)
+                    && paletteObject is List<object> paletteList)
+                {
+                    for (int i = 0; i < paletteList.Count; i++)
+                    {
+                        palette[i] = paletteList[i].ToString();
                     }
                 }
 
@@ -62,6 +108,21 @@ namespace RDEditorPlus.Util
                 Plugin.LogError($"Error loading level from {path}:\n{ex}");
 
                 return false;
+            }
+        }
+
+        private static IEnumerable<Dictionary<string, object>> GetObjects(Dictionary<string, object> root, string key)
+        {
+            if (root.TryGetValue(key, out var obj)
+                    && obj is List<object> list)
+            {
+                foreach (var element in list)
+                {
+                    if (element is Dictionary<string, object> dict)
+                    {
+                        yield return dict;
+                    }
+                }
             }
         }
 

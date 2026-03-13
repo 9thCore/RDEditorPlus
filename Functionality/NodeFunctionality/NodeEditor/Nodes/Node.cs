@@ -261,7 +261,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             [VariableType<RDLevelNodeVariable>] RDLevelFile,
             [VariableType<RDLevelSaveNodeVariable>] RDLevelSaveFile,
             [ConnectorColor("FF0000")] RDLevelSettings,
-            [ConnectorColor("FF00FF")] RDLevelEvents
+            [ConnectorColor("FF00FF")] RDLevelEvents,
+            [ConnectorColor("FF80FF")] RDLevelPalette
         }
 
         private void SetName(string name)
