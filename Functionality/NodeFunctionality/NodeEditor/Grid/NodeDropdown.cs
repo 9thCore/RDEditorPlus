@@ -26,6 +26,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     #region file
                     GameObject file = CreateDropdown("File");
                     AddButton(file.transform, "Load RD Level", instance.CreateNode<Node_LoadRDLevel>);
+                    AddButton(file.transform, "Save RD Level", instance.CreateNode<Node_SaveRDLevel>);
 
                     AddCategoryButton(transform, "File I/O", file);
                     #endregion

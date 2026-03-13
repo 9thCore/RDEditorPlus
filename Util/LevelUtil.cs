@@ -8,9 +8,10 @@ namespace RDEditorPlus.Util
 {
     public static class LevelUtil
     {
-        public static bool TryLevelLoad(string path, out List<LevelEvent_Base> events)
+        public static bool TryLevelLoad(string path, out RDLevelSettings settings, out List<LevelEvent_Base> events)
         {
             events = [];
+            settings = new(version: 1);
 
             if (!File.Exists(path))
             {
@@ -22,6 +23,12 @@ namespace RDEditorPlus.Util
             {
                 var text = RDFile.ReadAllText(path, null);
                 var root = Json.Deserialize(text) as Dictionary<string, object>;
+
+                if (root.TryGetValue("settings", out var settingsObject)
+                    && settingsObject is Dictionary<string, object> settingsDict)
+                {
+                    settings.Decode(settingsDict);
+                }
 
                 if (root.TryGetValue("events", out var eventObject)
                     && eventObject is List<object> eventList)

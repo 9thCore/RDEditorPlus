@@ -149,6 +149,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                 cast = new RDLevelFile(value);
                 return true;
             }
+            else if (type == typeof(RDLevelSaveFile))
+            {
+                cast = new RDLevelSaveFile(value);
+                return true;
+            }
 
             cast = null;
             return false;

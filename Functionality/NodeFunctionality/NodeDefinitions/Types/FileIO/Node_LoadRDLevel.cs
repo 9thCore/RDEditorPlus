@@ -4,8 +4,6 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.FileIO
 {
@@ -15,16 +13,20 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
         {
             var path = file.ToString();
 
-            if (!LevelUtil.TryLevelLoad(path, out List<LevelEvent_Base> events))
+            if (!LevelUtil.TryLevelLoad(path, out RDLevelSettings settings, out List<LevelEvent_Base> events))
             {
                 return;
             }
 
+            this.settings = settings;
             this.events = new(events);
         }
 
         [Variable]
         public RDLevelFile file;
+
+        [Output]
+        public RDLevelSettings settings;
 
         [Output]
         public RDLevelEvents events;
