@@ -22,7 +22,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public void SetEndPoint(Vector2 point)
         {
-            endPoint = point;
             Vector2 delta = point - rectTransform.position.xy();
             rectTransform.localEulerAngles = new(0f, 0f, -delta.GetAngle());
             line.sizeDelta = new Vector2(delta.magnitude / rectTransform.lossyScale.x, line.sizeDelta.y);
@@ -32,8 +31,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         {
             Destroy(gameObject);
         }
-
-        private Vector2 endPoint;
 
         [SerializeField]
         private RectTransform rectTransform;
