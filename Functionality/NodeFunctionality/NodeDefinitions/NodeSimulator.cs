@@ -39,6 +39,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
         }
 
         public int SpritePostfix => spritePostfix++;
+        public int FloatingTextIndexOffset { get; set; } = 0;
 
         private int spritePostfix = 0;
         private readonly Dictionary<string, Node_Base> nodes = new();

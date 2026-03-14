@@ -26,6 +26,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             }
 
             MakeSpriteIdentifiersUnique(sprites, events);
+            RemapFloatingText(events);
 
             this.settings = settings;
             this.rows = rows;
@@ -76,6 +77,28 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             {
                 sprite.spriteId = $"{sprite.spriteId}{spritePostfix}";
             }
+        }
+
+        private void RemapFloatingText(List<LevelEvent_Base> events)
+        {
+            int offset = simulator.FloatingTextIndexOffset;
+            int maxIndexHere = 0;
+
+            foreach (var levelEvent in events)
+            {
+                if (levelEvent is LevelEvent_FloatingText text)
+                {
+                    maxIndexHere = Math.Max(maxIndexHere, text.id + 1);
+                    text.id += offset;
+                }
+                else if (levelEvent is LevelEvent_AdvanceText advanceText)
+                {
+                    maxIndexHere = Math.Max(maxIndexHere, advanceText.id + 1);
+                    advanceText.id += offset;
+                }
+            }
+
+            simulator.FloatingTextIndexOffset += maxIndexHere;
         }
     }
 }
