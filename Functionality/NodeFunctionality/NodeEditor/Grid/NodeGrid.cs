@@ -13,10 +13,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
     {
         public static NodeGrid Create(Transform parent, NodePanelHolder holder)
         {
-            GameObject root = new(nameof(NodeGrid));
-            root.SetActive(false);
+            GameObject zoomHelper = new(nameof(NodeGrid));
+            zoomHelper.SetActive(false);
 
-            root.transform.SetParent(parent);
+            zoomHelper.transform.SetParent(parent);
+            zoomHelper.transform.localScale = Vector3.one;
+            zoomHelper.transform.localPosition = Vector3.zero;
+
+            GameObject root = new("root");
+
+            root.transform.SetParent(zoomHelper.transform);
             root.transform.localScale = Vector3.one;
             root.transform.localPosition = Vector3.zero;
 
@@ -32,8 +38,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             rt.localPosition = Vector3.zero;
             rt.localScale = Vector3.one;
 
-            rt.offsetMin = new Vector2(-300f, -200f);
-            rt.offsetMax = -rt.offsetMin;
+            rt.sizeDelta = new Vector2(1900f, 650f);
 
             GameObject space = new("space");
             var spaceRT = space.AddComponent<RectTransform>();
@@ -58,8 +63,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             component.root = root.AddComponent<RectTransform>();
             component.connections = connectionsRT;
             component.holder = holder;
+            component.zoomHelper = zoomHelper.AddComponent<RectTransform>();
 
-            root.SetActive(true);
+            zoomHelper.SetActive(true);
             return component;
         }
 
@@ -122,6 +128,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         public void Reset()
         {
             root.anchoredPosition = Vector2.zero;
+            zoomHelper.localScale = Vector3.one;
             UpdateBackground();
         }
 
@@ -216,11 +223,38 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             return orderedNodes;
         }
 
+        public bool CanZoom { get; set; } = false;
+
         private void UpdateBackground()
         {
             background.anchoredPosition = -root.anchoredPosition.RoundToMultiple(GridSize);
         }
 
+        private void Zoom(float delta, Vector2 mousePosition)
+        {
+            if (delta == 0f)
+            {
+                return;
+            }
+
+            Vector3 position = root.position;
+            zoomHelper.position = mousePosition;
+            root.position = position;
+
+            float zoom = Mathf.Clamp(CurrentZoom + delta, MinZoom, MaxZoom);
+            zoomHelper.localScale = Vector3.one * zoom;
+
+            UpdateBackground();
+        }
+
+        private void Update()
+        {
+            Zoom(Input.mouseScrollDelta.y * ZoomSpeedFactor, Input.mousePosition);
+        }
+
+        private float CurrentZoom => zoomHelper.localScale.x;
+
+        private RectTransform zoomHelper;
         private RectTransform root;
         private RectTransform space;
         private RectTransform background;
@@ -231,6 +265,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
         public const string NodesKey = "Nodes";
         public const string NodeKey = "Node";
+        
+        private const float ZoomSpeedFactor = 10f / 60f;
+        private const float MinZoom = 0.33f;
+        private const float MaxZoom = 3.0f;
 
         public static Sprite GridSprite
         {

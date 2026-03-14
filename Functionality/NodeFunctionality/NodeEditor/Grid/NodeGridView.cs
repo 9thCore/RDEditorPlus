@@ -55,6 +55,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             maskRectTransform.offsetMin = maskRectTransform.offsetMax = Vector2.zero;
 
             component.grid = NodeGrid.Create(maskRectTransform, holder);
+            mask.AddComponent<NodeGridViewEventTrigger>().Setup(component.grid);
 
             view.SetActive(true);
             return component;
