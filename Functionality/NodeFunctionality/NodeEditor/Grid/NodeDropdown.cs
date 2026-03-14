@@ -34,6 +34,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     #region events
                     GameObject events = CreateDropdown("Event");
                     AddButton(events.transform, "Bar Filter", instance.CreateNode<Node_BarFilter>);
+                    AddButton(events.transform, "Merge Events", instance.CreateNode<Node_MergeEvents>);
 
                     AddCategoryButton(transform, "Events", events);
                     #endregion
