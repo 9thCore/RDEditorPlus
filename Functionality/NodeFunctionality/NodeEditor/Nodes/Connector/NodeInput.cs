@@ -34,11 +34,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             link = null;
         }
 
-        public void Drag(Vector2 delta)
+        public void Drag()
         {
             if (link != null)
             {
-                link.Connection.OffsetEndPoint(delta);
+                link.Connection.SetEndPoint(control.position.xy());
             }
         }
 

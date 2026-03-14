@@ -108,7 +108,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
             foreach (var input in inputs)
             {
-                input.Drag(delta);
+                input.Drag();
             }
 
             foreach (var output in outputs)

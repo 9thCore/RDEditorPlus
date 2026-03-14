@@ -28,11 +28,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             line.sizeDelta = new Vector2(delta.magnitude / rectTransform.lossyScale.x, line.sizeDelta.y);
         }
 
-        public void OffsetEndPoint(Vector2 delta)
-        {
-            SetEndPoint(endPoint + delta);
-        }
-
         public void Delete()
         {
             Destroy(gameObject);
