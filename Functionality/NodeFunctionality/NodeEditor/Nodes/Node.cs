@@ -284,10 +284,24 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         private IEnumerator DeactivateImmediatelyAterUIUpdate()
         {
-            // idk why it has to wait twice
+            // idk why it has to wait thrice
             yield return null;
             yield return null;
+            yield return null;
+
             gameObject.SetActive(false);
+
+            foreach (var component in GetComponentsInChildren<ContentSizeFitter>())
+            {
+                GameObject.DestroyImmediate(component);
+            }
+
+            yield return null;
+
+            foreach (var component in GetComponentsInChildren<HorizontalOrVerticalLayoutGroup>())
+            {
+                GameObject.DestroyImmediate(component);
+            }
         }
 
         [SerializeField]
