@@ -80,6 +80,11 @@ namespace RDEditorPlus.Util
                     events.Add(instance);
                 }
 
+                foreach (var data in GetObjects(root, RDEditorConstants.ConditionalsKey))
+                {
+                    conditionals.Add(Conditional.Decode(data));
+                }
+
                 foreach (var data in GetObjects(root, RDEditorConstants.BookmarksKey))
                 {
                     if (int.TryParse(data["bar"].ToString(), out var bar)

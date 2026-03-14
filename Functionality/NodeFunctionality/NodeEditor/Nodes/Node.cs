@@ -264,6 +264,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             [ConnectorColor("FF8000")] RDLevelRows,
             [ConnectorColor("0080FF")] RDLevelSprites,
             [ConnectorColor("FF00FF")] RDLevelEvents,
+            [ConnectorColor("FF0080")] RDLevelConditionals,
+            [ConnectorColor("FFFFFF")] RDLevelBookmarks,
             [ConnectorColor("FF80FF")] RDLevelPalette
         }
 

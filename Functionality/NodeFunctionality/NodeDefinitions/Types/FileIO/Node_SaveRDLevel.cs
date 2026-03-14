@@ -21,9 +21,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
                 settings: settings,
                 rows: rows,
                 levelEvents: events,
-                conditionals: [],
+                conditionals: conditionals,
                 sprites: sprites,
-                bookmarks: [],
+                bookmarks: bookmarks,
                 colorPalette: palette);
 
             string text = data.Encode();
@@ -45,6 +45,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
         [Input]
         public RDLevelEvents events;
+
+        [Input]
+        public RDLevelConditionals conditionals;
+
+        [Input]
+        public RDLevelBookmarks bookmarks;
 
         [Input]
         public RDLevelPalette palette;

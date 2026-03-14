@@ -29,6 +29,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             this.rows = rows;
             this.sprites = sprites;
             this.events = events;
+            this.conditionals = conditionals;
+            this.bookmarks = bookmarks;
             this.palette = palette;
         }
 
@@ -46,6 +48,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
         [Output]
         public RDLevelEvents events;
+
+        [Output]
+        public RDLevelConditionals conditionals;
+
+        [Output]
+        public RDLevelBookmarks bookmarks;
 
         [Output]
         public RDLevelPalette palette;
