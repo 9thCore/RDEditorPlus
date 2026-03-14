@@ -1,6 +1,7 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Events;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.FileIO;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Sprites;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using UnityEngine;
@@ -29,6 +30,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     AddButton(file.transform, "Save RD Level", instance.CreateNode<Node_SaveRDLevel>);
 
                     AddCategoryButton(transform, "File I/O", file);
+                    #endregion
+
+                    #region sprites
+                    GameObject sprites = CreateDropdown("Sprite");
+                    AddButton(sprites.transform, "Merge Sprites", instance.CreateNode<Node_MergeSprites>);
+
+                    AddCategoryButton(transform, "Sprites", sprites);
                     #endregion
 
                     #region events

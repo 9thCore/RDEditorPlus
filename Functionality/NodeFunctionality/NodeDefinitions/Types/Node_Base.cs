@@ -13,12 +13,19 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
 {
     public abstract class Node_Base : INodeWorkspace.INode
     {
+        public void SetSimulator(NodeSimulator simulator)
+        {
+            this.simulator = simulator;
+        }
+
         public abstract void PostDeserialise();
         public abstract void SetVariable(string name, object value);
         public abstract void SetInput(string name, object value);
         public abstract object GetOutput(string name);
 
         public static GameObject PreparePrefab(string name) => throw new NotImplementedException();
+
+        protected NodeSimulator simulator;
     }
 
     public abstract class Node_Base<T> : Node_Base where T : Node_Base<T>

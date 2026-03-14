@@ -13,6 +13,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
                 return null;
             }
 
+            instance.SetSimulator(this);
             nodes.Add(id, instance);
             return instance;
         }
@@ -37,6 +38,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
             inputNode.SetInput(inputName, outputNode.GetOutput(outputName));
         }
 
+        public int SpritePostfix => spritePostfix++;
+
+        private int spritePostfix = 0;
         private readonly Dictionary<string, Node_Base> nodes = new();
     }
 }

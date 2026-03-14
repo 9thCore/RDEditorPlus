@@ -25,6 +25,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
                 return;
             }
 
+            MakeSpriteIdentifiersUnique(sprites, events);
+
             this.settings = settings;
             this.rows = rows;
             this.sprites = sprites;
@@ -57,5 +59,23 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
         [Output]
         public RDLevelPalette palette;
+
+        private void MakeSpriteIdentifiersUnique(List<LevelEvent_MakeSprite> sprites, List<LevelEvent_Base> events)
+        {
+            int spritePostfix = simulator.SpritePostfix;
+
+            foreach (var levelEvent in events)
+            {
+                if (!levelEvent.target.IsNullOrEmpty())
+                {
+                    levelEvent.target = $"{levelEvent.target}{spritePostfix}";
+                }
+            }
+
+            foreach (var sprite in sprites)
+            {
+                sprite.spriteId = $"{sprite.spriteId}{spritePostfix}";
+            }
+        }
     }
 }

@@ -7,6 +7,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
     {
         public RDLevelSprites() : this(null) { }
 
+        public List<LevelEvent_MakeSprite> Collect() => this;
+
         public readonly IReadOnlyList<LevelEvent_MakeSprite> Sprites = sprites.AsReadOnly();
 
         public static implicit operator List<LevelEvent_MakeSprite>(RDLevelSprites instance)
