@@ -257,6 +257,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>] Single,
             [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>] Int32,
             [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
+            [ConnectorColor("FF0000"), VariableType<BooleanNodeVariable>] Boolean,
 
             [VariableType<RDLevelNodeVariable>] RDLevelFile,
             [VariableType<RDLevelSaveNodeVariable>] RDLevelSaveFile,

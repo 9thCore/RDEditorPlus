@@ -1,4 +1,5 @@
 ﻿using RDLevelEditor;
+using System;
 using System.Collections.Generic;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
@@ -27,6 +28,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
         public readonly RDLevelEvents WithBarFilter(int start, int end)
         {
             changes.Add(new BarFilterEventsChange(start, end));
+            return new(events, changes, changesToPerform + 1);
+        }
+
+        public readonly RDLevelEvents WithTabFilter(bool sounds, bool rows, bool actions, bool sprites, bool rooms, bool windows)
+        {
+            changes.Add(new TabFilterEventsChange(TabFilterEventsChange.GetFlagFrom(sounds, rows, actions, sprites, rooms, windows)));
             return new(events, changes, changesToPerform + 1);
         }
 
@@ -59,6 +66,48 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                 int start = this.start;
                 int end = this.end;
                 events.RemoveAll(ev => ev.bar < start || ev.bar > end);
+            }
+        }
+
+        private readonly struct TabFilterEventsChange(TabFilterEventsChange.TabFlag flag) : IEventsChange
+        {
+            private readonly TabFlag flag = flag;
+
+            public void Apply(ref List<LevelEvent_Base> events)
+            {
+                TabFlag flag = this.flag;
+                events.RemoveAll(ev => !flag.HasFlag(GetFlagFromTab(ev.defaultTab)));
+            }
+
+            [Flags]
+            public enum TabFlag
+            {
+                None = 0,
+                Sounds = 1 << 0,
+                Rows = 1 << 1,
+                Actions = 1 << 2,
+                Sprites = 1 << 3,
+                Rooms = 1 << 4,
+                Windows = 1 << 5
+            }
+
+            public static TabFlag GetFlagFrom(bool sounds, bool rows, bool actions, bool sprites, bool rooms, bool windows)
+                => (TabFlag)((int)(sounds ? TabFlag.Sounds : 0) + (int)(rows ? TabFlag.Rows : 0)
+                 + (int)(actions ? TabFlag.Actions : 0) + (int)(sprites ? TabFlag.Sprites : 0)
+                 + (int)(rooms ? TabFlag.Rooms : 0) + (int)(windows ? TabFlag.Windows : 0));
+
+            private static TabFlag GetFlagFromTab(Tab tab)
+            {
+                return tab switch
+                {
+                    Tab.Song => TabFlag.Sounds,
+                    Tab.Rows => TabFlag.Rows,
+                    Tab.Actions => TabFlag.Actions,
+                    Tab.Sprites => TabFlag.Sprites,
+                    Tab.Rooms => TabFlag.Rooms,
+                    Tab.Windows => TabFlag.Windows,
+                    _ => TabFlag.None
+                };
             }
         }
     }

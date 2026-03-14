@@ -18,6 +18,9 @@ namespace RDEditorPlus.Util
         [Filename("editor_browse1")]
         public static Sprite Browse1Sprite { get; private set; }
 
+        [Filename("editor-checkmark")]
+        public static Sprite CheckmarkSprite { get; private set; }
+
         [Filename("RDLatinFontPoint")]
         public static Font StandardFont { get; private set; }
 
