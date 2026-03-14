@@ -330,8 +330,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         public const int TopPadding = 4;
         public const int BottomPadding = 4;
         public const float RootSpacing = 4f;
-        public const float InterfaceSpacing = 8f;
-        public const float ConnectorSpacing = 6f;
+        public const float InterfaceSpacing = 2f;
+        public const float ConnectorSpacing = 4f;
 
         public const string IDKey = "id";
         public const string NameKey = "name";
@@ -377,6 +377,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
                     background.type = Image.Type.Tiled;
 
                     var transform = node.transform as RectTransform;
+                    transform.SizeDeltaX(120f);
 
                     node.rectTransform = transform;
 
