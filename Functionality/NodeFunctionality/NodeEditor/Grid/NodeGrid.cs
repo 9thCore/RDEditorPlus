@@ -249,6 +249,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
         private void Update()
         {
+            if (!CanZoom)
+            {
+                return;
+            }
+
             Zoom(Input.mouseScrollDelta.y * ZoomSpeedFactor, Input.mousePosition);
         }
 
