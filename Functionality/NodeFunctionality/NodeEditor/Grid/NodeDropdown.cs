@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Constant;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Events;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.FileIO;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Sprites;
@@ -30,6 +31,14 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     AddButton(file.transform, "Save RD Level", instance.CreateNode<Node_SaveRDLevel>);
 
                     AddCategoryButton(transform, "File I/O", file);
+                    #endregion
+
+                    #region constants
+                    GameObject constants = CreateDropdown("Constant");
+                    AddButton(constants.transform, "Int", instance.CreateNode<Node_IntConstant>);
+                    AddButton(constants.transform, "Float", instance.CreateNode<Node_FloatConstant>);
+
+                    AddCategoryButton(transform, "Constant", constants);
                     #endregion
 
                     #region sprites
