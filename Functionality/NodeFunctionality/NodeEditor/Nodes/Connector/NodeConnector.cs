@@ -172,8 +172,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             ResetColor();
         }
 
-        public static Sprite Sprite;
-
         [SerializeField]
         protected RectTransform rectTransform;
         [SerializeField]
@@ -213,7 +211,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             outline.effectColor = Color.gray;
 
             var image = control.AddComponent<Image>();
-            image.sprite = Sprite;
+            image.sprite = AssetUtil.InputFieldSprite;
             image.type = Image.Type.Tiled;
 
             var controlRT = control.transform as RectTransform;
@@ -229,9 +227,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             GameObject text = new("name");
 
             connector.text = text.AddComponent<Text>();
-            connector.text.font = Node.Font;
+            connector.text.ApplyRDFont();
             connector.text.alignment = TextAnchor.MiddleLeft;
-            connector.text.fontSize = 8;
             connector.text.verticalOverflow = VerticalWrapMode.Overflow;
 
             text.AddComponent<EightSidedOutline>().effectColor = Color.black;

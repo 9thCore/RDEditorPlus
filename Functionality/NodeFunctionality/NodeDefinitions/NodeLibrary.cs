@@ -55,16 +55,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
                 var name = type.Name.Substring(startIndex: 5);
                 var method = type.GetMethod(nameof(Node_Base.PreparePrefab), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
-                try
-                {
-                    var prefab = (GameObject)method.Invoke(null, [name]);
-                    nodeData.Add(name, new(prefab, type));
-                    aNode = name;
-                }
-                catch (Exception e)
-                {
-                    Plugin.LogError($"Could not cache type {type.FullName} because:\n{e}");
-                }
+                var prefab = (GameObject)method.Invoke(null, [name]);
+                nodeData.Add(name, new(prefab, type));
+                aNode = name;
             }
         }
 

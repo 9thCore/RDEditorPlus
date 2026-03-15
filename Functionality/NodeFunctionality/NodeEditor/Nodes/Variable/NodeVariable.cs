@@ -153,9 +153,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                     GameObject placeholder = new("placeholder");
 
                     var text = placeholder.AddComponent<Text>();
-                    text.font = Node.Font;
+                    text.ApplyRDFont();
                     text.alignment = TextAnchor.LowerLeft;
-                    text.fontSize = 8;
                     text.color = Color.black.WithAlpha(0.33f);
 
                     var textRT = placeholder.transform as RectTransform;
@@ -202,9 +201,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                     GameObject textObject = new("text");
 
                     var text = textObject.AddComponent<Text>();
-                    text.font = Node.Font;
+                    text.ApplyRDFont();
                     text.alignment = TextAnchor.LowerLeft;
-                    text.fontSize = 8;
                     text.color = Color.black;
 
                     var textRT = textObject.transform as RectTransform;
@@ -239,8 +237,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 
                     GameObject name = new("name");
                     Text text = name.AddComponent<Text>();
-                    text.font = Node.Font;
-                    text.fontSize = 8;
+                    text.ApplyRDFont();
                     text.alignment = TextAnchor.MiddleLeft;
 
                     text.gameObject.AddComponent<EightSidedOutline>().effectColor = Color.black;

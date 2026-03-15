@@ -251,8 +251,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
 
             title = clone.GetComponentInChildren<Text>();
             Object.DestroyImmediate(title.GetComponent<RDStringToUIText>());
-            Node.Font = title.font;
-            NodeOutput.Sprite = NodeInput.Sprite = Node.Sprite = sprite;
 
             GameObject levelName = Object.Instantiate(title.gameObject, title.transform.parent);
             var rt3 = levelName.transform as RectTransform;
@@ -310,8 +308,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             rt2.localScale = Vector3.one;
 
             SetLevelName();
-
-            NodeLibrary.Instance.Prime();
         }
 
         protected readonly GameObject gameObject;

@@ -292,17 +292,20 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
             gameObject.SetActive(false);
 
-            foreach (var component in GetComponentsInChildren<ContentSizeFitter>())
-            {
-                GameObject.DestroyImmediate(component);
-            }
-
             yield return null;
 
-            foreach (var component in GetComponentsInChildren<HorizontalOrVerticalLayoutGroup>())
+            foreach (var component in autoLayoutGroups)
             {
                 GameObject.DestroyImmediate(component);
             }
+
+            foreach (var component in autoLayoutFitters)
+            {
+                GameObject.DestroyImmediate(component);
+            }
+
+            autoLayoutGroups = null;
+            autoLayoutFitters = null;
         }
 
         [SerializeField]
@@ -335,12 +338,15 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         [SerializeField]
         private string nodeName;
 
+        [SerializeField]
+        private HorizontalOrVerticalLayoutGroup[] autoLayoutGroups;
+
+        [SerializeField]
+        private ContentSizeFitter[] autoLayoutFitters;
+
         private string id;
         private bool accessible;
         private bool alreadySaved;
-
-        public static Font Font;
-        public static Sprite Sprite;
 
         public const int TopPadding = 4;
         public const int BottomPadding = 4;
@@ -387,7 +393,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
                     baseNode.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
                     var background = baseNode.AddComponent<Image>();
-                    background.sprite = Sprite;
+                    background.sprite = AssetUtil.ButtonSprite;
                     background.color = Color.gray.WithBrightness(0.8f);
                     background.type = Image.Type.Tiled;
 
@@ -426,9 +432,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
                     title.transform.localScale = Vector3.one;
 
                     node.title = title.AddComponent<Text>();
-                    node.title.font = Font;
+                    node.title.ApplyRDFont();
                     node.title.alignment = TextAnchor.UpperCenter;
-                    node.title.fontSize = 8;
 
                     var titleRT = node.title.rectTransform;
                     titleRT.SetParent(layoutRT);
@@ -517,6 +522,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
                     node.outputParent = outputsRT;
                     #endregion
+
+                    node.autoLayoutGroups = baseNode.GetComponentsInChildren<HorizontalOrVerticalLayoutGroup>(includeInactive: true);
+                    node.autoLayoutFitters = baseNode.GetComponentsInChildren<ContentSizeFitter>(includeInactive: true);
                 }
 
                 return baseNode;
