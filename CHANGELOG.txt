@@ -1,0 +1,1 @@
+- Fix NRE if editing a sound event's conditionals with the MultiEdit patch
