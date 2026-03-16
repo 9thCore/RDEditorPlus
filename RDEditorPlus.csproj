@@ -60,5 +60,8 @@
     <!-- Prepare release -->
     <MakeDir Directories="$(PluginReleaseOutput)"></MakeDir>
     <ZipDirectory SourceDirectory="$(PluginPrereleaseOutput)" DestinationFile="$(PluginReleaseOutput)\$(ProjectName)_v$(Version).zip" Overwrite="true" />
+    
+    <!-- RDModifications auto-update support -->
+    <WriteLinesToFile File="./VERSION.txt" Overwrite="true" Lines="$(Version)b" />
   </Target>
 </Project>
