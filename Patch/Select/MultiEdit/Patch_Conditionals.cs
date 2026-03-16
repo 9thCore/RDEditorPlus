@@ -2,9 +2,6 @@
 using RDEditorPlus.Functionality.MultiEdit;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace RDEditorPlus.Patch.Select.MultiEdit
 {
