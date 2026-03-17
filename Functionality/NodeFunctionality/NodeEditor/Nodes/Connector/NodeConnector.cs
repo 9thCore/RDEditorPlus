@@ -199,12 +199,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             connectorName = text;
         }
 
-        protected void Start()
+        protected void OnEnable()
         {
             allConnectors.Add(this);
         }
 
-        protected void OnDestroy()
+        protected void OnDisable()
         {
             allConnectors.Remove(this);
         }
