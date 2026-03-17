@@ -1,5 +1,6 @@
 ﻿using RDEditorPlus.Functionality.Components;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Attributes;
 using RDEditorPlus.Util;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,8 +20,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         public abstract void EndConnection(NodeConnector selectedNode);
         public abstract void SetColor(Node.Type nodeType, Type type);
         public abstract void ResetColor();
-        public abstract void Unlink();
+        public abstract void Unlink(bool justReplace);
         public abstract void PropagateInaccessibility();
+        public abstract void ResetColorOverrideType();
+        public abstract void SetColorOverrideType(Node.Type type);
+        public abstract bool ConnectedTo(NodeConnector connector);
+        public abstract bool ConnectedToAnything { get; }
 
         public enum Type
         {
@@ -30,11 +35,19 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public record Link(NodeInput Input, NodeOutput Output, NodeConnection Connection)
         {
-            public void Unlink()
+            public void Unlink(bool dontRaiseDisconnectEvent)
             {
                 Connection.Delete();
                 Output.Remove(this);
                 Input.RemoveLink();
+
+                Input.ResetColorOverrideType();
+
+                if (!dontRaiseDisconnectEvent)
+                {
+                    Input.node.RaiseDisconnectEvent();
+                    Output.node.RaiseDisconnectEvent();
+                }
             }
 
             public async Task SaveAsync(XmlWriter writer)
@@ -49,7 +62,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public const string NameKey = "name";
 
-        protected internal abstract void SetupConnection(NodeConnector other);
+        protected internal abstract void SetupConnection(NodeConnector other, bool justReplace);
 
         protected static void SetColorToAll(Node.Type nodeType, Type type)
         {
@@ -103,7 +116,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 node.PropagateInaccessibilityThroughInputs();
             }
 
-            SetColorToAll(type, GetOppositeType(connectorType));
+            SetColorToAll(usageOverrideType ?? type, GetOppositeType(connectorType));
             ResetColor();
         }
 
@@ -116,9 +129,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         {
             node.VirtualConnection.gameObject.SetActive(false);
 
-            if (selectedNode != null && selectedNode != this && selectedNode.available)
+            if (selectedNode != null && selectedNode != this
+                && selectedNode.available && !ConnectedTo(selectedNode))
             {
-                SetupConnection(selectedNode);
+                NodeConnector input = connectorType == Type.Input ? this : selectedNode;
+                NodeConnector output = connectorType == Type.Output ? this : selectedNode;
+
+                output.SetupConnection(input, justReplace: input.ConnectedToAnything);
             }
 
             ResetColorToAll();
@@ -126,15 +143,17 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public override void SetColor(Node.Type nodeType, Type type)
         {
-            if (nodeType == this.type && node.Accessible && connectorType == type)
+            
+
+            if (Node.AreCompatible(nodeType, this.type) && node.Accessible && connectorType == type)
             {
-                controlImage.color = Node.GetColor(this.type).ValidControl;
+                controlImage.color = GetColor.ValidControl;
                 controlOutline.effectColor = OutlineSelectableColor;
                 available = true;
             }
             else
             {
-                controlImage.color = Node.GetColor(this.type).InvalidControl;
+                controlImage.color = GetColor.InvalidControl;
                 controlOutline.effectColor = OutlineUnselectableColor;
                 available = false;
             }
@@ -142,9 +161,33 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public override void ResetColor()
         {
-            controlImage.color = Node.GetColor(type).ValidControl;
+            controlImage.color = GetColor.ValidControl;
             controlOutline.effectColor = OutlineUnselectableColor;
         }
+
+        public override void ResetColorOverrideType()
+        {
+            colorOverrideType = null;
+            ResetColor();
+        }
+
+        public override void SetColorOverrideType(Node.Type type)
+        {
+            colorOverrideType = type;
+            ResetColor();
+        }
+
+        public void ResetUsageOverrideType()
+        {
+            usageOverrideType = null;
+        }
+
+        public void SetUsageOverrideType(Node.Type type)
+        {
+            usageOverrideType = type;
+        }
+
+        public Node.Type? ColorOverrideType => colorOverrideType;
 
         protected abstract void AddToNode(Node node, string description);
         protected abstract void PrefabSetup();
@@ -172,12 +215,18 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             ResetColor();
         }
 
+        private ConnectorColorAttribute GetColor => Node.GetColor(colorOverrideType ?? type);
+
         [SerializeField]
         protected RectTransform rectTransform;
         [SerializeField]
         protected Text text;
         [SerializeField]
         protected Node.Type type;
+        [SerializeField]
+        protected Node.Type? colorOverrideType;
+        [SerializeField]
+        protected Node.Type? usageOverrideType;
         [SerializeField]
         protected Image controlImage;
         [SerializeField]

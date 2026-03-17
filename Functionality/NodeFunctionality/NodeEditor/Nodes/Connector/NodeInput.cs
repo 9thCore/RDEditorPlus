@@ -1,6 +1,7 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Util;
+using System;
 using System.Threading.Tasks;
 using System.Xml;
 using UnityEngine;
@@ -19,11 +20,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         }
 
-        public void SetLink(Link link)
+        public void SetLink(Link link, bool replace)
         {
             if (this.link != null)
             {
-                this.link.Unlink();
+                this.link.Unlink(replace);
             }
 
             this.link = link;
@@ -47,11 +48,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             node.AddInput(rectTransform, this, description);
         }
 
-        public override void Unlink()
+        public override void Unlink(bool dontRaiseDisconnectEvent)
         {
             if (link != null)
             {
-                link.Unlink();
+                link.Unlink(dontRaiseDisconnectEvent);
             }
         }
 
@@ -62,6 +63,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 link.Output.node.PropagateInaccessibilityThroughInputs();
             }
         }
+
+        public override bool ConnectedTo(NodeConnector connector)
+        {
+            return link != null && link.Output == connector;
+        }
+
+        public override bool ConnectedToAnything => link != null;
 
         public async Task SaveAsync(XmlWriter writer)
         {
@@ -91,7 +99,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 return;
             }
 
-            output.SetupConnection(this);
+            output.SetupConnection(this, justReplace: false);
         }
 
         public bool IsLinked => link != null;
@@ -106,10 +114,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             text.rectTransform.anchorMax = Vector2.one;
         }
 
-        protected internal override void SetupConnection(NodeConnector other)
-        {
-            other.SetupConnection(this);
-        }
+        protected internal override void SetupConnection(NodeConnector other, bool justReplace) => throw new NotImplementedException();
 
         public const string LinkKey = "Link";
 

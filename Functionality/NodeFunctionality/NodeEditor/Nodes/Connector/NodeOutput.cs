@@ -35,13 +35,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             node.AddOutput(rectTransform, this, description);
         }
 
-        public override void Unlink()
+        public override void Unlink(bool dontRaiseDisconnectEvent)
         {
             List<Link> toBeRemoved = new(links);
 
             foreach (var link in toBeRemoved)
             {
-                link.Unlink();
+                link.Unlink(dontRaiseDisconnectEvent);
             }
         }
 
@@ -52,6 +52,21 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 link.Input.node.PropagateInaccessibilityThroughOutputs();
             }
         }
+
+        public override bool ConnectedTo(NodeConnector connector)
+        {
+            foreach (var link in links)
+            {
+                if (link.Input == connector)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public override bool ConnectedToAnything => links.Count > 0;
 
         public void PropagateDependenciesSaved()
         {
@@ -71,7 +86,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             text.alignment = TextAnchor.MiddleRight;
         }
 
-        protected internal override void SetupConnection(NodeConnector other)
+        protected internal override void SetupConnection(NodeConnector other, bool justReplace)
         {
             var input = other as NodeInput;
 
@@ -81,7 +96,23 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             Link link = new(input, this, connection);
 
             links.Add(link);
-            input.SetLink(link);
+            input.SetLink(link, justReplace);
+
+            if (Node.IsMathConvertible(type))
+            {
+                input.SetColorOverrideType(type);
+            }
+
+            if (justReplace)
+            {
+                input.node.RaiseReplaceEvent();
+                node.RaiseReplaceEvent();
+            }
+            else
+            {
+                input.node.RaiseConnectEvent();
+                node.RaiseConnectEvent();
+            }
         }
 
         private readonly List<Link> links = new();

@@ -121,12 +121,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         {
             foreach (var input in inputs)
             {
-                input.Unlink();
+                input.Unlink(dontRaiseDisconnectEvent: false);
             }
 
             foreach (var output in outputs)
             {
-                output.Unlink();
+                output.Unlink(dontRaiseDisconnectEvent: false);
             }
 
             if (!dontDeleteFromGrid)
@@ -252,6 +252,36 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         public string Name => nodeName;
         public Vector2 Position => rectTransform.anchoredPosition;
 
+        public void SubscribeToConnect(Action action)
+        {
+            onConnect += action;
+        }
+
+        public void SubscribeToDisconnect(Action action)
+        {
+            onDisconnect += action;
+        }
+
+        public void SubscribeToReplace(Action action)
+        {
+            onReplace += action;
+        }
+
+        public void RaiseConnectEvent()
+        {
+            onConnect?.Invoke();
+        }
+
+        public void RaiseDisconnectEvent()
+        {
+            onDisconnect?.Invoke();
+        }
+
+        public void RaiseReplaceEvent()
+        {
+            onReplace?.Invoke();
+        }
+
         public enum Type
         {
             [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>] Single,
@@ -344,6 +374,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         [SerializeField]
         private ContentSizeFitter[] autoLayoutFitters;
 
+        private Action onConnect, onDisconnect, onReplace;
         private string id;
         private bool accessible;
         private bool alreadySaved;
