@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes.Modifier;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Attributes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
@@ -19,7 +20,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 {
     public class Node : MonoBehaviour, INodeWorkspace.INode, ISerializableNodeWorkspace.INode
     {
-        public static GameObject PreparePrefab(string name, NodeVariable.Data[] variables, NodeInput.Data[] inputs, NodeOutput.Data[] outputs)
+        public static GameObject PreparePrefab(
+            string name,
+            NodeVariable.Data[] variables,
+            NodeInput.Data[] inputs,
+            NodeOutput.Data[] outputs,
+            NodeModifierAttribute attribute)
         {
             GameObject root = Instantiate(BaseNode);
             root.name = $"Mod_{MyPluginInfo.PLUGIN_GUID}_Node{name}";
@@ -45,12 +51,34 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
                 output.Setup(node);
             }
 
+            attribute?.Apply(root, node);
+
             node.ScheduleUIUpdate();
             return root;
         }
 
         public static ConnectorColorAttribute GetColor(Type type) => information[type].Color;
         public static VariableTypeAttribute GetVariableType(Type type) => information[type].VariableType;
+        public static bool CanConvertToMath(Type type) => information[type].Convertible?.CanDoMath ?? false;
+
+        public static bool AreCompatible(Type outputType, Type inputType)
+        {
+            if (inputType == Type.MathConvertible)
+            {
+                return CanConvertToMath(outputType);
+            }
+            else if (outputType == Type.MathConvertible)
+            {
+                return CanConvertToMath(inputType);
+            }
+
+            return inputType == outputType;
+        }
+
+        public static Type GetBestFitFor(Type a, Type b)
+        {
+            return (Type)Math.Max((int)a, (int)b);
+        }
 
         public void Setup(NodeGrid grid)
         {
@@ -284,10 +312,17 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         public enum Type
         {
-            [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>] Single,
-            [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>] Int32,
+            [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>,
+                Convertible(TypeConvertible.Math)] Int32,
+            [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>,
+                Convertible(TypeConvertible.Math)] Single,
             [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
             [ConnectorColor("FF0000"), VariableType<BooleanNodeVariable>] Boolean,
+
+            /// <summary>
+            /// Node connector that can connect with anything that has the Convertible attribute set with TypeConvertible.Math
+            /// </summary>
+            [ConnectorColor("FFFFFF")] MathConvertible,
 
             [VariableType<RDLevelNodeVariable>] RDLevelFile,
             [VariableType<RDLevelSaveNodeVariable>] RDLevelSaveFile,
@@ -298,6 +333,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             [ConnectorColor("FF0080")] RDLevelConditionals,
             [ConnectorColor("FFFFFF")] RDLevelBookmarks,
             [ConnectorColor("FF80FF")] RDLevelPalette
+        }
+
+        [Flags]
+        public enum TypeConvertible
+        {
+            Math = 1 << 0
         }
 
         private void SetName(string name)
@@ -401,7 +442,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             {
                 information.Add(
                     value,
-                    new(value.GetAttributeOfType<ConnectorColorAttribute>(), value.GetAttributeOfType<VariableTypeAttribute>()));
+                    new(
+                        Color: value.GetAttributeOfType<ConnectorColorAttribute>(),
+                        VariableType: value.GetAttributeOfType<VariableTypeAttribute>(),
+                        Convertible: value.GetAttributeOfType<ConvertibleAttribute>())
+                    );
             }
         }
 
@@ -565,6 +610,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         private static GameObject baseNode;
         private static readonly Dictionary<Type, TypeInformation> information = new();
 
-        private record struct TypeInformation(ConnectorColorAttribute Color, VariableTypeAttribute VariableType);
+        private record struct TypeInformation(ConnectorColorAttribute Color, VariableTypeAttribute VariableType, ConvertibleAttribute Convertible);
     }
 }

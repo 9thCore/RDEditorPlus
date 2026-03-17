@@ -116,7 +116,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 node.PropagateInaccessibilityThroughInputs();
             }
 
-            SetColorToAll(usageOverrideType ?? type, GetOppositeType(connectorType));
+            SetColorToAll(colorOverrideType ?? type, GetOppositeType(connectorType));
             ResetColor();
         }
 
@@ -143,9 +143,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         public override void SetColor(Node.Type nodeType, Type type)
         {
-            
+            bool compatibile = connectorType == Type.Input
+                ? Node.AreCompatible(nodeType, this.type)
+                : Node.AreCompatible(this.type, nodeType);
 
-            if (Node.AreCompatible(nodeType, this.type) && node.Accessible && connectorType == type)
+            if (compatibile && node.Accessible && connectorType == type)
             {
                 controlImage.color = GetColor.ValidControl;
                 controlOutline.effectColor = OutlineSelectableColor;

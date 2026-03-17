@@ -1,5 +1,6 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeClasses;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes.Modifier;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable;
@@ -23,7 +24,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
         public abstract void SetInput(string name, object value);
         public abstract object GetOutput(string name);
 
-        public static GameObject PreparePrefab(string name) => throw new NotImplementedException();
+        public static GameObject PreparePrefab(string name, NodeModifierAttribute attribute) => throw new NotImplementedException();
 
         protected NodeSimulator simulator;
     }
@@ -53,7 +54,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                 return;
             }
 
-            input.Field.SetValue(this, value);
+            input.Field.SetValue(this, input.Convert(value));
         }
 
         public override object GetOutput(string name)
@@ -84,7 +85,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
             }
         }
 
-        public new static GameObject PreparePrefab(string name)
+        public new static GameObject PreparePrefab(string name, NodeModifierAttribute attribute)
         {
             var nodeVariables = new NodeVariable.Data[VariableFields.Length];
             var nodeInputs = new NodeInput.Data[InputFields.Length];
@@ -123,7 +124,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                 nodeOutputs[i] = new(type, OutputFields[i].Name, OutputFields[i].Description);
             }
 
-            return Node.PreparePrefab(name, nodeVariables, nodeInputs, nodeOutputs);
+            return Node.PreparePrefab(name, nodeVariables, nodeInputs, nodeOutputs, attribute);
         }
 
         private static bool TryGetTypeFrom(Type type, out Node.Type result) => Enum.TryParse(type.Name, ignoreCase: true, out result);
@@ -199,22 +200,38 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
         private static readonly Dictionary<string, Output> OutputByName = new();
 
         private record Variable(FieldInfo Field, VariableAttribute Attribute, string Description)
+            : Definition<VariableAttribute>(Field, Attribute, Description)
         {
-            public string Name => Attribute.NameOverride ?? Field.Name;
-            public Type Type => Field.FieldType;
             public object DefaultValue => Attribute.DefaultValue;
         }
 
         private record Input(FieldInfo Field, InputAttribute Attribute, string Description)
-        {
-            public string Name => Attribute.NameOverride ?? Field.Name;
-            public Type Type => Field.FieldType;
-        }
+            : Definition<InputAttribute>(Field, Attribute, Description)
+        { }
 
         private record Output(FieldInfo Field, OutputAttribute Attribute, string Description)
+            : Definition<OutputAttribute>(Field, Attribute, Description)
+        { }
+
+        private abstract record Definition<AttributeType>(FieldInfo Field, AttributeType Attribute, string Description)
+            where AttributeType : BaseAttribute
         {
             public string Name => Attribute.NameOverride ?? Field.Name;
             public Type Type => Field.FieldType;
+            
+            public object Convert(object value)
+            {
+                if (Type == typeof(MathConvertible))
+                {
+                    return MathConvertible.Convert(value);
+                }
+                else if (value is MathConvertible mathConvertible)
+                {
+                    return mathConvertible.Value;
+                }
+
+                return value;
+            }
         }
 
         private static string GetDescription(FieldInfo field) => field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;

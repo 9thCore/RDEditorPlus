@@ -2,6 +2,7 @@
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Constant;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Events;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.FileIO;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Maths;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Sprites;
 using RDEditorPlus.Util;
 using RDLevelEditor;
@@ -55,6 +56,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     AddButton(events.transform, "Merge Events", instance.CreateNode<Node_MergeEvents>);
 
                     AddCategoryButton(transform, "Events", events);
+                    #endregion
+
+                    #region math
+                    GameObject math = CreateDropdown("Math");
+                    AddButton(math.transform, "Add", instance.CreateNode<Node_MathAdd>);
+
+                    AddCategoryButton(transform, "Math", math);
                     #endregion
 
                     GameObject blocker = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeDropdown)}_Blocker");

@@ -98,7 +98,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             links.Add(link);
             input.SetLink(link, justReplace);
 
-            if (Node.IsMathConvertible(type))
+            Node.Type type = colorOverrideType ?? this.type;
+
+            if (type == Node.Type.MathConvertible || Node.CanConvertToMath(type))
             {
                 input.SetColorOverrideType(type);
             }

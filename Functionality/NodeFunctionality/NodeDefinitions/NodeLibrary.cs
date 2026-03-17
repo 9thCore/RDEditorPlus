@@ -1,4 +1,5 @@
-﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes.Modifier;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,12 +51,17 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions
             var nodeTypes = assembly.GetTypes()
                 .Where(type => type.IsSubclassOf(typeof(Node_Base)) && !type.IsAbstract);
 
+            var parameters = new object[2];
+
             foreach (var type in nodeTypes)
             {
                 var name = type.Name.Substring(startIndex: 5);
                 var method = type.GetMethod(nameof(Node_Base.PreparePrefab), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
-                var prefab = (GameObject)method.Invoke(null, [name]);
+                parameters[0] = name;
+                parameters[1] = type.GetCustomAttribute<NodeModifierAttribute>();
+
+                var prefab = (GameObject)method.Invoke(null, parameters);
                 nodeData.Add(name, new(prefab, type));
                 aNode = name;
             }
