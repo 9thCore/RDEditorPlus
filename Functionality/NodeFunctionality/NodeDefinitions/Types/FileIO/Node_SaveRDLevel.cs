@@ -35,7 +35,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
         public RDLevelSaveFile file;
 
         [Input]
-        public RDLevelSettings settings;
+        public RDLevelSettings settings = new(RDEditorConstants.CurrentVersion);
 
         [Input]
         public RDLevelRows rows;
@@ -53,6 +53,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
         public RDLevelBookmarks bookmarks;
 
         [Input]
-        public RDLevelPalette palette;
+        public RDLevelPalette palette = new();
     }
 }

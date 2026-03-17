@@ -29,7 +29,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Eve
         public bool windows = true;
 
         [Input("events")]
-        public RDLevelEvents input;
+        public RDLevelEvents input = new();
 
         [Output("events")]
         public RDLevelEvents output;

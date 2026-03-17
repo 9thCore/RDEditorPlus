@@ -17,7 +17,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Eve
         public int end;
 
         [Input]
-        public RDLevelEvents events;
+        public RDLevelEvents events = new();
 
         [Output("events")]
         public RDLevelEvents result;

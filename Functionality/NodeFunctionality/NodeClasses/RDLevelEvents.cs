@@ -6,6 +6,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
 {
     public readonly struct RDLevelEvents
     {
+        public RDLevelEvents() : this(null, [], 0) { }
+
         public RDLevelEvents(List<LevelEvent_Base> events) : this(events.AsReadOnly(), new(), 0) { }
 
         public readonly List<LevelEvent_Base> Apply()
