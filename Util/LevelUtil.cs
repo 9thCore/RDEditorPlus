@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace RDEditorPlus.Util
@@ -100,10 +101,7 @@ namespace RDEditorPlus.Util
                 if (root.TryGetValue(RDEditorConstants.ColorPaletteKey, out var paletteObject)
                     && paletteObject is List<object> paletteList)
                 {
-                    for (int i = 0; i < paletteList.Count; i++)
-                    {
-                        palette[i] = paletteList[i].ToString();
-                    }
+                    palette = [.. paletteList.Select(color => color.ToString())];
                 }
 
                 return true;
