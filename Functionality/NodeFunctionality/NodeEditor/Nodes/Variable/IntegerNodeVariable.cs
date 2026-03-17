@@ -6,6 +6,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class IntegerNodeVariable : NodeVariable<IntegerNodeVariable, int>
     {
+        public override bool CanSave() => currentValue != initialValue;
+
         protected override void OnVariableChange(string text)
         {
             if (int.TryParse(text, out var result))

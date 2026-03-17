@@ -76,10 +76,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 
     public abstract class NodeVariable<NodeVariableDerivative, VariableType> : NodeVariable
         where NodeVariableDerivative : NodeVariable<NodeVariableDerivative, VariableType>
-        where VariableType : IEquatable<VariableType>
     {
         public override object Value => currentValue;
-        public override bool CanSave() => !initialValue.Equals(currentValue);
 
         protected override void OnVariableChange(string text)
         {

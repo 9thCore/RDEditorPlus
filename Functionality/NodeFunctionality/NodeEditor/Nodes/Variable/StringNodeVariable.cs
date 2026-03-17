@@ -6,6 +6,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class StringNodeVariable : NodeVariable<StringNodeVariable, string>
     {
+        public override bool CanSave() => currentValue != initialValue;
+
         protected override void OnVariableChange(string text)
         {
             if (text.IsNullOrEmpty())

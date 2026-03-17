@@ -8,6 +8,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class RDLevelSaveNodeVariable : NodeVariable<RDLevelSaveNodeVariable, RDLevelSaveFile>
     {
+        public override bool CanSave() => !currentValue.Equals(initialValue);
+
         public void SelectLevel()
         {
             string location = FileBrowser.SaveFile(
