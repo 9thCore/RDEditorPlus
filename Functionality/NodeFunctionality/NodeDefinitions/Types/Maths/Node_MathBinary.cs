@@ -29,15 +29,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Mat
         {
             Add,
             Subtract,
-
             Multiply,
-            Divide,
-            Modulo,
-
-            Power,
-
-            Min,
-            Max
+            Divide
         }
     }
 }
