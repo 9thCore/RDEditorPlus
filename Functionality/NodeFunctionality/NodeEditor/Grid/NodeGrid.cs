@@ -1,6 +1,7 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
+using RDLevelEditor;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
@@ -249,7 +250,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
         private void Update()
         {
-            if (!CanZoom)
+            if (!CanZoom || !RDEditorUtils.ControlIsPressed())
             {
                 return;
             }
