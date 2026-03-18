@@ -10,7 +10,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Mat
     {
         public override void PostDeserialise()
         {
-            value = value1 + value2;
+            value = operation switch
+            {
+                MathOperation.Add => value1 + value2,
+                _ => value1 + value2
+            };
+
+            Plugin.LogInfo($"{operation}({value1}, {value2}) = {value}");
         }
 
         [Variable<MathOperation>]

@@ -114,6 +114,65 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         private const float InputFieldLeftPadding = 4f;
         private const float InputFieldRightPadding = 4f;
 
+        protected static GameObject AddInputField(Transform parent, out RectTransform inputFieldRT, out InputField inputField)
+        {
+            GameObject inputFieldHolder = new("inputField");
+
+            var image = inputFieldHolder.AddComponent<Image>();
+            image.type = Image.Type.Tiled;
+            image.sprite = AssetUtil.InputFieldSprite;
+
+            inputField = inputFieldHolder.AddComponent<InputField>();
+            inputField.caretColor = Color.black;
+
+            inputFieldRT = inputFieldHolder.transform as RectTransform;
+            inputFieldRT.SetParent(parent);
+            inputFieldRT.localScale = Vector3.one;
+            inputFieldRT.anchorMin = new Vector2(0.5f, 0f);
+            inputFieldRT.anchorMax = Vector2.one;
+            inputFieldRT.offsetMin = new Vector2(NodeLayoutLeftPadding, 0f);
+            inputFieldRT.offsetMax = new Vector2(-NodeLayoutRightPadding, 0f);
+
+            GameObject textObject = new("text");
+
+            var text = textObject.AddComponent<Text>();
+            text.ApplyRDFont();
+            text.alignment = TextAnchor.LowerLeft;
+            text.color = Color.black;
+
+            var textRT = textObject.transform as RectTransform;
+            textRT.SetParent(inputFieldRT);
+            textRT.localScale = Vector3.one;
+            textRT.anchorMin = Vector2.zero;
+            textRT.anchorMax = Vector2.one;
+            textRT.offsetMin = new Vector2(InputFieldLeftPadding, 0f);
+            textRT.offsetMax = new Vector2(-InputFieldRightPadding, 0f);
+
+            inputField.textComponent = text;
+
+            return inputFieldHolder;
+        }
+
+        protected static void AddPlaceholder(InputField inputField)
+        {
+            GameObject placeholder = new("placeholder");
+
+            var text = placeholder.AddComponent<Text>();
+            text.ApplyRDFont();
+            text.alignment = TextAnchor.LowerLeft;
+            text.color = Color.black.WithAlpha(0.33f);
+
+            var textRT = placeholder.transform as RectTransform;
+            textRT.SetParent(inputField.transform);
+            textRT.localScale = Vector3.one;
+            textRT.anchorMin = Vector2.zero;
+            textRT.anchorMax = Vector2.one;
+            textRT.offsetMin = new Vector2(InputFieldLeftPadding, 0f);
+            textRT.offsetMax = new Vector2(-InputFieldRightPadding, 0f);
+
+            inputField.placeholder = text;
+        }
+
         protected static GameObject AddBrowseButton(RectTransform inputField)
         {
             var sprite = AssetUtil.Browse1Sprite;
@@ -146,24 +205,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                 {
                     inputFieldTextPlaceholderVariable = Instantiate(InputFieldVariable);
                     var variable = inputFieldTextPlaceholderVariable.GetComponent<NodeVariableDerivative>();
-                    var inputField = variable.inputField;
-
-                    GameObject placeholder = new("placeholder");
-
-                    var text = placeholder.AddComponent<Text>();
-                    text.ApplyRDFont();
-                    text.alignment = TextAnchor.LowerLeft;
-                    text.color = Color.black.WithAlpha(0.33f);
-
-                    var textRT = placeholder.transform as RectTransform;
-                    textRT.SetParent(inputField.transform);
-                    textRT.localScale = Vector3.one;
-                    textRT.anchorMin = Vector2.zero;
-                    textRT.anchorMax = Vector2.one;
-                    textRT.offsetMin = new Vector2(InputFieldLeftPadding, 0f);
-                    textRT.offsetMax = new Vector2(-InputFieldRightPadding, 0f);
-
-                    inputField.placeholder = text;
+                    AddPlaceholder(variable.inputField);
                 }
 
                 return inputFieldTextPlaceholderVariable;
@@ -179,40 +221,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                     inputFieldVariable = Instantiate(BaseVariable);
                     var variable = inputFieldVariable.GetComponent<NodeVariableDerivative>();
 
-                    GameObject inputField = new("inputField");
-
-                    var image = inputField.AddComponent<Image>();
-                    image.type = Image.Type.Tiled;
-                    image.sprite = AssetUtil.InputFieldSprite;
-
-                    var field = inputField.AddComponent<InputField>();
-                    field.caretColor = Color.black;
-
-                    var inputFieldRT = inputField.transform as RectTransform;
-                    inputFieldRT.SetParent(inputFieldVariable.transform);
-                    inputFieldRT.localScale = Vector3.one;
-                    inputFieldRT.anchorMin = new Vector2(0.5f, 0f);
-                    inputFieldRT.anchorMax = Vector2.one;
-                    inputFieldRT.offsetMin = new Vector2(NodeLayoutLeftPadding, 0f);
-                    inputFieldRT.offsetMax = new Vector2(-NodeLayoutRightPadding, 0f);
-
-                    GameObject textObject = new("text");
-
-                    var text = textObject.AddComponent<Text>();
-                    text.ApplyRDFont();
-                    text.alignment = TextAnchor.LowerLeft;
-                    text.color = Color.black;
-
-                    var textRT = textObject.transform as RectTransform;
-                    textRT.SetParent(inputFieldRT);
-                    textRT.localScale = Vector3.one;
-                    textRT.anchorMin = Vector2.zero;
-                    textRT.anchorMax = Vector2.one;
-                    textRT.offsetMin = new Vector2(InputFieldLeftPadding, 0f);
-                    textRT.offsetMax = new Vector2(-InputFieldRightPadding, 0f);
-
-                    field.textComponent = text;
-                    variable.inputField = field;
+                    AddInputField(inputFieldVariable.transform, out _, out variable.inputField);
                 }
 
                 return inputFieldVariable;

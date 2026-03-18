@@ -317,6 +317,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
                 Convertible(TypeConvertible.Math)] Int32,
             [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>,
                 Convertible(TypeConvertible.Math)] Single,
+            [ConnectorColor("00FF80"), VariableType<Float2NodeVariable>,
+                Convertible(TypeConvertible.Math)] Float2,
 
             [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
             [ConnectorColor("FF0000"), VariableType<BooleanNodeVariable>] Boolean,
