@@ -1,6 +1,7 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeClasses;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes.Modifier;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Maths;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable;
@@ -168,6 +169,21 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                 {
                     cast = result;
                     return true;
+                }
+            }
+            else if (type.IsEnum)
+            {
+                if (type == typeof(Node_MathBinary.MathOperation))
+                {
+                    if (Enum.TryParse<Node_MathBinary.MathOperation>(value, out var result))
+                    {
+                        cast = result;
+                        return true;
+                    }
+                }
+                else
+                {
+                    Plugin.LogError($"Type {type} is an enum but is not handled by {nameof(Node_Base<T>)}.{nameof(TryCast)}");
                 }
             }
 

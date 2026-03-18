@@ -6,13 +6,15 @@ using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Modifier;
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Maths
 {
     [NodeModifier<MathNodeModifier>]
-    public class Node_MathAdd : Node_Base<Node_MathAdd>
+    public class Node_MathBinary : Node_Base<Node_MathBinary>
     {
         public override void PostDeserialise()
         {
             value = value1 + value2;
-            Plugin.LogInfo(value);
         }
+
+        [Variable<MathOperation>]
+        public MathOperation operation;
 
         [Input]
         public MathConvertible value1 = new();
@@ -22,5 +24,20 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Mat
 
         [Output]
         public MathConvertible value;
+
+        public enum MathOperation
+        {
+            Add,
+            Subtract,
+
+            Multiply,
+            Divide,
+            Modulo,
+
+            Power,
+
+            Min,
+            Max
+        }
     }
 }

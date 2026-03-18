@@ -21,6 +21,21 @@ namespace RDEditorPlus.Util
         [Filename("editor-checkmark")]
         public static Sprite CheckmarkSprite { get; private set; }
 
+        [Filename("downArrow")]
+        public static Sprite DownArrowSprite { get; private set; }
+
+        [Filename("UIMask")]
+        public static Sprite UIMaskSprite { get; private set; }
+
+        [Filename("editor-button-1px")]
+        public static Sprite Button1PxSprite { get; private set; }
+
+        [Filename("CLS_Signs Arrow")]
+        public static Sprite CLSSignsArrowSprite { get; private set; }
+
+        [Filename("editor_rounded_rectangle")]
+        public static Sprite EditorRoundedRectangleSprite { get; private set; }
+
         [Filename("RDLatinFontPoint")]
         public static Font StandardFont { get; private set; }
 

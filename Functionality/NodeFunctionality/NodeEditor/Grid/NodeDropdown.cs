@@ -60,7 +60,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
                     #region math
                     GameObject math = CreateDropdown("Math");
-                    AddButton(math.transform, "Add", instance.CreateNode<Node_MathAdd>);
+                    AddButton(math.transform, "Binary", instance.CreateNode<Node_MathBinary>);
 
                     AddCategoryButton(transform, "Math", math);
                     #endregion

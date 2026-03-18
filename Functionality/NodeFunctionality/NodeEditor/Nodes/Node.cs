@@ -4,6 +4,7 @@ using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Attributes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable.Enums;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable.RDLevelNode;
 using RDEditorPlus.Util;
 using RDLevelEditor;
@@ -316,8 +317,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
                 Convertible(TypeConvertible.Math)] Int32,
             [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>,
                 Convertible(TypeConvertible.Math)] Single,
+
             [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
             [ConnectorColor("FF0000"), VariableType<BooleanNodeVariable>] Boolean,
+
+            [ConnectorColor("FF00FF"), VariableType<MathOperationNodeVariable>] MathOperation,
 
             /// <summary>
             /// Node connector that can connect with anything that has the Convertible attribute set with TypeConvertible.Math
