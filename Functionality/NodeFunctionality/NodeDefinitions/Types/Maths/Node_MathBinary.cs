@@ -13,7 +13,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Mat
             value = operation switch
             {
                 MathOperation.Add => value1 + value2,
-                _ => value1 + value2
+                MathOperation.Subtract => value1 - value2,
+                MathOperation.Multiply => value1 * value2,
+                MathOperation.Divide => value1 / value2,
+                _ => value1
             };
 
             Plugin.LogInfo($"{operation}: [{value1}], [{value2}] => [{value}]");

@@ -47,11 +47,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                 return new(left.intValue + right.intValue);
             }
 
-            var leftData = left.Data;
-            var rightData = right.Data;
-
-            Type bestFit = GetBestFitFor(left.type, right.type);
-
+            GetDataFor(left, right, out var leftData, out var rightData, out var bestFit);
             return bestFit switch
             {
                 Type.Float => new MathConvertible((leftData.Simple + rightData.Simple).Value),
@@ -64,6 +60,80 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                     (leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue) ? (leftData.Y + rightData.Y).Expression : string.Empty),
                 _ => left
             };
+        }
+
+        public static MathConvertible operator -(MathConvertible left, MathConvertible right)
+        {
+            if (left.type == Type.Int && right.type == Type.Int)
+            {
+                return new(left.intValue - right.intValue);
+            }
+
+            GetDataFor(left, right, out var leftData, out var rightData, out var bestFit);
+            return bestFit switch
+            {
+                Type.Float => new MathConvertible((leftData.Simple - rightData.Simple).Value),
+                Type.FloatExpression => new MathConvertible((leftData.Simple - rightData.Simple).Expression),
+                Type.Float2 => new MathConvertible(
+                    (leftData.X - rightData.X).Value, (leftData.Y - rightData.Y).Value,
+                    leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue, leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue),
+                Type.FloatExpression2 => new MathConvertible(
+                    (leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue) ? (leftData.X - rightData.X).Expression : string.Empty,
+                    (leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue) ? (leftData.Y - rightData.Y).Expression : string.Empty),
+                _ => left
+            };
+        }
+
+        public static MathConvertible operator *(MathConvertible left, MathConvertible right)
+        {
+            if (left.type == Type.Int && right.type == Type.Int)
+            {
+                return new(left.intValue * right.intValue);
+            }
+
+            GetDataFor(left, right, out var leftData, out var rightData, out var bestFit);
+            return bestFit switch
+            {
+                Type.Float => new MathConvertible((leftData.Simple * rightData.Simple).Value),
+                Type.FloatExpression => new MathConvertible((leftData.Simple * rightData.Simple).Expression),
+                Type.Float2 => new MathConvertible(
+                    (leftData.X * rightData.X).Value, (leftData.Y * rightData.Y).Value,
+                    leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue, leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue),
+                Type.FloatExpression2 => new MathConvertible(
+                    (leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue) ? (leftData.X * rightData.X).Expression : string.Empty,
+                    (leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue) ? (leftData.Y * rightData.Y).Expression : string.Empty),
+                _ => left
+            };
+        }
+
+        public static MathConvertible operator /(MathConvertible left, MathConvertible right)
+        {
+            if (left.type == Type.Int && right.type == Type.Int)
+            {
+                return new(left.intValue / right.intValue);
+            }
+
+            GetDataFor(left, right, out var leftData, out var rightData, out var bestFit);
+            return bestFit switch
+            {
+                Type.Float => new MathConvertible((leftData.Simple / rightData.Simple).Value),
+                Type.FloatExpression => new MathConvertible((leftData.Simple / rightData.Simple).Expression),
+                Type.Float2 => new MathConvertible(
+                    (leftData.X / rightData.X).Value, (leftData.Y / rightData.Y).Value,
+                    leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue, leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue),
+                Type.FloatExpression2 => new MathConvertible(
+                    (leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue) ? (leftData.X / rightData.X).Expression : string.Empty,
+                    (leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue) ? (leftData.Y / rightData.Y).Expression : string.Empty),
+                _ => left
+            };
+        }
+
+        private static void GetDataFor(MathConvertible left, MathConvertible right,
+            out ConvertibleData leftData, out ConvertibleData rightData, out Type bestFit)
+        {
+            leftData = left.Data;
+            rightData = right.Data;
+            bestFit = GetBestFitFor(left.type, right.type);
         }
 
         private MathConvertible(int value) : this(Type.Int, value)
@@ -176,6 +246,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
             }
 
             public static AxisOperationResult operator +(AxisData left, AxisData right) => new('+', left, right);
+            public static AxisOperationResult operator -(AxisData left, AxisData right) => new('-', left, right);
+            public static AxisOperationResult operator *(AxisData left, AxisData right) => new('*', left, right);
+            public static AxisOperationResult operator /(AxisData left, AxisData right) => new('/', left, right);
 
             public static implicit operator AxisData(float value) => new(value);
             public static implicit operator AxisData(string expression) => new(expression);
@@ -237,6 +310,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                 => Operator switch
                 {
                     '+' => left + right,
+                    '-' => left - right,
+                    '*' => left * right,
+                    '/' => left / right,
                     _ => 0f
                 };
         }
