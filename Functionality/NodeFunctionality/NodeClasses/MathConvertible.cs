@@ -201,11 +201,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
 
         private readonly record struct AxisOperationResult(char Operator, in AxisData Left, in AxisData Right)
         {
-            public float Value => Operator switch
-            {
-                '+' => Left.Value + Right.Value,
-                _ => 0f
-            };
+            public float Value => Calculate(Left.Value, Right.Value);
 
             public string Expression
             {
@@ -227,9 +223,22 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                         return lhs;
                     }
 
+                    if (float.TryParse(lhs, out var left)
+                        && float.TryParse(rhs, out var right))
+                    {
+                        return Calculate(left, right).ToString();
+                    }
+
                     return $"({lhs}){Operator}({rhs})";
                 }
             }
+
+            private float Calculate(float left, float right)
+                => Operator switch
+                {
+                    '+' => left + right,
+                    _ => 0f
+                };
         }
 
         private enum Type
