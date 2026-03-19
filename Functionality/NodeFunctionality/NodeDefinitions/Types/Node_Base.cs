@@ -192,6 +192,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types
                 cast = Float2Util.ParseSerialised(value);
                 return true;
             }
+            else if (type == typeof(FloatExpression))
+            {
+                cast = new FloatExpression(value);
+                return true;
+            }
+            else if (type == typeof(FloatExpression2))
+            {
+                cast = FloatExpression2Util.ParseSerialised(value);
+                return true;
+            }
 
             cast = null;
             return false;

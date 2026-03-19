@@ -16,7 +16,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Mat
                 _ => value1 + value2
             };
 
-            Plugin.LogInfo($"{operation}({value1}, {value2}) = {value}");
+            Plugin.LogInfo($"{operation}: [{value1}], [{value2}] => [{value}]");
         }
 
         [Variable<MathOperation>]

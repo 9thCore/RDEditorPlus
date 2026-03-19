@@ -1,5 +1,5 @@
-﻿using nn.util;
-using RDEditorPlus.Util;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+using System;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
 {
@@ -12,16 +12,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
             return $"{Value} ({Value.GetType()})";
         }
 
-        public MathConvertible(MathConvertible other) : this(other.type, other.Value)
-        {
-            intValue = other.intValue;
-            floatValue = other.floatValue;
-
-            float2Value.x = other.float2Value.x;
-            float2Value.y = other.float2Value.y;
-            float2Value.xUsed = other.float2Value.xUsed;
-            float2Value.yUsed = other.float2Value.yUsed;
-        }
+        public MathConvertible() : this(hasValue: false) { }
 
         public static object Convert(object value)
         {
@@ -37,45 +28,40 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
             {
                 return new MathConvertible(float2Value);
             }
+            else if (value is FloatExpression floatExpressionValue)
+            {
+                return new MathConvertible(floatExpressionValue);
+            }
+            else if (value is FloatExpression2 floatExpression2Value)
+            {
+                return new MathConvertible(floatExpression2Value);
+            }
 
             return value;
         }
 
         public static MathConvertible operator+(MathConvertible left, MathConvertible right)
         {
-            return left.type switch
+            if (left.type == Type.Int && right.type == Type.Int)
             {
-                Type.Int => right.type switch
-                {
-                    Type.Int => new(left.intValue + right.intValue),
-                    Type.Float => new(left.intValue + right.floatValue),
-                    Type.Float2 => new(
-                        left.intValue + right.float2Value.x, left.intValue + right.float2Value.y,
-                        right.float2Value.xUsed, right.float2Value.yUsed),
-                    _ => left
-                },
-                Type.Float => right.type switch
-                {
-                    Type.Int => new(left.floatValue + right.intValue),
-                    Type.Float => new(left.floatValue + right.floatValue),
-                    Type.Float2 => new(
-                        left.floatValue + right.float2Value.x, left.floatValue + right.float2Value.y,
-                        right.float2Value.xUsed, right.float2Value.yUsed),
-                    _ => left
-                },
-                Type.Float2 => right.type switch
-                {
-                    Type.Int => new(
-                        left.float2Value.x + right.intValue, left.float2Value.y + right.intValue,
-                        left.float2Value.xUsed, left.float2Value.yUsed),
-                    Type.Float => new(
-                        left.float2Value.x + right.floatValue, left.float2Value.y + right.floatValue,
-                        left.float2Value.xUsed, left.float2Value.yUsed),
-                    Type.Float2 => new(
-                        left.float2Value.XOr(0) + right.float2Value.XOr(0), left.float2Value.YOr(0) + right.float2Value.YOr(0),
-                        left.float2Value.xUsed || right.float2Value.xUsed, left.float2Value.yUsed || right.float2Value.yUsed),
-                    _ => left
-                },
+                return new(left.intValue + right.intValue);
+            }
+
+            var leftData = left.Data;
+            var rightData = right.Data;
+
+            Type bestFit = GetBestFitFor(left.type, right.type);
+
+            return bestFit switch
+            {
+                Type.Float => new MathConvertible((leftData.Simple + rightData.Simple).Value),
+                Type.FloatExpression => new MathConvertible((leftData.Simple + rightData.Simple).Expression),
+                Type.Float2 => new MathConvertible(
+                    (leftData.X + rightData.X).Value, (leftData.Y + rightData.Y).Value,
+                    leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue, leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue),
+                Type.FloatExpression2 => new MathConvertible(
+                    (leftData.X.ForceInMultiValue || rightData.X.ForceInMultiValue) ? (leftData.X + rightData.X).Expression : string.Empty,
+                    (leftData.Y.ForceInMultiValue || rightData.Y.ForceInMultiValue) ? (leftData.Y + rightData.Y).Expression : string.Empty),
                 _ => left
             };
         }
@@ -83,7 +69,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
         private MathConvertible(int value) : this(Type.Int, value)
         {
             intValue = value;
-
         }
 
         private MathConvertible(float value) : this(Type.Float, value)
@@ -96,142 +81,182 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
             float2Value = value;
         }
 
+        private MathConvertible(FloatExpression value) : this(Type.FloatExpression, value)
+        {
+            floatExpressionValue = value;
+        }
+
+        private MathConvertible(FloatExpression2 value) : this(Type.FloatExpression2, value)
+        {
+            floatExpression2Value = value;
+        }
+
         private MathConvertible(float x, float y, bool xUsed, bool yUsed)
             : this(new Float2(x, y) { xUsed = xUsed, yUsed = yUsed }) { }
 
-        private MathConvertible(Type type, object value)
+        private MathConvertible(string expression)
+            : this(new FloatExpression(expression)) { }
+
+        private MathConvertible(string xExpression, string yExpression)
+            : this(new FloatExpression2(new FloatExpression(xExpression), new FloatExpression(yExpression))) { }
+
+        private MathConvertible(Type type, object value) : this(hasValue: true)
         {
             this.type = type;
             Value = value;
         }
 
+        private MathConvertible(bool hasValue)
+        {
+            this.hasValue = hasValue;
+        }
+
+        private ConvertibleData Data
+        {
+            get
+            {
+                if (!hasValue)
+                {
+                    return new(new AxisData(), new AxisData());
+                }
+
+                (AxisData x, AxisData y) = type switch
+                {
+                    Type.Int => (intValue, intValue),
+                    Type.Float => (floatValue, floatValue),
+                    Type.FloatExpression => (floatExpressionValue, floatExpressionValue),
+                    Type.Float2 => (AxisData.FromFloat2(float2Value.x, float2Value.xUsed), AxisData.FromFloat2(float2Value.y, float2Value.yUsed)),
+                    Type.FloatExpression2 => (AxisData.FromExpression2(floatExpression2Value.x), AxisData.FromExpression2(floatExpression2Value.y)),
+                    _ => (new AxisData(), new AxisData())
+                };
+
+                return new(x, y);
+            }
+        }
+
         private readonly int intValue;
         private readonly float floatValue;
+        private readonly FloatExpression floatExpressionValue;
         private readonly Float2 float2Value;
+        private readonly FloatExpression2 floatExpression2Value;
         private readonly Type type;
+        private readonly bool hasValue;
+
+        private readonly record struct AxisData(float Value, string Expression, AxisData.DataType Type, bool ForceInMultiValue)
+        {
+            public AxisData(float value, bool forceInMultiValue) : this(value, string.Empty, DataType.Value, forceInMultiValue) { }
+            public AxisData(float value) : this(value, forceInMultiValue: false) { }
+
+            public AxisData(string expression, bool forceInMultiValue) : this(0f, expression, DataType.Expression, forceInMultiValue) { }
+            public AxisData(string expression) : this(expression, forceInMultiValue: false) { }
+
+            public AxisData() : this(0f, string.Empty, DataType.None, ForceInMultiValue: false) { }
+
+            public override string ToString()
+                => Type switch
+                {
+                    DataType.None => string.Empty,
+                    DataType.Expression => Expression,
+                    DataType.Value => Value.ToString(),
+                    DataType.Float2Value => ForceInMultiValue ? Value.ToString() : string.Empty,
+                    _ => string.Empty
+                };
+
+            public static AxisData FromFloat2(float value, bool used)
+                => new(value, string.Empty, DataType.Float2Value, used);
+
+            public static AxisData FromExpression2(FloatExpression floatExpression)
+            {
+                if (floatExpression.isExpression)
+                {
+                    return new(floatExpression.exp, forceInMultiValue: !floatExpression.exp.IsNullOrEmpty());
+                }
+
+                return new(floatExpression.num, forceInMultiValue: true);
+            }
+
+            public static AxisOperationResult operator +(AxisData left, AxisData right) => new('+', left, right);
+
+            public static implicit operator AxisData(float value) => new(value);
+            public static implicit operator AxisData(string expression) => new(expression);
+            public static implicit operator AxisData(FloatExpression floatExpression)
+                => floatExpression.isExpression ? floatExpression.exp : floatExpression.num;
+
+            public enum DataType
+            {
+                None,
+                Value,
+                Float2Value,
+                Expression
+            }
+        }
+
+        private readonly record struct ConvertibleData(AxisData X, AxisData Y)
+        {
+            /// <summary>
+            /// Intended to be used by primitives, where X == Y
+            /// </summary>
+            public AxisData Simple => X;
+        }
+
+        private readonly record struct AxisOperationResult(char Operator, in AxisData Left, in AxisData Right)
+        {
+            public float Value => Operator switch
+            {
+                '+' => Left.Value + Right.Value,
+                _ => 0f
+            };
+
+            public string Expression
+            {
+                get
+                {
+                    var lhs = Left.ToString();
+                    var rhs = Right.ToString();
+
+                    if (lhs.IsNullOrEmpty() && rhs.IsNullOrEmpty())
+                    {
+                        return string.Empty;
+                    }
+                    else if (lhs.IsNullOrEmpty())
+                    {
+                        return rhs;
+                    }
+                    else if (rhs.IsNullOrEmpty())
+                    {
+                        return lhs;
+                    }
+
+                    return $"({lhs}){Operator}({rhs})";
+                }
+            }
+        }
 
         private enum Type
         {
             Int,
             Float,
-            Float2
+            FloatExpression,
+            Float2,
+            FloatExpression2,
+        }
+        
+        /// <summary>
+        /// Straight copy from <see cref="Node.GetBestFitFor(Node.Type, Node.Type)"/> but whatever
+        /// </summary>
+        private static Type GetBestFitFor(Type left, Type right)
+        {
+            if (left == Type.FloatExpression2 || right == Type.FloatExpression2)
+            {
+                return Type.FloatExpression2;
+            }
+            else if ((left == Type.FloatExpression && right == Type.Float2)
+                || (left == Type.Float2 && right == Type.FloatExpression))
+            {
+                return Type.FloatExpression2;
+            }
+
+            return (Type)Math.Max((int)left, (int)right);
         }
     }
-
-    //public readonly struct MathConvertible
-    //{
-    //    public readonly override string ToString()
-    //    {
-    //        return value.ToString();
-    //    }
-
-    //    // The integer type is the "least powerful" of them all, so it's best fit for a default value
-    //    public MathConvertible() : this(new IntegerValue(0)) { }
-
-    //    public object Value => value.UnderlyingValue;
-
-    //    public static MathConvertible operator +(MathConvertible a, MathConvertible b) => new(a.value.Add(b.value));
-
-    //    public static object Convert(object value)
-    //    {
-    //        if (value is int integer)
-    //        {
-    //            return new MathConvertible(new IntegerValue(integer));
-    //        }
-    //        else if (value is float single)
-    //        {
-    //            return new MathConvertible(new SingleValue(single));
-    //        }
-    //        else if (value is Float2 float2)
-    //        {
-    //            return new MathConvertible(new Float2Value(float2));
-    //        }
-
-    //        return value;
-    //    }
-
-    //    private MathConvertible(IValue value)
-    //    {
-    //        this.value = value;
-    //    }
-
-    //    private readonly IValue value;
-
-    //    private readonly record struct SingleValue(float Value) : IValue
-    //    {
-    //        public object UnderlyingValue => Value;
-
-    //        public IValue Add(IValue secondary)
-    //        {
-    //            if (secondary is SingleValue single)
-    //            {
-    //                return new SingleValue(Value + single.Value);
-    //            }
-    //            else if (secondary is IntegerValue integer)
-    //            {
-    //                return new SingleValue(Value + integer.Value);
-    //            }
-    //            else if (secondary is Float2Value float2)
-    //            {
-    //                return new Float2Value(Value + float2.Value.x, Value + float2.Value.y);
-    //            }
-
-    //            return default;
-    //        }
-    //    }
-
-    //    private readonly record struct IntegerValue(int Value) : IValue
-    //    {
-    //        public object UnderlyingValue => Value;
-
-    //        public IValue Add(IValue secondary)
-    //        {
-    //            if (secondary is SingleValue single)
-    //            {
-    //                return new SingleValue(Value + single.Value);
-    //            }
-    //            else if (secondary is IntegerValue integer)
-    //            {
-    //                return new IntegerValue(Value + integer.Value);
-    //            }
-    //            else if (secondary is Float2Value float2)
-    //            {
-    //                return new Float2Value(Value + float2.Value.x, Value + float2.Value.y);
-    //            }
-
-    //            return default;
-    //        }
-    //    }
-
-    //    private readonly record struct Float2Value(Float2 Value) : IValue
-    //    {
-    //        public Float2Value(float x, float y) : this(new(x, y)) { }
-
-    //        public object UnderlyingValue => Value;
-
-    //        public IValue Add(IValue secondary)
-    //        {
-    //            if (secondary is SingleValue single)
-    //            {
-    //                return new Float2Value(single.Value + Value.x, single.Value + Value.y);
-    //            }
-    //            else if (secondary is IntegerValue integer)
-    //            {
-    //                return new Float2Value(integer.Value + Value.x, integer.Value + Value.y);
-    //            }
-    //            else if (secondary is Float2Value float2)
-    //            {
-    //                return new Float2Value(Value + float2.Value);
-    //            }
-
-    //            return default;
-    //        }
-    //    }
-
-    //    private interface IValue
-    //    {
-    //        object UnderlyingValue { get; }
-    //        IValue Add(IValue secondary);
-    //    }
-    //}
 }

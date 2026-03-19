@@ -78,6 +78,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         public static Type GetBestFitFor(Type a, Type b)
         {
+            if (a == Type.FloatExpression2 || b == Type.FloatExpression2)
+            {
+                return Type.FloatExpression2;
+            }
+            else if ((a == Type.FloatExpression && b == Type.Float2)
+                || (a == Type.Float2 && b == Type.FloatExpression))
+            {
+                return Type.FloatExpression2;
+            }
+
             return (Type)Math.Max((int)a, (int)b);
         }
 
@@ -317,8 +327,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
                 Convertible(TypeConvertible.Math)] Int32,
             [ConnectorColor("00FF00"), VariableType<FloatNodeVariable>,
                 Convertible(TypeConvertible.Math)] Single,
+            [ConnectorColor("8080FF"), VariableType<FloatExpressionNodeVariable>,
+                Convertible(TypeConvertible.Math)] FloatExpression,
             [ConnectorColor("00FF80"), VariableType<Float2NodeVariable>,
                 Convertible(TypeConvertible.Math)] Float2,
+            [ConnectorColor("FF80FF"), VariableType<FloatExpression2NodeVariable>,
+                Convertible(TypeConvertible.Math)] FloatExpression2,
 
             [ConnectorColor("FFFF00"), VariableType<StringNodeVariable>] String,
             [ConnectorColor("FF0000"), VariableType<BooleanNodeVariable>] Boolean,

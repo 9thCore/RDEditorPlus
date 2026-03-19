@@ -38,7 +38,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     GameObject constants = CreateDropdown("Constant");
                     AddButton(constants.transform, "Int", instance.CreateNode<Node_IntConstant>);
                     AddButton(constants.transform, "Float", instance.CreateNode<Node_FloatConstant>);
+                    AddButton(constants.transform, "Expression", instance.CreateNode<Node_FloatExpressionConstant>);
                     AddButton(constants.transform, "Float2", instance.CreateNode<Node_Float2Constant>);
+                    AddButton(constants.transform, "Expression2", instance.CreateNode<Node_FloatExpression2Constant>);
 
                     AddCategoryButton(transform, "Constant", constants);
                     #endregion
