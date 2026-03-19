@@ -18,8 +18,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Mat
                 MathOperation.Divide => value1 / value2,
                 _ => value1
             };
-
-            Plugin.LogInfo($"{operation}: [{value1}], [{value2}] => [{value}]");
         }
 
         [Variable<MathOperation>]
