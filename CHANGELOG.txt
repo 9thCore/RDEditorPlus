@@ -1,1 +1,3 @@
-- Fix NRE if editing a sound event's conditionals with the MultiEdit patch
+- Fix compilation for new beta
+- Fix RDLevelData constructor exception
+- Fix SetVFXPreset bloom fix exception
