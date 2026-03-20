@@ -10,7 +10,7 @@ namespace RDEditorPlus.Patch
 {
     internal static class Patch_RDLevelData
     {
-        [HarmonyPatch(typeof(RDLevelData), MethodType.Constructor, [typeof(Dictionary<string, object>), typeof(bool), typeof(bool)])]
+        [HarmonyPatch(typeof(RDLevelData), MethodType.Constructor, [typeof(Dictionary<string, object>), typeof(bool), typeof(bool), typeof(bool)])]
         private static class ctor
         {
             private static void Postfix(Dictionary<string, object> rootDict)
