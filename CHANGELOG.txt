@@ -1,0 +1,3 @@
+- Fix compilation for new beta
+- Fix RDLevelData constructor exception
+- Fix SetVFXPreset bloom fix exception

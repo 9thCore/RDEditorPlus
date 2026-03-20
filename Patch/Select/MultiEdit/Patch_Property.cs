@@ -66,8 +66,8 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                 {
                     InspectorPanel inspectorPanel = __result.control.inspectorPanel;
 
-                    __result.button.onClick.RemoveAllListeners();
-                    __result.button.onClick.AddListener(() =>
+                    __result.labelButton.onClick.RemoveAllListeners();
+                    __result.labelButton.onClick.AddListener(() =>
                     {
                         LevelEventControl_Base currentControl = scnEditor.instance.selectedControls[0];
 

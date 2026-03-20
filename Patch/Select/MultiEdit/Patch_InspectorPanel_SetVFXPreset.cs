@@ -52,7 +52,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             private static void ILManipulator(ILContext il)
             {
                 const int bloomVFXIndex = (int)RDThemeFX.Bloom;
-                const byte inputFieldPropertyLocalIndex = 7;
+                const byte inputFieldPropertyLocalIndex = 10;
 
                 ILCursor cursor = new(il);
 
@@ -66,11 +66,11 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                         if (float.TryParse(inputField.inputField.text, out float value))
                         {
                             float clamped = Mathf.Clamp(value, -5f, 5f);
-                            inputField.inputField.text = value.ToString();
 
                             foreach (LevelEventControl_Base eventControl in scnEditor.instance.selectedControls)
                             {
-                                if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent)
+                                if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent
+                                && vfxEvent.intensity.HasValue)
                                 {
                                     vfxEvent.intensity = vfxEvent.preset == RDThemeFX.Bloom ? clamped : value;
                                 }
@@ -83,7 +83,10 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                                 if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent
                                 && vfxEvent.preset == RDThemeFX.Bloom)
                                 {
-                                    vfxEvent.intensity = Mathf.Clamp(vfxEvent.intensity, -5f, 5f);
+                                    if (vfxEvent.intensity.HasValue)
+                                    {
+                                        vfxEvent.intensity = Mathf.Clamp(vfxEvent.intensity.Value, -5f, 5f);
+                                    }
                                 }
                             }
                         }

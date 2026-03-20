@@ -2,6 +2,7 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.MultiEdit;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
@@ -151,7 +152,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             {
                 if (__instance.conditionalsPanel.showingListPanel)
                 {
-                    __instance.conditionalsPanel.ShowListPanel(visible: true);
+                    MultiEditManager.Instance.ApplyConditionalButtonThings(__instance.conditionalsPanel);
                 }
             }
         }

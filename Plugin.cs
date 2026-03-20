@@ -14,7 +14,11 @@ namespace RDEditorPlus
         public const string RDModificationsMaskName = "RDM";
 
         public static Plugin Instance;
-        internal static new ManualLogSource Logger;
+        
+        /// <summary>
+        /// Preferably, use the Log methods instead
+        /// </summary>
+        public static new ManualLogSource Logger;
 
         public static void LogWarn(object message)
         {
