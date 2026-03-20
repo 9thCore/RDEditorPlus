@@ -83,7 +83,14 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
                                 if (eventControl.levelEvent is LevelEvent_SetVFXPreset vfxEvent
                                 && vfxEvent.preset == RDThemeFX.Bloom)
                                 {
-                                    vfxEvent.intensity = Mathf.Clamp(vfxEvent.intensity, -5f, 5f);
+                                    //if (vfxEvent.intensity.HasValue)
+                                    //{
+                                    //    vfxEvent.intensity = Mathf.Clamp(vfxEvent.intensity.Value, -5f, 5f);
+                                    //}
+                                    //else
+                                    //{
+                                    //    vfxEvent.intensity = 0f;
+                                    //}
                                 }
                             }
                         }
