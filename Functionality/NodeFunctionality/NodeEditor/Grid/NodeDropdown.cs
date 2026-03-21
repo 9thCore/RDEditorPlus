@@ -3,6 +3,7 @@ using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Constan
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Events;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.FileIO;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Maths;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Rows;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Sprites;
 using RDEditorPlus.Util;
 using RDLevelEditor;
@@ -57,6 +58,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     AddButton(sprites.transform, "Merge Sprites", instance.CreateNode<Node_MergeSprites>);
 
                     AddCategoryButton(transform, "Sprites", sprites);
+                    #endregion
+
+                    #region rows
+                    GameObject rows = CreateDropdown("Row");
+                    AddButton(rows.transform, "Merge Rows", instance.CreateNode<Node_MergeRows>);
+
+                    AddCategoryButton(transform, "Rows", rows);
                     #endregion
 
                     #region events

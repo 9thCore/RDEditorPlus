@@ -1,4 +1,5 @@
-﻿using RDLevelEditor;
+﻿using RDEditorPlus.Util;
+using RDLevelEditor;
 using System;
 using System.Collections.Generic;
 
@@ -30,13 +31,25 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
         public readonly RDLevelEvents WithBarFilter(int start, int end)
         {
             changes.Add(new BarFilterEventsChange(start, end));
-            return new(events, changes, changesToPerform + 1);
+            return Next;
         }
 
         public readonly RDLevelEvents WithTabFilter(bool sounds, bool rows, bool actions, bool sprites, bool rooms, bool windows)
         {
             changes.Add(new TabFilterEventsChange(TabFilterEventsChange.GetFlagFrom(sounds, rows, actions, sprites, rooms, windows)));
-            return new(events, changes, changesToPerform + 1);
+            return Next;
+        }
+
+        public readonly RDLevelEvents WithRowMapping(int[] map)
+        {
+            changes.Add(new RowMapEventsChange(map));
+            return Next;
+        }
+
+        public readonly RDLevelEvents WithRowOffset(int offset)
+        {
+            changes.Add(new RowOffsetEventsChange(offset));
+            return Next;
         }
 
         public static implicit operator RDLevelEvents(List<LevelEvent_Base> events) => new(events);
@@ -52,6 +65,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
         private readonly IReadOnlyList<LevelEvent_Base> events;
         private readonly List<IEventsChange> changes;
         private readonly int changesToPerform;
+
+        private readonly RDLevelEvents Next => new(events, changes, changesToPerform + 1);
 
         private interface IEventsChange
         {
@@ -110,6 +125,34 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                     Tab.Windows => TabFlag.Windows,
                     _ => TabFlag.None
                 };
+            }
+        }
+
+        private readonly struct RowMapEventsChange(int[] map) : IEventsChange
+        {
+            public void Apply(ref List<LevelEvent_Base> events)
+            {
+                foreach (var levelEvent in events)
+                {
+                    if (levelEvent.info.usesRow)
+                    {
+                        levelEvent.row = map[levelEvent.row];
+                    }
+                }
+            }
+        }
+
+        private readonly struct RowOffsetEventsChange(int offset) : IEventsChange
+        {
+            public void Apply(ref List<LevelEvent_Base> events)
+            {
+                foreach (var levelEvent in events)
+                {
+                    if (levelEvent.info.usesRow)
+                    {
+                        levelEvent.row += offset;
+                    }
+                }
             }
         }
     }

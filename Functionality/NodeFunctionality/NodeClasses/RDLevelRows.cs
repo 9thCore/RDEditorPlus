@@ -7,6 +7,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
     {
         public RDLevelRows() : this(null) { }
 
+        public List<LevelEvent_MakeRow> Collect() => this;
+
         public readonly IReadOnlyList<LevelEvent_MakeRow> Rows = rows.AsReadOnly();
 
         public static implicit operator List<LevelEvent_MakeRow>(RDLevelRows instance)
