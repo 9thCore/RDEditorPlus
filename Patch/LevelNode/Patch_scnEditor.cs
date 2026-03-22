@@ -1,9 +1,9 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.Functionality.LevelMerger;
+using RDEditorPlus.Functionality.LevelNode;
 using RDLevelEditor;
 using UnityEngine;
 
-namespace RDEditorPlus.Patch.LevelMerger
+namespace RDEditorPlus.Patch.LevelNode
 {
     internal static class Patch_scnEditor
     {
@@ -14,7 +14,7 @@ namespace RDEditorPlus.Patch.LevelMerger
             {
                 if (RDEditorUtils.CheckForKeyCombo(false, false, KeyCode.R))
                 {
-                    MergerPanelHolder.Instance.Toggle(true);
+                    LevelNodePanelHolder.Instance.Toggle(true);
                 }
             }
         }

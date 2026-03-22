@@ -1,9 +1,9 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 
-namespace RDEditorPlus.Functionality.LevelMerger
+namespace RDEditorPlus.Functionality.LevelNode
 {
-    public class MergeNodeDataRoot : NodeDataRoot
+    public class LevelNodeDataRoot : NodeDataRoot
     {
 
     }

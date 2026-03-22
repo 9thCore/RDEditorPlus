@@ -56,14 +56,14 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
                     #region sprites
                     GameObject sprites = CreateDropdown("Sprite");
-                    AddButton(sprites.transform, "Merge Sprites", instance.CreateNode<Node_MergeSprites>);
+                    AddButton(sprites.transform, "Merge", instance.CreateNode<Node_MergeSprites>);
 
                     AddCategoryButton(transform, "Sprites", sprites);
                     #endregion
 
                     #region rows
                     GameObject rows = CreateDropdown("Row");
-                    AddButton(rows.transform, "Merge Rows", instance.CreateNode<Node_MergeRows>);
+                    AddButton(rows.transform, "Merge", instance.CreateNode<Node_MergeRows>);
 
                     AddCategoryButton(transform, "Rows", rows);
                     #endregion
@@ -72,14 +72,14 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     GameObject events = CreateDropdown("Event");
                     AddButton(events.transform, "Bar Filter", instance.CreateNode<Node_BarFilter>);
                     AddButton(events.transform, "Tab Filter", instance.CreateNode<Node_TabFilter>);
-                    AddButton(events.transform, "Merge Events", instance.CreateNode<Node_MergeEvents>);
+                    AddButton(events.transform, "Merge", instance.CreateNode<Node_MergeEvents>);
 
                     AddCategoryButton(transform, "Events", events);
                     #endregion
 
                     #region conditionals
                     GameObject conditionals = CreateDropdown("Conditional");
-                    AddButton(conditionals.transform, "Merge Conditionals", instance.CreateNode<Node_MergeConditionals>);
+                    AddButton(conditionals.transform, "Merge", instance.CreateNode<Node_MergeConditionals>);
 
                     AddCategoryButton(transform, "Conditionals", conditionals);
                     #endregion
@@ -88,7 +88,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     GameObject math = CreateDropdown("Math");
                     AddButton(math.transform, "Binary", instance.CreateNode<Node_MathBinary>);
 
-                    AddCategoryButton(transform, "Math", math);
+                    //AddCategoryButton(transform, "Math", math);
                     #endregion
 
                     GameObject blocker = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeDropdown)}_Blocker");
