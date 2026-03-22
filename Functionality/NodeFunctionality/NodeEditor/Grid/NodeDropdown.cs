@@ -51,7 +51,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     AddCategoryButton(constants.transform, "Math", constants_math);
                     #endregion
 
-                    AddCategoryButton(transform, "Constant", constants);
+                    //AddCategoryButton(transform, "Constant", constants);
                     #endregion
 
                     #region sprites
