@@ -321,13 +321,14 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
 
         private static GameObject GetPrefab(Node.Type type)
         {
-            if (prefabCache.TryGetValue(type, out var prefab))
+            if (prefabCache.TryGetValue(type, out var prefab)
+                && prefab != null)
             {
                 return prefab;
             }
 
             prefab = SetupConnector(BaseConnectorPrefab, type);
-            prefabCache.Add(type, prefab);
+            prefabCache[type] = prefab;
             return prefab;
         }
 
