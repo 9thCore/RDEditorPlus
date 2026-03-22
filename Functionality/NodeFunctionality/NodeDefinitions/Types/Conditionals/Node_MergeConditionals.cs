@@ -14,7 +14,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Con
             // Conditionals are 1-indexed
             // This might leave gaps in the indices, but filling them is a pain in the ass
             // (and this mod isn't intended for optimising levels, anyway)
-            int offset = list1.Max(conditional => conditional.id);
+            int offset = list1.Any() ? list1.Max(conditional => conditional.id) : 0;
 
             var list2 = conditionals2.Collect();
             foreach (var conditional in list2)
