@@ -10,7 +10,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Con
         }
 
         [Variable]
-        public FloatExpression value;
+        public FloatExpression value = FloatExpression.EmptyInput();
 
         [Output("value")]
         public FloatExpression output;
