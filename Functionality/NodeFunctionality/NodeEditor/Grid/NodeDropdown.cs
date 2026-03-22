@@ -124,7 +124,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             where T : Node_Base
         {
             string name = typeof(T).Name.Substring("Node_".Length);
-            grid.AddNodeAtPointerPosition(name, Input.mousePosition);
+            grid.AddNodeAtPointerPosition(name, transform.position);
 
             CurrentSubtree.SetActive(false);
             blocker.gameObject.SetActive(false);

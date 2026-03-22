@@ -13,12 +13,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             this.target = target;
         }
 
-        public override void OnPointerClick(PointerEventData eventData)
+        public override void OnPointerClick(PointerEventData _)
         {
             parent.SetActive(false);
             target.SetActive(true);
 
-            target.transform.position = eventData.position;
+            target.transform.position = dropdown.transform.position;
             target.transform.SetAsLastSibling();
             dropdown.CurrentSubtree = target;
         }
