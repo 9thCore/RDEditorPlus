@@ -81,7 +81,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     GameObject conditionals = CreateDropdown("Conditional");
                     AddButton(conditionals.transform, "Merge", instance.CreateNode<Node_MergeConditionals>);
 
-                    AddCategoryButton(transform, "Conditionals", conditionals);
+                    AddCategoryButton(transform, "Conditions", conditionals);
                     #endregion
 
                     #region math
