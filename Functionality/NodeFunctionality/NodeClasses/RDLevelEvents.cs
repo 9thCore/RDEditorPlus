@@ -7,9 +7,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
 {
     public readonly struct RDLevelEvents
     {
-        public RDLevelEvents() : this(null, [], 0) { }
+        public RDLevelEvents() : this(null, null) { }
 
-        public RDLevelEvents(List<LevelEvent_Base> events) : this(events.AsReadOnly(), new(), 0) { }
+        public RDLevelEvents(List<LevelEvent_Base> events) : this(events.AsReadOnly(), null) { }
 
         public readonly List<LevelEvent_Base> Apply()
         {
@@ -20,59 +20,55 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
 
             List<LevelEvent_Base> copy = [.. events];
 
-            for (int i = 0; i < changesToPerform; i++)
+            if (changes != null)
             {
-                changes[i].Apply(ref copy);
+                foreach (var change in changes)
+                {
+                    change.Apply(ref copy);
+                }
             }
 
             return copy;
         }
 
         public readonly RDLevelEvents WithBarFilter(int start, int end)
-        {
-            changes.Add(new BarFilterEventsChange(start, end));
-            return Next;
-        }
+            => WithChange(new BarFilterEventsChange(start, end));
 
         public readonly RDLevelEvents WithTabFilter(bool sounds, bool rows, bool actions, bool sprites, bool rooms, bool windows)
-        {
-            changes.Add(new TabFilterEventsChange(TabFilterEventsChange.GetFlagFrom(sounds, rows, actions, sprites, rooms, windows)));
-            return Next;
-        }
+            => WithChange(new TabFilterEventsChange(TabFilterEventsChange.GetFlagFrom(sounds, rows, actions, sprites, rooms, windows)));
 
         public readonly RDLevelEvents WithRowMapping(int[] map)
-        {
-            changes.Add(new RowMapEventsChange(map));
-            return Next;
-        }
+            => WithChange(new RowMapEventsChange(map));
 
         public readonly RDLevelEvents WithRowOffset(int offset)
-        {
-            changes.Add(new RowOffsetEventsChange(offset));
-            return Next;
-        }
+            => WithChange(new RowOffsetEventsChange(offset));
 
         public readonly RDLevelEvents WithConditionalOffset(int offset)
-        {
-            changes.Add(new ConditionalOffsetEventsChange(offset));
-            return Next;
-        }
+            => WithChange(new ConditionalOffsetEventsChange(offset));
 
         public static implicit operator RDLevelEvents(List<LevelEvent_Base> events) => new(events);
         public static implicit operator List<LevelEvent_Base>(RDLevelEvents instance) => instance.Apply();
 
-        private RDLevelEvents(IReadOnlyList<LevelEvent_Base> events, List<IEventsChange> changes, int changesToPerform)
+        private RDLevelEvents(IReadOnlyList<LevelEvent_Base> events, IReadOnlyList<IEventsChange> changes)
         {
             this.events = events;
             this.changes = changes;
-            this.changesToPerform = changesToPerform;
         }
 
         private readonly IReadOnlyList<LevelEvent_Base> events;
-        private readonly List<IEventsChange> changes;
-        private readonly int changesToPerform;
+        private readonly IReadOnlyList<IEventsChange> changes;
 
-        private readonly RDLevelEvents Next => new(events, changes, changesToPerform + 1);
+        private readonly RDLevelEvents WithChange<T>(T instance) where T : IEventsChange
+        {
+            if (changes == null)
+            {
+                return new(events, [instance]);
+            }
+
+            List<IEventsChange> nextChanges = [.. changes];
+            nextChanges.Add(instance);
+            return new(events, nextChanges.AsReadOnly());
+        }
 
         private interface IEventsChange
         {
