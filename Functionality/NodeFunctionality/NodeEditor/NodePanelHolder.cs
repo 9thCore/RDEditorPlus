@@ -20,6 +20,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
     public abstract class NodePanelHolder : INodeWorkspace, ISerializableNodeWorkspace
     {
         public abstract string DefaultFilename { get; }
+        public abstract string FileDescription { get; }
+        public abstract string SaveFileText { get; }
+        public abstract string LoadFileText { get; }
         public abstract string[] Extensions { get; }
 
         protected abstract Task SaveAsync();
@@ -77,9 +80,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
                 string location = FileBrowser.SaveFile(
                     scnEditor.GetLastUsedFolder(),
                     DefaultFilename,
-                    "Rhythm Doctor level merge data",
+                    FileDescription,
                     Extensions,
-                    "Save level merge data");
+                    SaveFileText);
 
                 if (location.IsNullOrEmpty())
                 {
@@ -106,9 +109,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
 
             string location = FileBrowser.PickFile(
                     scnEditor.GetLastUsedFolder(),
-                    "Rhythm Doctor level merge data",
+                    FileDescription,
                     Extensions,
-                    "Load level merge data");
+                    LoadFileText);
 
             if (location.IsNullOrEmpty())
             {
