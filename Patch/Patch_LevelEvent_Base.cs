@@ -1,8 +1,11 @@
 ﻿using HarmonyLib;
+using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace RDEditorPlus.Patch
 {
@@ -40,6 +43,27 @@ namespace RDEditorPlus.Patch
 
                 builder.Insert(0, __result);
                 __result = builder.ToString();
+            }
+        }
+
+        [HarmonyPatch(typeof(LevelEvent_Base), nameof(LevelEvent_Base.DecodeTargetId))]
+        private static class DecodeTargetId
+        {
+            private static void ILManipulator(ILContext il)
+            {
+                ILCursor cursor = new(il);
+
+                cursor
+                    .GotoNext(MoveType.Before, instruction => instruction.MatchCall<Debug>(nameof(Debug.LogWarning)))
+                    .Next.Operand = AccessTools.Method(typeof(DecodeTargetId), nameof(ConditionalWarn));
+            }
+
+            private static void ConditionalWarn(string text)
+            {
+                if (!LevelUtil.DisableTargetIDWarning)
+                {
+                    Debug.LogWarning(text);
+                }
             }
         }
     }

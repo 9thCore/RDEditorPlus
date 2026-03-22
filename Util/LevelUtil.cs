@@ -9,6 +9,8 @@ namespace RDEditorPlus.Util
 {
     public static class LevelUtil
     {
+        public static bool DisableTargetIDWarning { get; private set; } = false;
+
         public static bool TryLevelLoad(string path,
             out RDLevelSettings settings,
             out List<LevelEvent_MakeRow> rows,
@@ -39,6 +41,8 @@ namespace RDEditorPlus.Util
             conditionals = [];
             bookmarks = [];
             palette = RDEditorConstants.defaultColorPalette;
+
+            DisableTargetIDWarning = true;
 
             try
             {
@@ -104,12 +108,14 @@ namespace RDEditorPlus.Util
                     palette = [.. paletteList.Select(color => color.ToString())];
                 }
 
+                DisableTargetIDWarning = false;
                 return true;
             }
             catch (Exception ex)
             {
                 Plugin.LogError($"Error loading level from {path}:\n{ex}");
 
+                DisableTargetIDWarning = false;
                 return false;
             }
         }
