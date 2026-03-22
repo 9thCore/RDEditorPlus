@@ -7,6 +7,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
     {
         public RDLevelConditionals() : this(null) { }
 
+        public List<Conditional> Collect() => this;
+
         public readonly IReadOnlyList<Conditional> Conditionals = conditionals.AsReadOnly();
 
         public static implicit operator List<Conditional>(RDLevelConditionals instance)

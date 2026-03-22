@@ -52,6 +52,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
             return Next;
         }
 
+        public readonly RDLevelEvents WithConditionalOffset(int offset)
+        {
+            changes.Add(new ConditionalOffsetEventsChange(offset));
+            return Next;
+        }
+
         public static implicit operator RDLevelEvents(List<LevelEvent_Base> events) => new(events);
         public static implicit operator List<LevelEvent_Base>(RDLevelEvents instance) => instance.Apply();
 
@@ -151,6 +157,23 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                     if (levelEvent.info.usesRow)
                     {
                         levelEvent.row += offset;
+                    }
+                }
+            }
+        }
+
+        private readonly struct ConditionalOffsetEventsChange(int offset) : IEventsChange
+        {
+            public void Apply(ref List<LevelEvent_Base> events)
+            {
+                foreach (var levelEvent in events)
+                {
+                    if (levelEvent.conditionals != null)
+                    {
+                        for (int i = levelEvent.conditionals.Count - 1; i >= 0; i--)
+                        {
+                            levelEvent.conditionals[i] += Math.Sign(levelEvent.conditionals[i]) * offset;
+                        }
                     }
                 }
             }
