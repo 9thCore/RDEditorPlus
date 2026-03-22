@@ -1,5 +1,6 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeClasses;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes;
+using System.Linq;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Sprites
 {
@@ -8,7 +9,20 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Spr
         public override void PostDeserialise()
         {
             var list = input1.Collect();
-            list.AddRange(input2.Collect());
+
+            var list2 = input2.Collect();
+            foreach (var sprite in list2)
+            {
+                if (list.Any(spr => spr.spriteId == sprite.spriteId))
+                {
+                    Plugin.LogInfo($"Sprite of same ID '{sprite.spriteId}' found in both inputs, discarding second instance.\n(Make the sprite IDs unique with the Sprites/Ensure Unique node if this is not desired!)");
+                }
+                else
+                {
+                    list.Add(sprite);
+                }
+            }
+
             output = list;
         }
 

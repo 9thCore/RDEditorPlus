@@ -25,7 +25,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
                 return;
             }
 
-            MakeSpriteIdentifiersUnique(sprites, events);
+            // MakeSpriteIdentifiersUnique(sprites, events);
             RemapFloatingText(events);
 
             this.settings = settings;

@@ -57,6 +57,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     #region sprites
                     GameObject sprites = CreateDropdown("Sprite");
                     AddButton(sprites.transform, "Merge", instance.CreateNode<Node_MergeSprites>);
+                    AddButton(sprites.transform, "Ensure Unique", instance.CreateNode<Node_EnsureUniqueSprites>);
 
                     AddCategoryButton(transform, "Sprites", sprites);
                     #endregion

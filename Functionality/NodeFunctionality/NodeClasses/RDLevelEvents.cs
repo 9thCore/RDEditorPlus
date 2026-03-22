@@ -46,6 +46,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
         public readonly RDLevelEvents WithConditionalOffset(int offset)
             => WithChange(new ConditionalOffsetEventsChange(offset));
 
+        public readonly RDLevelEvents WithUniqueSpriteIDs(int postfix)
+            => WithChange(new UniqueSpriteIDsEventsChange(postfix));
+
         public static implicit operator RDLevelEvents(List<LevelEvent_Base> events) => new(events);
         public static implicit operator List<LevelEvent_Base>(RDLevelEvents instance) => instance.Apply();
 
@@ -170,6 +173,20 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
                         {
                             levelEvent.conditionals[i] += Math.Sign(levelEvent.conditionals[i]) * offset;
                         }
+                    }
+                }
+            }
+        }
+
+        private readonly struct UniqueSpriteIDsEventsChange(int postfix) : IEventsChange
+        {
+            public void Apply(ref List<LevelEvent_Base> events)
+            {
+                foreach (var levelEvent in events)
+                {
+                    if (!levelEvent.target.IsNullOrEmpty())
+                    {
+                        levelEvent.target = $"{levelEvent.target}{postfix}";
                     }
                 }
             }
