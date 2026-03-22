@@ -20,9 +20,9 @@ namespace RDEditorPlus.Functionality.LevelNode
         }
 
         public override string DefaultFilename => "level";
-        public override string FileDescription => "Rhythm Doctor level merge data";
-        public override string SaveFileText => "Save level merge data";
-        public override string LoadFileText => "Load level merge data";
+        public override string FileDescription => "Rhythm Doctor level node editor data";
+        public override string SaveFileText => "Save level node editor data";
+        public override string LoadFileText => "Load level node editor data";
         public override string[] Extensions => ["rdlevelnode"];
 
         protected LevelNodePanelHolder()
