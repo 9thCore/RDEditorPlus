@@ -223,12 +223,18 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             var clone = Object.Instantiate(template);
             clone.name = $"Mod_{MyPluginInfo.PLUGIN_GUID}_{GetType().Name}";
 
-            var transform = clone.transform;
+            var offset = new Vector2(16f, 10f);
+
+            var transform = clone.transform as RectTransform;
+            transform.offsetMin -= offset;
+            transform.offsetMax += offset;
 
             transform.SetParent(templateTransform.parent);
             transform.localPosition = templateTransform.localPosition;
             transform.localRotation = templateTransform.localRotation;
             transform.localScale = templateTransform.localScale;
+
+            (transform.Find("Image").transform as RectTransform).anchoredPosition += offset;
 
             var popup = clone.GetComponent<RDPublishPopup>();
             popup.enabled = false;
