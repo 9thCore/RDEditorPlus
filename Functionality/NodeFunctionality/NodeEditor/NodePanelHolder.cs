@@ -35,8 +35,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
                 view.Reset();
             }
 
-            Vector3 start = show ? Vector3.zero : Vector3.one;
-            Vector3 end = show ? Vector3.one : Vector3.zero;
+            Vector3 start = show ? Vector3.zero : DesiredScale;
+            Vector3 end = show ? DesiredScale : Vector3.zero;
 
             float time = show ? RDConstants.data.roomsSelectionPopup_showAnimDuration : RDConstants.data.roomsSelectionPopup_hideAnimDuration;
             Ease ease = show ? RDConstants.data.roomsSelectionPopup_showAnimEase : RDConstants.data.roomsSelectionPopup_hideAnimEase;
@@ -329,6 +329,18 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             Idle,
             Saving,
             Loading
+        }
+
+        private Vector3 DesiredScale
+        {
+            get
+            {
+                float windowScale = Screen.width / scrVfxControl.CanvasWidth;
+                float editorScale = scnEditor.instance.canvasScaler.scaleFactor;
+                float scale = windowScale / editorScale;
+
+                return Vector3.one * scale;
+            }
         }
 
         protected static GameObject CloneButton(Transform parent, string name, UnityAction call, Vector2 anchorMin, Vector2 anchorMax)
