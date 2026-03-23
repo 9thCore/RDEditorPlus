@@ -91,6 +91,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             var input = other as NodeInput;
 
             var connection = node.CreateConnection();
+            connection.SetColors(ValidControlColor);
             connection.SetAnchor(control);
             connection.SetEndPoint(other.control.position.xy());
             Link link = new(input, this, connection);

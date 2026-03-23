@@ -1,6 +1,4 @@
-﻿using RDEditorPlus.Util;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector
 {
@@ -13,18 +11,19 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             return instance.GetComponent<NodeConnection>();
         }
 
+        public void SetStartColor(Color color) => graphic.StartColor = color;
+        public void SetEndColor(Color color) => graphic.EndColor = color;
+        public void SetColors(Color color) => graphic.SetColors(color);
+
         public void SetAnchor(RectTransform anchor)
         {
             rectTransform.position = anchor.position;
             rectTransform.localEulerAngles = Vector3.zero;
-            line.localPosition = Vector3.zero;
         }
 
         public void SetEndPoint(Vector2 point)
         {
-            Vector2 delta = point - rectTransform.position.xy();
-            rectTransform.localEulerAngles = new(0f, 0f, -delta.GetAngle());
-            line.sizeDelta = new Vector2(delta.magnitude / rectTransform.lossyScale.x, line.sizeDelta.y);
+            graphic.SetEndPoint(point - rectTransform.position.xy());
         }
 
         public void Delete()
@@ -36,7 +35,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         private RectTransform rectTransform;
 
         [SerializeField]
-        private RectTransform line;
+        private NodeConnectionGraphic graphic;
 
         private const float Height = 1f;
 
@@ -49,23 +48,14 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                     prefab = new($"Mod_{MyPluginInfo.PLUGIN_GUID}_{nameof(NodeConnection)}");
                     prefab.SetActive(false);
 
-                    GameObject line = new("line");
+                    var prefabRT = prefab.AddComponent<RectTransform>();
 
-                    var rt2 = prefab.AddComponent<RectTransform>();
-                    rt2.pivot = new Vector2(0f, 0.5f);
-
-                    var image = line.AddComponent<Image>();
-                    image.raycastTarget = false;
-
-                    var rt = line.transform as RectTransform;
-                    rt.SetParent(rt2);
-                    rt.offsetMin = new Vector2(0f, -Height);
-                    rt.offsetMax = new Vector2(20f, Height);
-                    rt.pivot = new Vector2(0f, 0.5f);
+                    var graphic = prefab.AddComponent<NodeConnectionGraphic>();
+                    graphic.raycastTarget = false;
 
                     var connection = prefab.AddComponent<NodeConnection>();
-                    connection.rectTransform = rt2;
-                    connection.line = rt;
+                    connection.rectTransform = prefabRT;
+                    connection.graphic = graphic;
                 }
 
                 return prefab;
@@ -73,7 +63,5 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         }
 
         private static GameObject prefab;
-
-        private static readonly Vector3[] WorldCornerStorage = new Vector3[4];
     }
 }

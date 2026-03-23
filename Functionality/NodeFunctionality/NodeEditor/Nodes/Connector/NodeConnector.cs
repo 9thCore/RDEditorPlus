@@ -103,6 +103,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
     {
         public override void StartConnection()
         {
+            node.VirtualConnection.SetStartColor(ValidControlColor);
             node.VirtualConnection.SetAnchor(control);
             node.VirtualConnection.gameObject.SetActive(true);
 
@@ -194,6 +195,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         protected abstract void AddToNode(Node node, string description);
         protected abstract void PrefabSetup();
 
+        protected Color ValidControlColor => GetColor.ValidControl;
         protected void SetName(string text)
         {
             // epic line
