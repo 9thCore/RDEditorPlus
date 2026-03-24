@@ -2,10 +2,8 @@
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
-using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using RDLevelEditor;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
@@ -19,6 +17,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
 {
     public abstract class NodePanelHolder : INodeWorkspace, ISerializableNodeWorkspace
     {
+        public static NodePanelHolder CurrentPanel = null;
+
         public abstract string DefaultFilename { get; }
         public abstract string FileDescription { get; }
         public abstract string SaveFileText { get; }
@@ -33,6 +33,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             {
                 gameObject.SetActive(true);
                 view.Reset();
+                CurrentPanel = this;
+            }
+            else
+            {
+                CurrentPanel = null;
             }
 
             Vector3 start = show ? Vector3.zero : DesiredScale;
@@ -104,8 +109,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             {
                 return;
             }
-
-            scnEditor.PauseIfUnpaused();
 
             string location = FileBrowser.PickFile(
                     scnEditor.GetLastUsedFolder(),
@@ -186,7 +189,55 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
 
         public ISerializableNodeWorkspace.INode[] GetDependencyOrderedNodes() => view.GetDependencyOrderedNodes();
 
+        public void OnUpdate()
+        {
+            if (!scnEditor.instance.userIsEditingAnInputField)
+            {
+                InputUpdate();
+            }
+        }
+
         protected abstract void HandleDeserialization(Stream stream);
+
+        protected virtual void InputUpdate()
+        {
+            HaveAnyDefaultInputsPassed();
+        }
+
+        protected bool HaveAnyDefaultInputsPassed()
+        {
+            if (RDEditorUtils.CheckForKeyCombo(control: true, shift: false, KeyCode.N))
+            {
+                NewButtonClick();
+                return true;
+            }
+            else if (RDEditorUtils.CheckForKeyCombo(control: true, shift: false, KeyCode.O))
+            {
+                ScheduleLoad();
+                return true;
+            }
+            else if (RDEditorUtils.CheckForKeyCombo(control: true, shift: true, KeyCode.S))
+            {
+                ScheduleSave(forceAskForNewLocation: true);
+                return true;
+            }
+            else if (RDEditorUtils.CheckForKeyCombo(control: true, shift: false, KeyCode.S))
+            {
+                ScheduleSave(forceAskForNewLocation: false);
+                return true;
+            }
+            else if (RDEditorUtils.CheckForKeyCombo(control: true, shift: false, KeyCode.Z))
+            {
+                return true;
+            }
+            else if (RDEditorUtils.CheckForKeyCombo(control: true, shift: true, KeyCode.Z)
+                || RDEditorUtils.CheckForKeyCombo(control: true, shift: false, KeyCode.Y))
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         protected void SetLevelName()
         {

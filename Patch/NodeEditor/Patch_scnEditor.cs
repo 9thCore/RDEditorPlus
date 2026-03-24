@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
-using RDEditorPlus.Util;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor;
 using RDLevelEditor;
 
 namespace RDEditorPlus.Patch.NodeEditor
@@ -14,6 +14,27 @@ namespace RDEditorPlus.Patch.NodeEditor
             {
                 NodeLibrary.Instance.Prime();
             }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Update))]
+        private static class Update
+        {
+            private static bool Prefix()
+            {
+                if (NodePanelHolder.CurrentPanel == null)
+                {
+                    return true;
+                }
+
+                NodePanelHolder.CurrentPanel.OnUpdate();
+                return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.StartPlaying))]
+        private static class StartPlaying
+        {
+            private static bool Prefix() => NodePanelHolder.CurrentPanel == null;
         }
     }
 }
