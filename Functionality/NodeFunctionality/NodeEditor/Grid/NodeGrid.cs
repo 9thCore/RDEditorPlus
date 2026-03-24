@@ -3,6 +3,7 @@ using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using RDLevelEditor;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
@@ -230,6 +231,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             return orderedNodes;
         }
 
+        public void RegisterMoveNodeAction(Node node, Vector3 oldPosition, Vector3 currentPosition)
+            => RegisterAction(new MoveNodeAction(this, node.Id, (currentPosition - oldPosition).xy()));
+
         public void Undo() => this.DefaultUndo();
         public void Redo() => this.DefaultRedo();
         public void ClearUndo() => this.DefaultClearUndo();
@@ -324,23 +328,35 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         public const int GridSize = 6;
         private static Sprite gridSprite = null;
 
-        private record AddNodeAction(NodeGrid Grid, GameObject Prefab, string ID, Vector3 Position) : IUndoCapable.IAction
+        private record AddNodeAction(NodeGrid Grid, GameObject Prefab, string ID, Vector3 Position) : NodeTargettableAction(Grid, ID)
         {
-            public void OnRedo()
-            {
-                Grid.AddNode(Prefab, Position, ID, registerUndoEvent: false);
-            }
+            public override void OnRedo() => Grid.AddNode(Prefab, Position, ID, registerUndoEvent: false);
+            public override void OnUndo() => GetNode(node => node.Delete(dontDeleteFromGrid: false));
+        }
 
-            public void OnUndo()
+        private record MoveNodeAction(NodeGrid Grid, string ID, Vector2 DeltaPosition) : NodeTargettableAction(Grid, ID)
+        {
+            public override void OnRedo() => GetNode(node => node.Drag(DeltaPosition));
+            public override void OnUndo() => GetNode(node => node.Drag(-DeltaPosition));
+        }
+
+        private abstract record NodeTargettableAction(NodeGrid Grid, string ID) : IUndoCapable.IAction
+        {
+            public abstract void OnRedo();
+            public abstract void OnUndo();
+
+            protected void GetNode(Action<Node> callback)
             {
-                if (!Grid.TryGetNodeFromID(ID, out var result))
+                if (!TryGetNode(out var result))
                 {
                     Plugin.LogWarn($"Tried to undo {this}, but there was no node");
                     return;
                 }
 
-                result.Delete(dontDeleteFromGrid: false);
+                callback(result);
             }
+
+            protected bool TryGetNode(out Node result) => Grid.TryGetNodeFromID(ID, out result);
         }
     }
 }

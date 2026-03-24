@@ -32,6 +32,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 lastDragPosition = eventData.position;
+                startDragPosition = node.transform.position;
             }
         }
 
@@ -44,7 +45,17 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             }
         }
 
+        public override void OnEndDrag(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                node.Drag(eventData.position - lastDragPosition);
+                node.SendDragEvent(startDragPosition);
+            }
+        }
+
         private Vector2 lastDragPosition;
+        private Vector2 startDragPosition;
 
         [SerializeField]
         private Node node;

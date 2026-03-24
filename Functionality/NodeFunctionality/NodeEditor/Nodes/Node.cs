@@ -322,6 +322,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             onReplace?.Invoke();
         }
 
+        public void SendDragEvent(Vector3 oldPosition)
+            => grid.RegisterMoveNodeAction(this, oldPosition, transform.position);
+
         public enum Type
         {
             [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>,
