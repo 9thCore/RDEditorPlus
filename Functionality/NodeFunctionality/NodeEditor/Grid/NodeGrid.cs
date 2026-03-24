@@ -234,6 +234,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         public void RegisterMoveNodeAction(Node node, Vector3 oldPosition, Vector3 currentPosition)
             => RegisterAction(new MoveNodeAction(this, node.Id, (currentPosition - oldPosition).xy()));
 
+        public void RegisterLinkNodesAction(Node input, Node output, string inputName, string outputName)
+            => RegisterAction(new LinkNodesAction(this, input.Id, output.Id, inputName, outputName, Replace: false));
+
+        public void RegisterReplaceLinkNodesAction(Node input, Node output, Node replaced, string inputName, string outputName, string replacedName)
+            => RegisterAction(new ReplaceLinkNodesAction(this, input.Id, output.Id, replaced.Id, inputName, outputName, replacedName));
+
         public void Undo() => this.DefaultUndo();
         public void Redo() => this.DefaultRedo();
         public void ClearUndo() => this.DefaultClearUndo();
@@ -338,6 +344,50 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         {
             public override void OnRedo() => GetNode(node => node.Drag(DeltaPosition));
             public override void OnUndo() => GetNode(node => node.Drag(-DeltaPosition));
+        }
+
+        private record ReplaceLinkNodesAction(NodeGrid Grid, string InputID, string OutputID, string ReplaceID,
+            string InputName, string OutputName, string ReplaceName)
+            : LinkNodesAction(Grid, InputID, OutputID, InputName, OutputName, Replace: true)
+        {
+            public override void OnUndo()
+            {
+                if (!Grid.TryGetNodeFromID(InputID, out var input)
+                    || !Grid.TryGetNodeFromID(ReplaceID, out var replace))
+                {
+                    Plugin.LogWarn($"Tried to undo {this}, but there was no input or replaced output");
+                    return;
+                }
+
+                replace.GetOutput(ReplaceName).SetupConnection(input.GetInput(InputName), justReplace: true);
+            }
+        }
+
+        private record LinkNodesAction(NodeGrid Grid, string InputID, string OutputID, string InputName, string OutputName, bool Replace)
+            : IUndoCapable.IAction
+        {
+            public void OnRedo()
+            {
+                if (!Grid.TryGetNodeFromID(InputID, out var input)
+                    || !Grid.TryGetNodeFromID(OutputID, out var output))
+                {
+                    Plugin.LogWarn($"Tried to undo {this}, but there was no input or output");
+                    return;
+                }
+
+                output.GetOutput(OutputName).SetupConnection(input.GetInput(InputName), justReplace: Replace);
+            }
+
+            public virtual void OnUndo()
+            {
+                if (!Grid.TryGetNodeFromID(InputID, out var input))
+                {
+                    Plugin.LogWarn($"Tried to undo {this}, but there was no node");
+                    return;
+                }
+
+                input.GetInput(InputName).Unlink(dontRaiseDisconnectEvent: false);
+            }
         }
 
         private abstract record NodeTargettableAction(NodeGrid Grid, string ID) : IUndoCapable.IAction

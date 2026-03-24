@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+using RDEditorPlus.Util;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -96,6 +97,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             connection.SetEndPoint(other.control.position.xy());
             Link link = new(input, this, connection);
 
+            var replace = input.ConnectedOutput;
+
             links.Add(link);
             input.SetLink(link, justReplace);
 
@@ -110,11 +113,28 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             {
                 input.node.RaiseReplaceEvent();
                 node.RaiseReplaceEvent();
+
+                if (!UndoCapableUtil.CurrentlyUndoingOrRedoing)
+                {
+                    if (replace != null)
+                    {
+                        node.SendReplaceLinkEvent(input.node, replace.node, input.Name, Name, replace.Name);
+                    }
+                    else
+                    {
+                        node.SendLinkEvent(input.node, input.Name, Name);
+                    }
+                }
             }
             else
             {
                 input.node.RaiseConnectEvent();
                 node.RaiseConnectEvent();
+
+                if (!UndoCapableUtil.CurrentlyUndoingOrRedoing)
+                {
+                    node.SendLinkEvent(input.node, input.Name, Name);
+                }
             }
         }
 

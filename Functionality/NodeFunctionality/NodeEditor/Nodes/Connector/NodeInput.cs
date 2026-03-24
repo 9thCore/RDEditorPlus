@@ -105,6 +105,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         public bool IsLinked => link != null;
         public string Target => link.Output.Id;
         public string Output => link.Output.Name;
+        public NodeOutput ConnectedOutput => IsLinked ? link.Output : null;
 
         protected override void PrefabSetup()
         {
