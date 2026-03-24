@@ -74,6 +74,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             await grid.SaveAsync(writer);
         }
 
+        public void Undo() => grid.Undo();
+        public void Redo() => grid.Redo();
+        public void ClearUndo() => grid.ClearUndo();
+
         public void Clear() => grid.Clear();
 
         public bool TryGetNodeFromID(string id, out Node result) => grid.TryGetNodeFromID(id, out result);

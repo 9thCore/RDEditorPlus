@@ -139,6 +139,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
                 savedLevelName = null;
             }
 
+            view.ClearUndo();
+
             SetLevelName();
             SetState(State.Idle);
         }
@@ -146,6 +148,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
         public void Clear()
         {
             view.Clear();
+            view.ClearUndo();
         }
 
         public void NewButtonClick()
@@ -228,11 +231,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             }
             else if (RDEditorUtils.CheckForKeyCombo(control: true, shift: false, KeyCode.Z))
             {
+                view.Undo();
                 return true;
             }
             else if (RDEditorUtils.CheckForKeyCombo(control: true, shift: true, KeyCode.Z)
                 || RDEditorUtils.CheckForKeyCombo(control: true, shift: false, KeyCode.Y))
             {
+                view.Redo();
                 return true;
             }
 

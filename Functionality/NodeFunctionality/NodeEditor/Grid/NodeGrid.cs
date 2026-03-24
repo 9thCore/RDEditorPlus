@@ -1,4 +1,5 @@
-﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+﻿using RDEditorPlus.Functionality.Mixins;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
 using RDLevelEditor;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 {
-    public class NodeGrid : MonoBehaviour
+    public class NodeGrid : MonoBehaviour, IUndoCapable
     {
         public static NodeGrid Create(Transform parent, NodePanelHolder holder)
         {
@@ -85,7 +86,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             }
         }
 
-        public Node AddNode(GameObject prefab, Vector2 position, string id)
+        public Node AddNode(GameObject prefab, Vector2 position, string id, bool registerUndoEvent = true)
         {
             GameObject instance = Instantiate(prefab, space);
 
@@ -94,11 +95,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             rt.anchoredPosition = position;
 
             var node = instance.GetComponent<Node>();
-            node.GenerateID(id);
+            string nodeID = node.GenerateID(id);
             node.Setup(this);
             nodes.Add(node);
 
             instance.SetActive(true);
+
+            if (registerUndoEvent)
+            {
+                RegisterAction(new AddNodeAction(this, prefab, nodeID, position));
+            }
 
             return node;
         }
@@ -224,6 +230,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             return orderedNodes;
         }
 
+        public void Undo() => this.DefaultUndo();
+        public void Redo() => this.DefaultRedo();
+        public void ClearUndo() => this.DefaultClearUndo();
+        public void RegisterAction(IUndoCapable.IAction action) => this.DefaultRegisterAction(action);
+
+        public Stack<IUndoCapable.IAction> UndoStack { get; init; } = new();
+        public Stack<IUndoCapable.IAction> RedoStack { get; init; } = new();
         public bool CanZoom { get; set; } = false;
 
         private void UpdateBackground()
@@ -310,5 +323,24 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
         public const int GridSize = 6;
         private static Sprite gridSprite = null;
+
+        private record AddNodeAction(NodeGrid Grid, GameObject Prefab, string ID, Vector3 Position) : IUndoCapable.IAction
+        {
+            public void OnRedo()
+            {
+                Grid.AddNode(Prefab, Position, ID, registerUndoEvent: false);
+            }
+
+            public void OnUndo()
+            {
+                if (!Grid.TryGetNodeFromID(ID, out var result))
+                {
+                    Plugin.LogWarn($"Tried to undo {this}, but there was no node");
+                    return;
+                }
+
+                result.Delete(dontDeleteFromGrid: false);
+            }
+        }
     }
 }

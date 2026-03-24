@@ -96,9 +96,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             this.grid = grid;
         }
 
-        public void GenerateID(string id)
+        public string GenerateID(string id)
         {
             this.id = id.IsNullOrEmpty() ? LevelEvent_MakeSprite.RandomString(8) : id;
+            return this.id;
         }
 
         public NodeInput GetInput(string name)
