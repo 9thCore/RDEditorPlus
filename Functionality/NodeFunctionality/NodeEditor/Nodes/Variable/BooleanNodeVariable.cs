@@ -6,17 +6,17 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class BooleanNodeVariable : NodeVariable<BooleanNodeVariable, bool>
     {
-        public override bool CanSave() => currentValue != initialValue;
+        public override bool CanSave() => CurrentValue != initialValue;
 
         protected override void OnVariableChange(string text)
         {
             if (bool.TryParse(text, out var result))
             {
-                currentValue = result;
+                CurrentValue = result;
             }
             else
             {
-                currentValue = initialValue;
+                CurrentValue = initialValue;
             }
 
             base.OnVariableChange(text);

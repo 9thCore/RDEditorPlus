@@ -8,7 +8,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class RDLevelSaveNodeVariable : NodeVariable<RDLevelSaveNodeVariable, RDLevelSaveFile>
     {
-        public override bool CanSave() => !currentValue.Equals(initialValue);
+        public override bool CanSave() => !CurrentValue.Equals(initialValue);
 
         public void SelectLevel()
         {
@@ -29,8 +29,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 
         protected override void OnVariableChange(string path)
         {
-            currentValue = new RDLevelSaveFile(path);
-            SetRepresentation(currentValue.LevelName);
+            CurrentValue = new RDLevelSaveFile(path);
+            SetRepresentation(CurrentValue.LevelName);
         }
 
         protected override void SetInitialValue(object initialValue)

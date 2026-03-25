@@ -5,7 +5,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class MathOperationNodeVariable : EnumNodeVariable<MathOperationNodeVariable, Node_MathBinary.MathOperation>
     {
-        public override bool CanSave() => currentValue != initialValue;
+        public override bool CanSave() => CurrentValue != initialValue;
 
         public static GameObject VariablePrefab => GetCachedPrefab(Node.Type.MathOperation);
     }

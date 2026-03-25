@@ -5,17 +5,17 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class FloatExpressionNodeVariable : NodeVariable<FloatExpressionNodeVariable, FloatExpression>
     {
-        public override bool CanSave() => currentValue != initialValue;
+        public override bool CanSave() => CurrentValue != initialValue;
 
         protected override void OnVariableChange(string text)
         {
             if (float.TryParse(text, out var result))
             {
-                currentValue = new FloatExpression(result);
+                CurrentValue = new FloatExpression(result);
             }
             else
             {
-                currentValue = new FloatExpression(text);
+                CurrentValue = new FloatExpression(text);
             }
 
             base.OnVariableChange(text);
@@ -35,7 +35,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 
         private void Start()
         {
-            currentValue = initialValue = FloatExpression.EmptyInput();
+            // (commented out because I'll fix it later when math is added back)
+            // CurrentValue = initialValue = FloatExpression.EmptyInput();
         }
 
         public static GameObject VariablePrefab

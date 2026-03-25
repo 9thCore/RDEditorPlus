@@ -7,31 +7,31 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 {
     public class FloatExpression2NodeVariable : NodeVariable<FloatExpression2NodeVariable, FloatExpression2>
     {
-        public override object Value => FloatExpression2Util.Serialise(currentValue);
+        public override object Value => FloatExpression2Util.Serialise(CurrentValue);
 
-        public override bool CanSave() => !currentValue.x.Equal(initialValue.x) || !currentValue.y.Equal(initialValue.y);
+        public override bool CanSave() => !CurrentValue.x.Equal(initialValue.x) || !CurrentValue.y.Equal(initialValue.y);
 
         protected override void OnVariableChange(string text)
         {
-            currentValue = FloatExpression2Util.ParseSerialised(text);
+            CurrentValue = FloatExpression2Util.ParseSerialised(text);
             base.OnVariableChange(text);
         }
 
         protected override void SetRepresentation(string value)
         {
-            inputField.SetTextWithoutNotify(currentValue.x.ToString());
-            yInputField.SetTextWithoutNotify(currentValue.y.ToString());
+            inputField.SetTextWithoutNotify(CurrentValue.x.ToString());
+            yInputField.SetTextWithoutNotify(CurrentValue.y.ToString());
         }
 
         private void OnXVariableChange(string text)
         {
             if (float.TryParse(text, out var value))
             {
-                currentValue = new(new FloatExpression(value), currentValue.y);
+                CurrentValue = new(new FloatExpression(value), CurrentValue.y);
             }
             else
             {
-                currentValue = new(new FloatExpression(text), currentValue.y);
+                CurrentValue = new(new FloatExpression(text), CurrentValue.y);
             }
 
             base.OnVariableChange(text);
@@ -41,11 +41,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         {
             if (float.TryParse(text, out var value))
             {
-                currentValue = new(currentValue.x, new FloatExpression(value));
+                CurrentValue = new(CurrentValue.x, new FloatExpression(value));
             }
             else
             {
-                currentValue = new(currentValue.x, new FloatExpression(text));
+                CurrentValue = new(CurrentValue.x, new FloatExpression(text));
             }
 
             base.OnVariableChange(text);
@@ -60,7 +60,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
             yInputField.onEndEdit.AddListener(OnYVariableChange);
 
             // hardcoding because idk why its set to (x: 0, y: 0) otherwise
-            currentValue = initialValue = new(FloatExpression.EmptyInput(), FloatExpression.EmptyInput());
+            // (commented out because I'll fix it later when math is added back)
+            // CurrentValue = initialValue = new(FloatExpression.EmptyInput(), FloatExpression.EmptyInput());
         }
 
         [SerializeField]

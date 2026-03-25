@@ -245,6 +245,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             => RegisterAction(new DeleteNodeAction(this, node.Id, NodeLibrary.Instance.GetPrefab(node.Name), anchoredPosition,
                 node.InputTargets, node.OutputTargets, node.SerialisedVariables));
 
+        public void RegisterVariableChangeNodeAction(Node node, string name, string oldValue, string newValue)
+            => RegisterAction(new NodeVariableChangeAction(this, node.Id, name, oldValue, newValue));
+
         public void Undo() => this.DefaultUndo();
         public void Redo() => this.DefaultRedo();
         public void ClearUndo() => this.DefaultClearUndo();
@@ -409,6 +412,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
                 input.GetInput(InputName).Unlink(dontRaiseDisconnectEvent: false);
             }
+        }
+
+        private record NodeVariableChangeAction(NodeGrid Grid, string ID, string Name, string OldValue, string NewValue)
+            : NodeTargettableAction(Grid, ID)
+        {
+            public override void OnRedo() => GetNode(node => node.SetVariable(Name, NewValue));
+            public override void OnUndo() => GetNode(node => node.SetVariable(Name, OldValue));
         }
 
         private abstract record NodeTargettableAction(NodeGrid Grid, string ID) : IUndoCapable.IAction

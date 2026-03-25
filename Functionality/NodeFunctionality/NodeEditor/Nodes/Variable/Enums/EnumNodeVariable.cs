@@ -15,11 +15,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         {
             if (Enum.TryParse(text, out TEnum value))
             {
-                currentValue = value;
+                CurrentValue = value;
             }
             else
             {
-                currentValue = initialValue;
+                CurrentValue = initialValue;
             }
 
             base.OnVariableChange(text);
@@ -28,6 +28,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         protected override void SetInitialValue(object initialValue)
         {
             dropdown.value = Convert.ToInt32(initialValue);
+            base.SetInitialValue(Values[dropdown.value]);
         }
 
         protected override void SetRepresentation(string value)
@@ -37,8 +38,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
 
         private void OnVariableChange(int index)
         {
-            currentValue = Values[index];
-            SetRepresentation(currentValue.ToString());
+            CurrentValue = Values[index];
+            SetRepresentation(CurrentValue.ToString());
         }
 
         private void Awake()

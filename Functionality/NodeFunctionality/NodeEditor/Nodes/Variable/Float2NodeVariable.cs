@@ -8,36 +8,35 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
     public class Float2NodeVariable : NodeVariable<Float2NodeVariable, Float2>
     {
         public override object Value
-            => (currentValue.xUsed ? currentValue.x.ToString() : string.Empty) +
+            => (CurrentValue.xUsed ? CurrentValue.x.ToString() : string.Empty) +
             Float2Util.SerialisationSeparator +
-            (currentValue.yUsed ? currentValue.y.ToString() : string.Empty);
+            (CurrentValue.yUsed ? CurrentValue.y.ToString() : string.Empty);
 
         public override bool CanSave()
-            => currentValue.x != initialValue.x || currentValue.xUsed != initialValue.xUsed
-            || currentValue.y != initialValue.y || currentValue.yUsed != initialValue.yUsed;
+            => CurrentValue.x != initialValue.x || CurrentValue.xUsed != initialValue.xUsed
+            || CurrentValue.y != initialValue.y || CurrentValue.yUsed != initialValue.yUsed;
 
         protected override void OnVariableChange(string text)
         {
-            currentValue = Float2Util.ParseSerialised(text);
+            CurrentValue = Float2Util.ParseSerialised(text);
             base.OnVariableChange(text);
         }
 
         protected override void SetRepresentation(string value)
         {
-            inputField.SetTextWithoutNotify(currentValue.xUsed ? currentValue.x.ToString() : string.Empty);
-            yInputField.SetTextWithoutNotify(currentValue.yUsed ? currentValue.y.ToString() : string.Empty);
+            inputField.SetTextWithoutNotify(CurrentValue.xUsed ? CurrentValue.x.ToString() : string.Empty);
+            yInputField.SetTextWithoutNotify(CurrentValue.yUsed ? CurrentValue.y.ToString() : string.Empty);
         }
 
         private void OnXVariableChange(string text)
         {
             if (float.TryParse(text, out var result))
             {
-                currentValue.x = result;
-                currentValue.xUsed = true;
+                CurrentValue = CurrentValue with { x = result, xUsed = true };
             }
             else
             {
-                currentValue.xUsed = false;
+                CurrentValue = CurrentValue with { xUsed = false };
             }
 
             base.OnVariableChange(text);
@@ -47,12 +46,11 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         {
             if (float.TryParse(text, out var result))
             {
-                currentValue.y = result;
-                currentValue.yUsed = true;
+                CurrentValue = CurrentValue with { y = result, yUsed = true };
             }
             else
             {
-                currentValue.yUsed = false;
+                CurrentValue = CurrentValue with { yUsed = false };
             }
 
             base.OnVariableChange(text);

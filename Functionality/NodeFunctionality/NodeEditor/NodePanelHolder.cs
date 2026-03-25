@@ -18,6 +18,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
     public abstract class NodePanelHolder : INodeWorkspace, ISerializableNodeWorkspace
     {
         public static NodePanelHolder CurrentPanel = null;
+        public static bool CurrentlyLoading => CurrentPanel != null && CurrentPanel.state == State.Loading;
 
         public abstract string DefaultFilename { get; }
         public abstract string FileDescription { get; }

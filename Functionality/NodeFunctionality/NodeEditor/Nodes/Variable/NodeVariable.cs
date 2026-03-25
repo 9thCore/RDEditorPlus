@@ -34,6 +34,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
                 if (variable != null)
                 {
                     node.AddVariable(variable.rectTransform, variable, description);
+                    variable.node = node;
                 }
             }
         }
@@ -58,6 +59,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         protected RectTransform rectTransform;
         [SerializeField]
         protected Node.Type type;
+        [SerializeField]
+        protected Node node;
 
         public const string NameKey = "name";
         public const string ValueKey = "Value";
@@ -66,8 +69,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         {
             var instance = Instantiate(Node.GetVariableType(type).Prefab);
             var variable = instance.GetComponent<NodeVariable>();
-            variable.SetInitialValue(initialValue);
             variable.SetName(name);
+            variable.SetInitialValue(initialValue);
 
             instance.SetActive(true);
             return variable;
@@ -96,10 +99,28 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
             SetRepresentation(initialValue.ToString());
         }
 
+        protected VariableType CurrentValue
+        {
+            get => currentValue;
+            set
+            {
+                if (UndoCapableUtil.CurrentlyUndoingOrRedoing
+                    || NodePanelHolder.CurrentlyLoading)
+                {
+                    currentValue = value;
+                    return;
+                }
+
+                node.SendVariableChangeEvent(variableName, currentValue.ToString(), value.ToString());
+                currentValue = value;
+            }
+        }
+
         [SerializeField]
         protected VariableType initialValue;
+
         [SerializeField]
-        protected VariableType currentValue;
+        private VariableType currentValue;
 
         private void Awake()
         {

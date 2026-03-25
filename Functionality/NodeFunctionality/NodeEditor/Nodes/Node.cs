@@ -392,6 +392,9 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         public void SendDeleteEvent() => grid.RegisterDeleteNodeAction(this, rectTransform.anchoredPosition);
 
+        public void SendVariableChangeEvent(string name, string oldValue, string newValue)
+            => grid.RegisterVariableChangeNodeAction(this, name, oldValue, newValue);
+
         public enum Type
         {
             [ConnectorColor("0000FF"), VariableType<IntegerNodeVariable>,
