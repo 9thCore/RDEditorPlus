@@ -59,6 +59,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
                 });
         }
 
+        public void Toggle() => Toggle(!gameObject.activeSelf);
+
         public INodeWorkspace.INode AddNode(string name, Vector2 position, string id = null)
         {
             var prefab = NodeLibrary.Instance.GetPrefab(name);

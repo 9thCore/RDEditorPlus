@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using RDEditorPlus.Functionality.LevelNode;
 using RDLevelEditor;
-using UnityEngine;
 
 namespace RDEditorPlus.Patch.LevelNode
 {
@@ -10,12 +9,16 @@ namespace RDEditorPlus.Patch.LevelNode
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Update))]
         private static class Update
         {
-            private static void Postfix()
+            private static bool Prefix()
             {
-                if (RDEditorUtils.CheckForKeyCombo(false, false, KeyCode.R))
+                if (!scnEditor.instance.userIsEditingAnInputField
+                    && RDEditorUtils.CheckForKeyCombo(false, false, PluginConfig.LevelNodeKeyCode))
                 {
-                    LevelNodePanelHolder.Instance.Toggle(true);
+                    LevelNodePanelHolder.Instance.Toggle();
+                    return false;
                 }
+
+                return true;
             }
         }
     }

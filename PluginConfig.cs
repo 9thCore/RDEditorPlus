@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace RDEditorPlus
 {
@@ -82,6 +83,9 @@ namespace RDEditorPlus
         public const string PATCH_LEVEL_NODE = "If a node editor tool for .rdlevels should be provided.\n" +
             "Intended primarily towards merging levels together, but can be used for crude edits like removing all events in a tab.\n" +
             "It is recommended to not overwrite the same level, but the tool will not forbid you from doing so.";
+        public const string PATCH_LEVEL_NODE_KEYCODE = "(Hopefully temporary config value)\n" +
+            "Keybind that opens the level node editor tool.\n" +
+            "Will not take effect while editing an input.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -110,6 +114,7 @@ namespace RDEditorPlus
 
         public static bool NodeEditorEnabled => Instance.nodeEditor.Value;
         public static bool LevelNodeEnabled => Instance.levelNode.Value;
+        public static KeyCode LevelNodeKeyCode => Instance.levelNodeKeycode.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -188,6 +193,9 @@ namespace RDEditorPlus
 
         [Config<bool>(PATCH_LEVEL_NODE, false)]
         public readonly ConfigEntry<bool> levelNode;
+
+        [Config<KeyCode>(PATCH_LEVEL_NODE_KEYCODE, KeyCode.Period)]
+        public readonly ConfigEntry<KeyCode> levelNodeKeycode;
 #pragma warning restore 0649
 
 
