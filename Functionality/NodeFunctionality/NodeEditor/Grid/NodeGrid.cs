@@ -248,6 +248,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         public void RegisterVariableChangeNodeAction(Node node, string name, string oldValue, string newValue)
             => RegisterAction(new NodeVariableChangeAction(this, node.Id, name, oldValue, newValue));
 
+        public void RegisterNodeInputRemoveLinkAction(Node node, int index, NodeTarget target)
+            => RegisterAction(new NodeInputRemoveLinkAction(this, node.Id, index, target));
+
+        public void RegisterNodeOutputRemoveLinkAction(Node node, int index, NodeTarget[] targets)
+            => RegisterAction(new NodeOutputRemoveLinksAction(this, node.Id, index, targets));
+
         public void Undo() => this.DefaultUndo();
         public void Redo() => this.DefaultRedo();
         public void ClearUndo() => this.DefaultClearUndo();
@@ -419,6 +425,20 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         {
             public override void OnRedo() => GetNode(node => node.SetVariable(Name, NewValue));
             public override void OnUndo() => GetNode(node => node.SetVariable(Name, OldValue));
+        }
+
+        private record NodeInputRemoveLinkAction(NodeGrid Grid, string ID, int Index, NodeTarget Target)
+            : NodeTargettableAction(Grid, ID)
+        {
+            public override void OnRedo() => GetNode(node => node.ClearInput(Index));
+            public override void OnUndo() => GetNode(node => node.SetInput(Index, Target));
+        }
+
+        private record NodeOutputRemoveLinksAction(NodeGrid Grid, string ID, int Index, NodeTarget[] Targets)
+            : NodeTargettableAction(Grid, ID)
+        {
+            public override void OnRedo() => GetNode(node => node.ClearOutput(Index));
+            public override void OnUndo() => GetNode(node => node.SetOutput(Index, Targets));
         }
 
         private abstract record NodeTargettableAction(NodeGrid Grid, string ID) : IUndoCapable.IAction

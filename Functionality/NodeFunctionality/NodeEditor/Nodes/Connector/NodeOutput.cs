@@ -48,6 +48,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             }
         }
 
+        public override void UndoableUnlinkAll()
+        {
+            node.SendOutputUnlinkEvent(this, Targets);
+            Unlink(dontRaiseDisconnectEvent: false);
+        }
+
         public override void PropagateInaccessibility()
         {
             foreach (var link in links)

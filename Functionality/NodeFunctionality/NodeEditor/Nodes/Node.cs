@@ -322,13 +322,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             onReplace?.Invoke();
         }
 
-        public NodeGrid.NodeTarget[] InputTargets
-            => inputs
-            .Select(input => input.IsLinked ? new NodeGrid.NodeTarget(input.Target, input.Output) : new NodeGrid.NodeTarget(null, null))
-            .ToArray();
-
+        public NodeGrid.NodeTarget[] InputTargets => inputs.Select(input => input.NodeTarget).ToArray();
         public NodeGrid.NodeTarget[][] OutputTargets => outputs.Select(output => output.Targets).ToArray();
-
         public string[] SerialisedVariables => variables.Select(variable => variable.Value.ToString()).ToArray();
 
         public void ConnectInputs(NodeGrid.NodeTarget[] targets)
@@ -336,11 +331,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             int index = 0;
             foreach (var target in targets)
             {
-                if (target.ID != null && grid.TryGetNodeFromID(target.ID, out var output))
-                {
-                    output.GetOutput(target.Name).SetupConnection(inputs[index], justReplace: false);
-                }
-
+                SetInput(index, target);
                 index++;
             }
         }
@@ -350,19 +341,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             int index = 0;
             foreach (var targets in outputTargets)
             {
-                var output = outputs[index];
-
-                if (targets != null)
-                {
-                    foreach (var target in targets)
-                    {
-                        if (grid.TryGetNodeFromID(target.ID, out var input))
-                        {
-                            output.SetupConnection(input.GetInput(target.Name), justReplace: false);
-                        }
-                    }
-                }
-
+                SetOutput(index, targets);
                 index++;
             }
         }
@@ -381,6 +360,35 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             }
         }
 
+        public void SetInput(int index, NodeGrid.NodeTarget target)
+        {
+            if (target.ID != null && grid.TryGetNodeFromID(target.ID, out var output))
+            {
+                output.GetOutput(target.Name).SetupConnection(inputs[index], justReplace: false);
+            }
+        }
+
+        public void SetOutput(int index, NodeGrid.NodeTarget[] targets)
+        {
+            if (targets == null)
+            {
+                return;
+            }
+
+            var output = outputs[index];
+
+            foreach (var target in targets)
+            {
+                if (grid.TryGetNodeFromID(target.ID, out var input))
+                {
+                    output.SetupConnection(input.GetInput(target.Name), justReplace: false);
+                }
+            }
+        }
+
+        public void ClearInput(int index) => inputs[index].Unlink(dontRaiseDisconnectEvent: false);
+        public void ClearOutput(int index) => outputs[index].Unlink(dontRaiseDisconnectEvent: false);
+
         public void SendDragEvent(Vector3 oldPosition)
             => grid.RegisterMoveNodeAction(this, oldPosition, transform.position);
 
@@ -394,6 +402,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         public void SendVariableChangeEvent(string name, string oldValue, string newValue)
             => grid.RegisterVariableChangeNodeAction(this, name, oldValue, newValue);
+
+        public void SendInputUnlinkEvent(NodeInput input, NodeGrid.NodeTarget target)
+            => grid.RegisterNodeInputRemoveLinkAction(this, inputs.IndexOf(input), target);
+
+        public void SendOutputUnlinkEvent(NodeOutput output, NodeGrid.NodeTarget[] targets)
+            => grid.RegisterNodeOutputRemoveLinkAction(this, outputs.IndexOf(output), targets);
 
         public enum Type
         {

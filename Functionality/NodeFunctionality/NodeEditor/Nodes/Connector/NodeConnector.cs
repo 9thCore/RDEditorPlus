@@ -21,6 +21,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         public abstract void SetColor(Node.Type nodeType, Type type);
         public abstract void ResetColor();
         public abstract void Unlink(bool justReplace);
+        public abstract void UndoableUnlinkAll();
         public abstract void PropagateInaccessibility();
         public abstract void ResetColorOverrideType();
         public abstract void SetColorOverrideType(Node.Type type);

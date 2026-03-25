@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Util;
 using System;
@@ -56,6 +57,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
             }
         }
 
+        public override void UndoableUnlinkAll()
+        {
+            node.SendInputUnlinkEvent(this, NodeTarget);
+            Unlink(dontRaiseDisconnectEvent: false);
+        }
+
         public override void PropagateInaccessibility()
         {
             if (link != null)
@@ -106,6 +113,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
         public string Target => link.Output.Id;
         public string Output => link.Output.Name;
         public NodeOutput ConnectedOutput => IsLinked ? link.Output : null;
+        public NodeGrid.NodeTarget NodeTarget => IsLinked ? new NodeGrid.NodeTarget(Target, Output) : new NodeGrid.NodeTarget(null, null);
 
         protected override void PrefabSetup()
         {
