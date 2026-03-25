@@ -320,6 +320,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                 if (gridSprite == null)
                 {
                     Texture2D texture = new(GridSize, GridSize);
+                    texture.filterMode = FilterMode.Point;
+
                     Color main = Color.gray;
                     Color background = Color.black;
 
