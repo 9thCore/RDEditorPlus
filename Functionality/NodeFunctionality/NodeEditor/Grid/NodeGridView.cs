@@ -32,7 +32,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             rectTransform.localScale = Vector3.one;
 
             rectTransform.anchorMin = new Vector2(0.02f, 0.18f);
-            rectTransform.anchorMax = new Vector2(0.98f, 0.88f);
+            rectTransform.anchorMax = new Vector2(0.98f, 0.94f);
             rectTransform.offsetMin = Vector2.zero;
             rectTransform.offsetMax = new Vector2(0f, -10f);
 

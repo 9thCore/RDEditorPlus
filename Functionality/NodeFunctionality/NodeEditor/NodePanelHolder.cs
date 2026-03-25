@@ -316,6 +316,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             var sprite = clone.GetComponent<Image>().sprite;
 
             title = clone.GetComponentInChildren<Text>();
+            title.rectTransform.anchorMin = new Vector2(0f, 1f);
+            title.rectTransform.anchorMax = new Vector2(1f, 1f);
+            title.rectTransform.offsetMin = new Vector2(0f, -10f);
+            title.rectTransform.offsetMax = Vector2.zero;
             Object.DestroyImmediate(title.GetComponent<RDStringToUIText>());
 
             GameObject levelName = Object.Instantiate(title.gameObject, title.transform.parent);

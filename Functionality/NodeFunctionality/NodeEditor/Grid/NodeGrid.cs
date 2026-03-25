@@ -42,7 +42,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             rt.localPosition = Vector3.zero;
             rt.localScale = Vector3.one;
 
-            rt.sizeDelta = new Vector2(1900f, 650f);
+            rt.sizeDelta = new Vector2(3800f, 1300f);
 
             GameObject space = new("space");
             var spaceRT = space.AddComponent<RectTransform>();
