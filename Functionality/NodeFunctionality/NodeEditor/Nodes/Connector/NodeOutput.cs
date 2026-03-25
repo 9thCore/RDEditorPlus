@@ -1,6 +1,8 @@
-﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
+﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Util;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector
@@ -76,6 +78,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connecto
                 link.Input.DependenciesSaved = true;
             }
         }
+
+        public NodeGrid.NodeTarget[] Targets => ConnectedToAnything
+            ? links.Select(link => new NodeGrid.NodeTarget(link.Input.Id, link.Input.Name)).ToArray()
+            : null;
 
         protected override void PrefabSetup()
         {

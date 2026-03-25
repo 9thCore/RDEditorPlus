@@ -322,6 +322,65 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             onReplace?.Invoke();
         }
 
+        public NodeGrid.NodeTarget[] InputTargets
+            => inputs
+            .Select(input => input.IsLinked ? new NodeGrid.NodeTarget(input.Target, input.Output) : new NodeGrid.NodeTarget(null, null))
+            .ToArray();
+
+        public NodeGrid.NodeTarget[][] OutputTargets => outputs.Select(output => output.Targets).ToArray();
+
+        public string[] SerialisedVariables => variables.Select(variable => variable.Value.ToString()).ToArray();
+
+        public void ConnectInputs(NodeGrid.NodeTarget[] targets)
+        {
+            int index = 0;
+            foreach (var target in targets)
+            {
+                if (target.ID != null && grid.TryGetNodeFromID(target.ID, out var output))
+                {
+                    output.GetOutput(target.Name).SetupConnection(inputs[index], justReplace: false);
+                }
+
+                index++;
+            }
+        }
+
+        public void ConnectOutputs(NodeGrid.NodeTarget[][] outputTargets)
+        {
+            int index = 0;
+            foreach (var targets in outputTargets)
+            {
+                var output = outputs[index];
+
+                if (targets != null)
+                {
+                    foreach (var target in targets)
+                    {
+                        if (grid.TryGetNodeFromID(target.ID, out var input))
+                        {
+                            output.SetupConnection(input.GetInput(target.Name), justReplace: false);
+                        }
+                    }
+                }
+
+                index++;
+            }
+        }
+
+        public void SetupVariables(string[] variableValues)
+        {
+            int index = 0;
+            foreach (var variableValue in variableValues)
+            {
+                if (variableValue != null)
+                {
+                    variables[index].SetValue(variableValue);
+                }
+
+                index++;
+            }
+        }
+
         public void SendDragEvent(Vector3 oldPosition)
             => grid.RegisterMoveNodeAction(this, oldPosition, transform.position);
 
@@ -330,6 +389,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
 
         public void SendReplaceLinkEvent(Node input, Node replace, string inputName, string outputName, string replaceName)
             => grid.RegisterReplaceLinkNodesAction(input, this, replace, inputName, outputName, replaceName);
+
+        public void SendDeleteEvent() => grid.RegisterDeleteNodeAction(this, rectTransform.anchoredPosition);
 
         public enum Type
         {

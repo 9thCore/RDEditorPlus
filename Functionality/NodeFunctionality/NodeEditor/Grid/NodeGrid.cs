@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.Mixins;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Connector;
 using RDEditorPlus.Util;
@@ -240,6 +241,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         public void RegisterReplaceLinkNodesAction(Node input, Node output, Node replaced, string inputName, string outputName, string replacedName)
             => RegisterAction(new ReplaceLinkNodesAction(this, input.Id, output.Id, replaced.Id, inputName, outputName, replacedName));
 
+        public void RegisterDeleteNodeAction(Node node, Vector2 anchoredPosition)
+            => RegisterAction(new DeleteNodeAction(this, node.Id, NodeLibrary.Instance.GetPrefab(node.Name), anchoredPosition,
+                node.InputTargets, node.OutputTargets, node.SerialisedVariables));
+
         public void Undo() => this.DefaultUndo();
         public void Redo() => this.DefaultRedo();
         public void ClearUndo() => this.DefaultClearUndo();
@@ -334,6 +339,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         public const int GridSize = 6;
         private static Sprite gridSprite = null;
 
+        public record struct NodeTarget(string ID, string Name);
+
         private record AddNodeAction(NodeGrid Grid, GameObject Prefab, string ID, Vector3 Position) : NodeTargettableAction(Grid, ID)
         {
             public override void OnRedo() => Grid.AddNode(Prefab, Position, ID, registerUndoEvent: false);
@@ -360,6 +367,20 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                 }
 
                 replace.GetOutput(ReplaceName).SetupConnection(input.GetInput(InputName), justReplace: true);
+            }
+        }
+
+        private record DeleteNodeAction(NodeGrid Grid, string ID, GameObject Prefab, Vector2 Position,
+            NodeTarget[] Inputs, NodeTarget[][] Outputs, string[] Variables)
+            : NodeTargettableAction(Grid, ID)
+        {
+            public override void OnRedo() => GetNode(node => node.Delete(dontDeleteFromGrid: false));
+            public override void OnUndo()
+            {
+                var node = Grid.AddNode(Prefab, Position, ID, registerUndoEvent: false);
+                node.ConnectInputs(Inputs);
+                node.ConnectOutputs(Outputs);
+                node.SetupVariables(Variables);
             }
         }
 

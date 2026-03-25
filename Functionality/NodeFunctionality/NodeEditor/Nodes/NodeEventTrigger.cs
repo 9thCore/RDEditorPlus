@@ -15,6 +15,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
         {
             if (eventData.button == PointerEventData.InputButton.Right)
             {
+                node.SendDeleteEvent();
                 node.Delete(dontDeleteFromGrid: false);
             }
         }
