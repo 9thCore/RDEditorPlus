@@ -435,13 +435,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes
             [VariableType<RDLevelNodeVariable>] RDLevelFile,
             [VariableType<RDLevelSaveNodeVariable>] RDLevelSaveFile,
             [ConnectorColor("FF0000")] RDLevelSettings,
-            [ConnectorColor("FF8000")] RDLevelRows,
-            [ConnectorColor("0080FF")] RDLevelSprites,
+            [ConnectorColor("0080FF")] RDLevelRows,
+            [ConnectorColor("00FF00")] RDLevelSprites,
             [ConnectorColor("FF00FF")] RDLevelEvents,
             [ConnectorColor("FF0080")] RDLevelConditionals,
             [ConnectorColor("FFFFFF")] RDLevelBookmarks,
             [ConnectorColor("FF80FF")] RDLevelPalette,
-            [ConnectorColor("FF8080")] RDLevelAssets
+            [ConnectorColor("00FFFF")] RDLevelAssets
         }
 
         [Flags]
