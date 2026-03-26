@@ -29,7 +29,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         protected override void OnVariableChange(string path)
         {
             CurrentValue = new RDLevelSaveFile(path);
-            SetRepresentation(CurrentValue.LevelName);
+            SetRepresentation(CurrentValue.LevelNameWithLastDirectory);
         }
 
         protected override void SetInitialValue(object initialValue)

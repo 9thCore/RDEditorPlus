@@ -20,6 +20,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
         }
 
         public readonly string LevelName => Path.GetFileNameWithoutExtension(path);
+        public readonly string LastDirectory => new DirectoryInfo(Path.GetDirectoryName(path)).Name;
+        public readonly string LevelNameWithLastDirectory => $"{LastDirectory}{Path.DirectorySeparatorChar}{LevelName}";
 
         public static implicit operator RDLevelFile(string path) => new(path);
     }
