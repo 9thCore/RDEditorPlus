@@ -44,14 +44,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
 
             rt.sizeDelta = new Vector2(3800f, 1300f);
 
-            GameObject space = new("space");
-            var spaceRT = space.AddComponent<RectTransform>();
-
-            spaceRT.SetParent(root.transform);
-            spaceRT.localPosition = Vector3.zero;
-            spaceRT.localScale = Vector3.one;
-            spaceRT.offsetMin = spaceRT.offsetMax = Vector2.zero;
-
             GameObject connections = new("connections");
             var connectionsRT = connections.AddComponent<RectTransform>();
 
@@ -60,12 +52,29 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
             connectionsRT.localScale = Vector3.one;
             connectionsRT.offsetMin = connectionsRT.offsetMax = Vector2.zero;
 
+            GameObject space = new("space");
+            var spaceRT = space.AddComponent<RectTransform>();
+
+            spaceRT.SetParent(root.transform);
+            spaceRT.localPosition = Vector3.zero;
+            spaceRT.localScale = Vector3.one;
+            spaceRT.offsetMin = spaceRT.offsetMax = Vector2.zero;
+
+            GameObject virtualConnections = new("virtualConnections");
+            var virtualConnectionsRT = virtualConnections.AddComponent<RectTransform>();
+
+            virtualConnectionsRT.SetParent(root.transform);
+            virtualConnectionsRT.localPosition = Vector3.zero;
+            virtualConnectionsRT.localScale = Vector3.one;
+            virtualConnectionsRT.offsetMin = virtualConnectionsRT.offsetMax = Vector2.zero;
+
             NodeGrid component = root.AddComponent<NodeGrid>();
             root.AddComponent<NodeGridEventTrigger>().Setup(component);
             component.background = rt;
             component.space = spaceRT;
             component.root = root.AddComponent<RectTransform>();
             component.connections = connectionsRT;
+            component.virtualConnectionRoot = virtualConnectionsRT;
             component.holder = holder;
             component.zoomHelper = zoomHelper.AddComponent<RectTransform>();
 
@@ -81,6 +90,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                 if (virtualConnection == null)
                 {
                     virtualConnection = CreateConnection();
+                    virtualConnection.transform.SetParent(virtualConnectionRoot);
                     virtualConnection.gameObject.SetActive(false);
                 }
 
@@ -302,6 +312,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
         private RectTransform space;
         private RectTransform background;
         private RectTransform connections;
+        private RectTransform virtualConnectionRoot;
         private NodeConnection virtualConnection;
         private NodePanelHolder holder;
         private readonly List<Node> nodes = new();
