@@ -1,3 +1,1 @@
-- Fix compilation for new beta
-- Fix RDLevelData constructor exception
-- Fix SetVFXPreset bloom fix exception
+- Add level utility node editor, that can be used to merge together different levels
