@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Assets;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Conditionals;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Constant;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Events;
@@ -83,6 +84,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     AddButton(conditionals.transform, "Merge", instance.CreateNode<Node_MergeConditionals>);
 
                     AddCategoryButton(transform, "Conditions", conditionals);
+                    #endregion
+
+                    #region assets
+                    GameObject assets = CreateDropdown("Asset");
+                    AddButton(assets.transform, "Merge", instance.CreateNode<Node_MergeAssets>);
+
+                    AddCategoryButton(transform, "Assets", assets);
                     #endregion
 
                     #region math

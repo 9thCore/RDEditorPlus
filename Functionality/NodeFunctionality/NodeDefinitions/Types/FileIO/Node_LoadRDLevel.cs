@@ -4,6 +4,8 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.FileIO
 {
@@ -25,7 +27,6 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
                 return;
             }
 
-            // MakeSpriteIdentifiersUnique(sprites, events);
             RemapFloatingText(events);
 
             this.settings = settings;
@@ -35,6 +36,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             this.conditionals = conditionals;
             this.bookmarks = bookmarks;
             this.palette = palette;
+
+            var data = new RDLevelData(settings, rows, events, conditionals, sprites, bookmarks, palette);
+
+            List<string> optionalFilesName = [];
+
+            string directory = Path.GetDirectoryName(path);
+            var files = RDPublishPopup.GetFilesForLevel(directory, ref optionalFilesName, data)
+                .Where(file => File.Exists(Path.Combine(directory, file))).ToArray();
+
+            assets = RDLevelAssets.FromFiles(directory, files);
         }
 
         [Variable]
@@ -61,23 +72,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
         [Output]
         public RDLevelPalette palette;
 
-        private void MakeSpriteIdentifiersUnique(List<LevelEvent_MakeSprite> sprites, List<LevelEvent_Base> events)
-        {
-            int spritePostfix = simulator.SpritePostfix;
-
-            foreach (var levelEvent in events)
-            {
-                if (!levelEvent.target.IsNullOrEmpty())
-                {
-                    levelEvent.target = $"{levelEvent.target}{spritePostfix}";
-                }
-            }
-
-            foreach (var sprite in sprites)
-            {
-                sprite.spriteId = $"{sprite.spriteId}{spritePostfix}";
-            }
-        }
+        [Output]
+        public RDLevelAssets assets;
 
         private void RemapFloatingText(List<LevelEvent_Base> events)
         {

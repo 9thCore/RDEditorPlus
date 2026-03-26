@@ -29,6 +29,12 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
             string text = data.Encode();
 
             RDFile.WriteAllText(path, text, RDEditorConstants.DefaultLevelEncoding);
+
+            string directory = Path.GetDirectoryName(path);
+            foreach (var asset in assets.Collect())
+            {
+                asset.CopyTo(directory);
+            }
         }
 
         [Variable]
@@ -54,5 +60,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Fil
 
         [Input]
         public RDLevelPalette palette = new();
+
+        [Input]
+        public RDLevelAssets assets;
     }
 }
