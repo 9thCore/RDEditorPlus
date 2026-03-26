@@ -1,5 +1,6 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Assets;
+using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Bookmarks;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Conditionals;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Constant;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Events;
@@ -91,6 +92,13 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     AddButton(assets.transform, "Merge", instance.CreateNode<Node_MergeAssets>);
 
                     AddCategoryButton(transform, "Assets", assets);
+                    #endregion
+
+                    #region bookmarks
+                    GameObject bookmarks = CreateDropdown("Bookmark");
+                    AddButton(bookmarks.transform, "Merge", instance.CreateNode<Node_MergeBookmarks>);
+
+                    AddCategoryButton(transform, "Bookmarks", bookmarks);
                     #endregion
 
                     #region math

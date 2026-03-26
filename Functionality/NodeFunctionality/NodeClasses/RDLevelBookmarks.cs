@@ -7,6 +7,8 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeClasses
     {
         public RDLevelBookmarks() : this(null) { }
 
+        public List<BookmarkData> Collect() => this;
+
         public readonly IReadOnlyList<BookmarkData> Bookmarks = bookmarks.AsReadOnly();
 
         public static implicit operator List<BookmarkData>(RDLevelBookmarks instance)
