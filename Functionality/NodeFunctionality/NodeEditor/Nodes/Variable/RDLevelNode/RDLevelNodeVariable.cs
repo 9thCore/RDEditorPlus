@@ -1,5 +1,4 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeClasses;
-using RDLevelEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityFileDialog;
@@ -13,7 +12,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Nodes.Variable
         public void SelectLevel()
         {
             string location = FileBrowser.PickFile(
-                    scnEditor.GetLastUsedFolder(),
+                    NodePanelHolder.LastUsedDirectory,
                     RDString.Get("editor.dialog.levelFileFormat"),
                     ["rdlevel"],
                     RDString.Get("editor.dialog.openFile"));

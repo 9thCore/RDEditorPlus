@@ -25,6 +25,8 @@ namespace RDEditorPlus.Functionality.LevelNode
         public override string LoadFileText => "Load level node editor data";
         public override string[] Extensions => ["rdlevelnode"];
 
+        protected override string SavePostfix => "LevelNode";
+
         protected LevelNodePanelHolder()
         {
             title.text = "Level Node Utility";

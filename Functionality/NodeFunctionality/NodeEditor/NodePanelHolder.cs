@@ -19,6 +19,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
     {
         public static NodePanelHolder CurrentPanel = null;
         public static bool CurrentlyLoading => CurrentPanel != null && CurrentPanel.state == State.Loading;
+        public static string LastUsedDirectory => CurrentPanel == null ? string.Empty : CurrentPanel.GetLastUsedDirectory();
 
         public abstract string DefaultFilename { get; }
         public abstract string FileDescription { get; }
@@ -27,6 +28,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
         public abstract string[] Extensions { get; }
 
         protected abstract Task SaveAsync();
+        protected abstract string SavePostfix { get; }
 
         public void Toggle(bool show)
         {
@@ -86,7 +88,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
                 || !Directory.Exists(Path.GetDirectoryName(savedLevelName)))
             {
                 string location = FileBrowser.SaveFile(
-                    scnEditor.GetLastUsedFolder(),
+                    GetLastUsedDirectory(),
                     DefaultFilename,
                     FileDescription,
                     Extensions,
@@ -97,6 +99,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
                     return;
                 }
 
+                SetLastUsedDirectory(Path.GetDirectoryName(location));
                 savedLevelName = location;
             }
 
@@ -114,7 +117,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
             }
 
             string location = FileBrowser.PickFile(
-                    scnEditor.GetLastUsedFolder(),
+                    GetLastUsedDirectory(),
                     FileDescription,
                     Extensions,
                     LoadFileText);
@@ -124,6 +127,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
                 return;
             }
 
+            SetLastUsedDirectory(Path.GetDirectoryName(location));
             SetState(State.Loading);
             Clear();
 
@@ -273,6 +277,10 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor
         }
 
         protected bool Valid() => gameObject != null;
+
+        private string GetLastUsedDirectory() => SaveUtil.GetString(LastDirectorySaveKey, string.Empty);
+        private void SetLastUsedDirectory(string path) => SaveUtil.SetString(LastDirectorySaveKey, path);
+        private string LastDirectorySaveKey => $"PanelHolder{SavePostfix}_LastDirectory";
 
         protected NodePanelHolder()
         {
