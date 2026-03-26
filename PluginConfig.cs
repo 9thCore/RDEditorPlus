@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace RDEditorPlus
 {
@@ -28,6 +29,7 @@ namespace RDEditorPlus
         public const string CATEGORY_ROWS = "Rows";
         public const string CATEGORY_SELECT = "Select";
         public const string CATEGORY_WINDOWS = "Windows";
+        public const string CATEGORY_NODEEDITOR = "NodeEditor";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -77,6 +79,14 @@ namespace RDEditorPlus
             "If set to " + nameof(MoreWindowsReorderBehaviour.ShowOrder) + ", it will show the order of the given window, where the window with \"1\" will be in front of the others.\n" +
             "If set to " + nameof(MoreWindowsReorderBehaviour.ShowData) + ", it will show the window indices as they are placed in the event, where the window with the topmost index will be in front of the others.";
 
+        public const string PATCH_NODE_EDITOR = "Toggle for all node editor functionality.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_LEVEL_NODE = "If a node editor tool for .rdlevels should be provided.\n" +
+            "Intended primarily towards merging levels together, but can be used for crude edits like removing all events in a tab.\n" +
+            "It is recommended to not overwrite the same level, but the tool will not forbid you from doing so.";
+        public const string PATCH_LEVEL_NODE_KEYCODE = "(Hopefully temporary config value)\n" +
+            "Keybind that opens the level node editor tool.\n" +
+            "Will not take effect while editing an input.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -102,6 +112,9 @@ namespace RDEditorPlus
         public static bool WindowsMoreEnabled => Instance.windowsMore.Value;
         public static MoreWindowsReorderBehaviour WindowsReorderBehaviour => Instance.windowsReorderBehaviour.Value;
 
+        public static bool NodeEditorEnabled => Instance.nodeEditor.Value;
+        public static bool LevelNodeEnabled => Instance.levelNode.Value;
+        public static KeyCode LevelNodeKeyCode => Instance.levelNodeKeycode.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -172,6 +185,17 @@ namespace RDEditorPlus
 
         [Config<MoreWindowsReorderBehaviour>(PATCH_WINDOWS_REORDER, MoreWindowsReorderBehaviour.ShowOrder)]
         public readonly ConfigEntry<MoreWindowsReorderBehaviour> windowsReorderBehaviour;
+
+
+        [Category(CATEGORY_NODEEDITOR)]
+        [Config<bool>(PATCH_NODE_EDITOR, false)]
+        public readonly ConfigEntry<bool> nodeEditor;
+
+        [Config<bool>(PATCH_LEVEL_NODE, false)]
+        public readonly ConfigEntry<bool> levelNode;
+
+        [Config<KeyCode>(PATCH_LEVEL_NODE_KEYCODE, KeyCode.Period)]
+        public readonly ConfigEntry<KeyCode> levelNodeKeycode;
 #pragma warning restore 0649
 
 
