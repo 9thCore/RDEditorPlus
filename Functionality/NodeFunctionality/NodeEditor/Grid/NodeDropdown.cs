@@ -98,7 +98,7 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeEditor.Grid
                     GameObject bookmarks = CreateDropdown("Bookmark");
                     AddButton(bookmarks.transform, "Merge", instance.CreateNode<Node_MergeBookmarks>);
 
-                    AddCategoryButton(transform, "Bookmarks", bookmarks);
+                    AddCategoryButton(transform, "Bookmark", bookmarks);
                     #endregion
 
                     #region math
