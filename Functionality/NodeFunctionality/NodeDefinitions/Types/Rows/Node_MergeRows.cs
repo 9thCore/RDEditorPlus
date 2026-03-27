@@ -1,5 +1,6 @@
 ﻿using RDEditorPlus.Functionality.NodeFunctionality.NodeClasses;
 using RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Attributes;
+using RDLevelEditor;
 
 namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Rows
 {
@@ -17,8 +18,18 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Row
             }
             list1.AddRange(list2);
 
+            var conds = conditionals2.Collect();
+            foreach (var cond in conds)
+            {
+                if (cond is Conditional_LastHit lastHit)
+                {
+                    lastHit.row += offset;
+                }
+            }
+
             rows = list1;
             events = events2.WithRowOffset(offset);
+            conditionals = conds;
         }
 
         [Input]
@@ -30,10 +41,16 @@ namespace RDEditorPlus.Functionality.NodeFunctionality.NodeDefinitions.Types.Row
         [Input]
         public RDLevelEvents events2;
 
+        [Input]
+        public RDLevelConditionals conditionals2;
+
         [Output]
         public RDLevelRows rows;
 
         [Output]
         public RDLevelEvents events;
+
+        [Output]
+        public RDLevelConditionals conditionals;
     }
 }
