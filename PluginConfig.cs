@@ -30,6 +30,7 @@ namespace RDEditorPlus
         public const string CATEGORY_SELECT = "Select";
         public const string CATEGORY_WINDOWS = "Windows";
         public const string CATEGORY_NODEEDITOR = "NodeEditor";
+        public const string CATEGORY_OPTIMISATIONS = "Optimisation";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -87,6 +88,11 @@ namespace RDEditorPlus
             "Keybind that opens the level node editor tool.\n" +
             "Will not take effect while editing an input.";
 
+        public const string PATCH_OPTIMISATIONS = "Toggle for all optimisations.\nIf disabled, none of the patches below will be applied.\nPerformance gain is not guaranteed, regardless of options chosen.";
+        public const string PATCH_OPTIMISATIONS_TIMELINE = "How aggressively the timeline should be optimised.\n" +
+            nameof(TimelineOptimisations.RecullOnlyIfRequired) + " permits recalculating event culling only if an update is required. Improves performance while the timeline is not being updated (moved, zoomed in, etc.), and should not break anything.\n" +
+            nameof(TimelineOptimisations.ChangeParents) + " changes the event's parents as the tab changes, so only the events in the current tab move. Improves performance while moving the timeline, but could cause issues and heavily depends on how many events are in the current tab (e.g. if 6940/6948 of the level's events are in the Actions tab, having the Actions tab open will barely improve performance, while having other tabs open will significantly improve performance).";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -115,6 +121,9 @@ namespace RDEditorPlus
         public static bool NodeEditorEnabled => Instance.nodeEditor.Value;
         public static bool LevelNodeEnabled => Instance.levelNode.Value;
         public static KeyCode LevelNodeKeyCode => Instance.levelNodeKeycode.Value;
+
+        public static bool OptimisationsEnabled => Instance.optimisations.Value;
+        public static TimelineOptimisations OptimisationsTimelineLevel => Instance.optimisationsTimeline.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -196,6 +205,14 @@ namespace RDEditorPlus
 
         [Config<KeyCode>(PATCH_LEVEL_NODE_KEYCODE, KeyCode.Period)]
         public readonly ConfigEntry<KeyCode> levelNodeKeycode;
+
+
+        [Category(CATEGORY_OPTIMISATIONS)]
+        [Config<bool>(PATCH_OPTIMISATIONS, false)]
+        public readonly ConfigEntry<bool> optimisations;
+
+        [Config<TimelineOptimisations>(PATCH_OPTIMISATIONS_TIMELINE, TimelineOptimisations.None)]
+        public readonly ConfigEntry<TimelineOptimisations> optimisationsTimeline;
 #pragma warning restore 0649
 
 
@@ -257,6 +274,14 @@ namespace RDEditorPlus
         {
             ShowOrder,
             ShowData
+        }
+
+        [Flags]
+        public enum TimelineOptimisations
+        {
+            None = 0,
+            RecullOnlyIfRequired = 1 << 0,
+            ChangeParents = 1 << 1
         }
 
         [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
