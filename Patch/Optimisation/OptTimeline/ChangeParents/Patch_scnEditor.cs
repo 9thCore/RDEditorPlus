@@ -17,18 +17,6 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.ChangeParents
             }
         }
 
-        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.DeleteAllData))]
-        private static class DeleteAllData
-        {
-            private static void Prefix()
-            {
-                foreach (var control in scnEditor.instance.eventControls)
-                {
-                    GameObject.Destroy(control.gameObject);
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.ShowTabSection))]
         private static class ShowTabSection
         {
@@ -104,15 +92,20 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.ChangeParents
 
             private static void UnparentAllFrom(List<LevelEventControl_Base> list)
             {
-                if (list == null)
+                if (list == null
+                    || list.Count == 0)
                 {
                     return;
                 }
 
-                foreach (var control in list)
+                var holder = list[0].transform.parent;
+
+                if (holder.GetComponent<ArbitraryTransformHolder>() == null)
                 {
-                    control.transform.SetParent(null, worldPositionStays: false);
+                    holder.gameObject.AddComponent<ArbitraryTransformHolder>().Transform = holder.parent;
                 }
+
+                holder.SetParent(null, worldPositionStays: false);
             }
 
             private static void ParentAllFrom(List<List<LevelEventControl_Base>> nestedList)
@@ -130,10 +123,20 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.ChangeParents
 
             private static void ParentAllFrom(List<LevelEventControl_Base> list)
             {
-                foreach (var control in list)
+                if (list == null
+                    || list.Count == 0)
                 {
-                    control.transform.SetParent(control.GetComponent<ArbitraryTransformHolder>().Transform, worldPositionStays: false);
+                    return;
                 }
+
+                var holder = list[0].transform.parent;
+
+                if (holder.GetComponent<ArbitraryTransformHolder>() == null)
+                {
+                    return;
+                }
+
+                holder.transform.SetParent(holder.GetComponent<ArbitraryTransformHolder>().Transform, worldPositionStays: false);
             }
         }
     }
