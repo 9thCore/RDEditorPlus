@@ -12,6 +12,7 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.RecullOnlyIfRequired
             private static void Postfix()
             {
                 lastPosition = new Vector2(float.NaN, float.NaN);
+                lastTab = Tab.None;
             }
         }
 
@@ -20,9 +21,10 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.RecullOnlyIfRequired
         {
             private static bool Prefix(Timeline __instance)
             {
-                if (__instance.shouldUpdateUI || lastPosition != CurrentPosition)
+                if (__instance.shouldUpdateUI || lastPosition != CurrentPosition || lastTab != CurrentTab)
                 {
                     lastPosition = CurrentPosition;
+                    lastTab = CurrentTab;
                     return true;
                 }
 
@@ -31,6 +33,8 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.RecullOnlyIfRequired
         }
 
         private static Vector2 lastPosition;
+        private static Tab lastTab;
         private static Vector2 CurrentPosition => scnEditor.instance.timeline.scrollviewContent.anchoredPosition;
+        private static Tab CurrentTab => scnEditor.instance.currentTab;
     }
 }
