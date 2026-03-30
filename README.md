@@ -17,6 +17,10 @@ Features:
 	- Under any other conditions, the events should be editable intuitively
 - Adds a button to add a new window to the timeline, since 5+ windows work in the unmodified game
 	- Windows can also be removed, until there are 4 left on the timeline (default)
+- Adds a node editor with limited use
+	- Can be used to merge together levels, as well as crudely edit existing levels by removing select events
+- Adds some basic optimisations
+	- Two timeline optimisations available, which may or may not cause issues in other areas
 
 Installation:  
 - [Install BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html) (Any 5.4.* should work just fine, even latest)

@@ -1,1 +1,2 @@
-- Add level utility node editor, that can be used to merge together different levels
+- Add conditional support to the merge rows node
+- Add toggleable basic timeline optimisations
