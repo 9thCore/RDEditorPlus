@@ -1,142 +1,36 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.Functionality.Components;
+using RDEditorPlus.Functionality.Optimisation;
 using RDLevelEditor;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace RDEditorPlus.Patch.Optimisation.OptTimeline.ChangeParents
 {
     internal static class Patch_scnEditor
     {
-        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.AddNewEventControl))]
-        private static class AddNewEventControl
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Start))]
+        private static class Start
         {
-            private static void Postfix(LevelEventControl_Base eventControl)
+            private static void Prefix(scnEditor __instance)
             {
-                eventControl.gameObject.AddComponent<ArbitraryTransformHolder>().Transform = eventControl.transform.parent;
+                foreach (var section in __instance.tabSections)
+                {
+                    TimelineOptimisations.Instance.Unparent(section, entireTab: true);
+                }
             }
         }
 
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.ShowTabSection))]
         private static class ShowTabSection
         {
-            private static void Postfix(Tab tab)
+            private static void Postfix(scnEditor __instance, Tab tab)
             {
-                var editor = scnEditor.instance;
-
-                switch (tab)
+                TimelineOptimisations.Instance.Parent(__instance.currentTabSection, entireTab: false);
+                foreach (var section in __instance.tabSections)
                 {
-                    case Tab.Song:
-                        ParentAllFrom(editor.eventControls_sounds);
-                        UnparentAllFrom(editor.eventControls_rows);
-                        UnparentAllFrom(editor.eventControls_actions);
-                        UnparentAllFrom(editor.eventControls_rooms);
-                        UnparentAllFrom(editor.eventControls_sprites);
-                        UnparentAllFrom(editor.eventControls_windows);
-                        break;
-                    case Tab.Rows:
-                        UnparentAllFrom(editor.eventControls_sounds);
-                        ParentAllFrom(editor.eventControls_rows);
-                        UnparentAllFrom(editor.eventControls_actions);
-                        UnparentAllFrom(editor.eventControls_rooms);
-                        UnparentAllFrom(editor.eventControls_sprites);
-                        UnparentAllFrom(editor.eventControls_windows);
-                        break;
-                    case Tab.Actions:
-                        UnparentAllFrom(editor.eventControls_sounds);
-                        UnparentAllFrom(editor.eventControls_rows);
-                        ParentAllFrom(editor.eventControls_actions);
-                        UnparentAllFrom(editor.eventControls_rooms);
-                        UnparentAllFrom(editor.eventControls_sprites);
-                        UnparentAllFrom(editor.eventControls_windows);
-                        break;
-                    case Tab.Rooms:
-                        UnparentAllFrom(editor.eventControls_sounds);
-                        UnparentAllFrom(editor.eventControls_rows);
-                        UnparentAllFrom(editor.eventControls_actions);
-                        ParentAllFrom(editor.eventControls_rooms);
-                        UnparentAllFrom(editor.eventControls_sprites);
-                        UnparentAllFrom(editor.eventControls_windows);
-                        break;
-                    case Tab.Sprites:
-                        UnparentAllFrom(editor.eventControls_sounds);
-                        UnparentAllFrom(editor.eventControls_rows);
-                        UnparentAllFrom(editor.eventControls_actions);
-                        UnparentAllFrom(editor.eventControls_rooms);
-                        ParentAllFrom(editor.eventControls_sprites);
-                        UnparentAllFrom(editor.eventControls_windows);
-                        break;
-                    case Tab.Windows:
-                        UnparentAllFrom(editor.eventControls_sounds);
-                        UnparentAllFrom(editor.eventControls_rows);
-                        UnparentAllFrom(editor.eventControls_actions);
-                        UnparentAllFrom(editor.eventControls_rooms);
-                        UnparentAllFrom(editor.eventControls_sprites);
-                        ParentAllFrom(editor.eventControls_windows);
-                        break;
+                    if (section.tab != tab)
+                    {
+                        TimelineOptimisations.Instance.Unparent(section, entireTab: true);
+                    }
                 }
-            }
-
-            private static void UnparentAllFrom(List<List<LevelEventControl_Base>> nestedList)
-            {
-                if (nestedList == null)
-                {
-                    return;
-                }
-
-                foreach (var list in nestedList)
-                {
-                    UnparentAllFrom(list);
-                }
-            }
-
-            private static void UnparentAllFrom(List<LevelEventControl_Base> list)
-            {
-                if (list == null
-                    || list.Count == 0)
-                {
-                    return;
-                }
-
-                var holder = list[0].transform.parent;
-
-                if (holder.GetComponent<ArbitraryTransformHolder>() == null)
-                {
-                    holder.gameObject.AddComponent<ArbitraryTransformHolder>().Transform = holder.parent;
-                }
-
-                holder.SetParent(null, worldPositionStays: false);
-            }
-
-            private static void ParentAllFrom(List<List<LevelEventControl_Base>> nestedList)
-            {
-                if (nestedList == null)
-                {
-                    return;
-                }
-
-                foreach (var list in nestedList)
-                {
-                    ParentAllFrom(list);
-                }
-            }
-
-            private static void ParentAllFrom(List<LevelEventControl_Base> list)
-            {
-                if (list == null
-                    || list.Count == 0)
-                {
-                    return;
-                }
-
-                var holder = list[0].transform.parent;
-
-                if (holder.GetComponent<ArbitraryTransformHolder>() == null)
-                {
-                    return;
-                }
-
-                holder.transform.SetParent(holder.GetComponent<ArbitraryTransformHolder>().Transform, worldPositionStays: false);
             }
         }
     }
