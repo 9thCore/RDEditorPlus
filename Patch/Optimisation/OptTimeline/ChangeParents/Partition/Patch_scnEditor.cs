@@ -49,9 +49,17 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.ChangeParents.Partition
                 var gameObject = transform.gameObject;
                 int page = 0;
                 var section = eventControl.tabSection;
-                while (section.container[page] != gameObject)
+
+                if (eventControl.levelEvent.type == LevelEventType.None)
                 {
-                    page++;
+                    page = section.pageIndex;
+                }
+                else 
+                {
+                    while (section.container[page] != gameObject)
+                    {
+                        page++;
+                    }
                 }
 
                 Transform partition = TimelineOptimisations.Instance.EnsurePartition(section, page, eventControl.bar);
