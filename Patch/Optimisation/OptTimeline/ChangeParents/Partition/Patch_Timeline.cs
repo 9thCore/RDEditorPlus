@@ -24,7 +24,10 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.ChangeParents.Partition
                     var leftEdge = __instance.GetBarAndBeatWithPosX(-anchoredPosition.x);
                     var rightEdge = __instance.GetBarAndBeatWithPosX(-anchoredPosition.x + __instance.scrollview.rect.width);
 
-                    TimelineOptimisations.Instance.HandlePartitionParents(__instance.editor.currentTabSection, leftEdge.bar, rightEdge.bar);
+                    TimelineOptimisations.Instance.HandlePartitionParents(
+                        __instance.editor.currentTabSection,
+                        leftEdge.bar - PluginConfig.OptimisationsTimelinePartitionsBuffer,
+                        rightEdge.bar + PluginConfig.OptimisationsTimelinePartitionsBuffer);
                 }
             }
         }

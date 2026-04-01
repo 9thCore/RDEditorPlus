@@ -95,6 +95,10 @@ namespace RDEditorPlus
         public const string PATCH_OPTIMISATIONS_TIMELINE_PARTITIONS = "Partitions the event's parents further to allow skipping moving events outside of view.\n" +
             "Could introduce even more issues than " + nameof(TimelineOptimisations.ChangeParents) + " already does.\n" +
             "Only takes effect if " + nameof(TimelineOptimisations.ChangeParents) + " is enabled (" + nameof(optimisationsTimeline) + " contains it), because otherwise there would be no performance benefit.";
+        public const string PATCH_OPTIMISATIONS_TIMELINE_PARTITIONS_BUFFER = "How much of a buffer the partition culling should have.\n" +
+            "A higher value means longer events will still be visible even if partially off-screen, but may lower performance as more events will be moved at once.\n" +
+            "A value of 0 is equivalent to no buffer.\n" +
+            "Only takes effect if " + nameof(optimisationsTimelinePartitions) + " is enabled.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -128,6 +132,7 @@ namespace RDEditorPlus
         public static bool OptimisationsEnabled => Instance.optimisations.Value;
         public static TimelineOptimisations OptimisationsTimelineLevel => Instance.optimisationsTimeline.Value;
         public static bool OptimisationsTimelinePartitionsEnabled => Instance.optimisationsTimelinePartitions.Value;
+        public static int OptimisationsTimelinePartitionsBuffer => Instance.optimisationsTimelinePartitionsBuffer.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -220,6 +225,9 @@ namespace RDEditorPlus
 
         [Config<bool>(PATCH_OPTIMISATIONS_TIMELINE_PARTITIONS, false)]
         public readonly ConfigEntry<bool> optimisationsTimelinePartitions;
+
+        [Config<int>(PATCH_OPTIMISATIONS_TIMELINE_PARTITIONS_BUFFER, 0)]
+        public readonly ConfigEntry<int> optimisationsTimelinePartitionsBuffer;
 #pragma warning restore 0649
 
 
