@@ -92,6 +92,9 @@ namespace RDEditorPlus
         public const string PATCH_OPTIMISATIONS_TIMELINE = "How aggressively the timeline should be optimised.\n" +
             nameof(TimelineOptimisations.RecullOnlyIfRequired) + " permits recalculating event culling only if an update is required. Improves performance while the timeline is not being updated (moved, zoomed in, etc.), and should not break anything.\n" +
             nameof(TimelineOptimisations.ChangeParents) + " changes the event's parents as the tab changes, so only the events in the current tab move. Improves performance while moving the timeline, but could cause issues and heavily depends on how many events are in the current tab (e.g. if 6940/6948 of the level's events are in the Actions tab, having the Actions tab open will barely improve performance, while having other tabs open will significantly improve performance).";
+        public const string PATCH_OPTIMISATIONS_TIMELINE_PARTITIONS = "Partitions the event's parents further to allow skipping moving events outside of view.\n" +
+            "Could introduce even more issues than " + nameof(TimelineOptimisations.ChangeParents) + " already does.\n" +
+            "Only takes effect if " + nameof(TimelineOptimisations.ChangeParents) + " is enabled (" + nameof(optimisationsTimeline) + " contains it), because otherwise there would be no performance benefit.";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
@@ -124,6 +127,7 @@ namespace RDEditorPlus
 
         public static bool OptimisationsEnabled => Instance.optimisations.Value;
         public static TimelineOptimisations OptimisationsTimelineLevel => Instance.optimisationsTimeline.Value;
+        public static bool OptimisationsTimelinePartitionsEnabled => Instance.optimisationsTimelinePartitions.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -213,6 +217,9 @@ namespace RDEditorPlus
 
         [Config<TimelineOptimisations>(PATCH_OPTIMISATIONS_TIMELINE, TimelineOptimisations.None)]
         public readonly ConfigEntry<TimelineOptimisations> optimisationsTimeline;
+
+        [Config<bool>(PATCH_OPTIMISATIONS_TIMELINE_PARTITIONS, false)]
+        public readonly ConfigEntry<bool> optimisationsTimelinePartitions;
 #pragma warning restore 0649
 
 
