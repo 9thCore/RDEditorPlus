@@ -46,7 +46,6 @@ namespace RDEditorPlus.Patch.Optimisation.OptTimeline.ChangeParents.Partition
                 var partition = TimelineOptimisations.Instance.EnsurePartition(section, page, __instance.bar);
                 if (__instance.transform.parent != partition)
                 {
-                    Plugin.LogInfo($"{__instance.transform.parent} -> {partition}");
                     __instance.transform.SetParent(partition, worldPositionStays: false);
                 }
             }
