@@ -1,2 +1,1 @@
-- Add conditional support to the merge rows node
-- Add toggleable basic timeline optimisations
+- Add event partitioning to the timeline, for a further hopeful performance gain
