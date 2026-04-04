@@ -56,7 +56,7 @@ namespace RDEditorPlus.Functionality.LevelOptions.Mods
             {
                 try
                 {
-                    mods = [.. File.ReadAllLines(path).Where(line => !line.IsNullOrEmpty())];
+                    mods = [.. File.ReadAllLines(path).Where(line => !line.IsNullOrEmpty()).Distinct()];
                 }
                 catch (Exception exception)
                 {
