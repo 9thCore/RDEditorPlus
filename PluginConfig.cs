@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using RDEditorPlus.ExtraData;
 using RDEditorPlus.Functionality.LevelOptions.Mods;
+using RDEditorPlus.Patch.LevelOptions.CustomClass;
 using System;
 using System.IO;
 using System.Linq;
@@ -104,9 +105,9 @@ namespace RDEditorPlus
 
         public const string PATCH_LEVEL_OPTIONS = "Toggle for all level option functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_LEVEL_OPTIONS_CUSTOM_CLASS = "If a dropdown for custom classes should be provided.\n" +
-            "Only a few select custom classes will be available.";
+            "The list of available custom classes will be fetched from \"BepInEx/plugins/RDEditorPlus/" + Patch_InspectorPanel_LevelSettings.Filename + "\", where the custom classes are expected to be separated by newlines (empty lines are ignored), or be given a sensible default otherwise (the useful custom classes that were available when the patch was last updated).";
         public const string PATCH_LEVEL_OPTIONS_MODS = "If a menu for selecting mods should be provided.\n" +
-            "The list of available mods will be fetched from \"BepInEx/plugins/RDEditorPlus/" + ModPanelHolder.ModListFile + "\", where the mods are expected to be separated by newlines (empty lines are ignored), or be given a sensible default otherwise (the mods that were available when the patch was last updated).";
+            "The list of available mods will be fetched from \"BepInEx/plugins/RDEditorPlus/" + ModPanelHolder.ModListFile + "\", where the mods are expected to be separated by newlines (empty lines are ignored), or be given a sensible default otherwise (the useful mods that were available when the patch was last updated).";
 
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;

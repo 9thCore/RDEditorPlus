@@ -3,6 +3,7 @@ using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,30 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
 {
     internal static class Patch_InspectorPanel_LevelSettings
     {
+        static Patch_InspectorPanel_LevelSettings()
+        {
+            string path = FileUtil.GetFilePathFromAssembly(Filename);
+            if (!File.Exists(path))
+            {
+                allowedCustomClasses = DefaultAllowedCustomClasses;
+            }
+            else
+            {
+                try
+                {
+                    allowedCustomClasses = [.. File.ReadAllLines(path).Where(line => !line.IsNullOrEmpty() && line != EmptyCustomClass).Distinct()];
+                    allowedCustomClasses.Insert(0, EmptyCustomClass);
+                }
+                catch (Exception exception)
+                {
+                    Plugin.LogError($"Tried to read from {path}, but was met with {exception} instead. Using default custom class list.");
+                    allowedCustomClasses = DefaultAllowedCustomClasses;
+                }
+            }
+
+            allowedCustomClassesCount = allowedCustomClasses.Count;
+        }
+
         [HarmonyPatch(typeof(InspectorPanel_LevelSettings), nameof(InspectorPanel_LevelSettings.Awake))]
         private static class Awake
         {
@@ -19,7 +44,7 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
                 UnityUtil.CreateDropdown(__instance.general.transform, out var dropdown, out var dropdownRT);
 
                 dropdown.ClearOptions();
-                dropdown.AddOptions(AllowedCustomClasses);
+                dropdown.AddOptions(allowedCustomClasses);
                 dropdown.onValueChanged.AddListener(OnSelectItem);
 
                 dropdownRT.anchorMin = Vector2.zero;
@@ -60,13 +85,13 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
             var manager = scnEditor.instance.inspectorPanelManager;
             manager.LevelEditorPlaySound(sound, group);
 
-            ValidCustomClass customClass = (ValidCustomClass)index;
+            string customClass = allowedCustomClasses[index];
 
             using (new SaveStateScope())
             {
                 scnEditor.instance.levelSettings.customClass = customClass switch
                 {
-                    ValidCustomClass.None => null,
+                    EmptyCustomClass => null,
                     _ => customClass.ToString()
                 };
             }
@@ -80,14 +105,15 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
         {
             if (customClass.IsNullOrEmpty())
             {
-                dropdown.SetValueWithoutNotify((int)ValidCustomClass.None);
+                dropdown.SetValueWithoutNotify(0);
                 return;
             }
 
-            if (Enum.TryParse(customClass, out ValidCustomClass result))
+            int index = allowedCustomClasses.IndexOf(customClass);
+            if (index != -1)
             {
                 ResetDropdownToUsualOptionsIfNeeded();
-                dropdown.SetValueWithoutNotify((int)result);
+                dropdown.SetValueWithoutNotify(index);
                 return;
             }
 
@@ -100,44 +126,32 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
 
         private static void ResetDropdownToUsualOptionsIfNeeded()
         {
-            if (dropdown.options.Count == AllowedCustomClassesCount)
+            if (dropdown.options.Count == allowedCustomClassesCount)
             {
                 return;
             }
 
             dropdown.ClearOptions();
-            dropdown.AddOptions(AllowedCustomClasses);
-        }
-
-        private enum ValidCustomClass
-        {
-            None,
-            Injury,
-            Intimate,
-            LuckyBreak,
-            PaigesReckoning,
-            Rollerdisco,
-            Unbeatable,
-            VividStasis,
-            Unreachable,
-            Freezeshot,
-            EdegaPerformance,
-            DistantDuet,
-            CareLess
+            dropdown.AddOptions(allowedCustomClasses);
         }
 
         private static Dropdown dropdown;
 
-        private static readonly List<string> AllowedCustomClasses = [.. Enum.GetValues(typeof(ValidCustomClass))
-            .Cast<ValidCustomClass>().Select(value => value.ToString())];
-        private static readonly int AllowedCustomClassesCount = AllowedCustomClasses.Count;
+        private static readonly List<string> allowedCustomClasses;
+        private static readonly int allowedCustomClassesCount;
+
+        private static List<string> DefaultAllowedCustomClasses => [EmptyCustomClass, "Injury", "Intimate", "LuckyBreak", "PaigesReckoning",
+            "Rollerdisco", "Unbeatable", "VividStasis", "Unreachable", "Freezeshot", "EdegaPerformance", "DistantDuet", "CareLess"];
 
         private static List<string> AllowedCustomClassesWithBadExtra(string key)
-            => [.. AllowedCustomClasses, $"<color=#800000>{key}</color>"];
+            => [.. allowedCustomClasses, $"<color=#800000>{key}</color>"];
 
         private const float ExtraVerticalOffset = 25f;
         private const float TextEndPoint = 70f;
         private const float TotalWidth = 114f;
         private const float CutFactor = 35f;
+        private const string EmptyCustomClass = "None";
+
+        public const string Filename = "customClasses.txt";
     }
 }
