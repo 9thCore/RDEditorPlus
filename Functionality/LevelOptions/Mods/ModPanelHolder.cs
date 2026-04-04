@@ -14,7 +14,15 @@ namespace RDEditorPlus.Functionality.LevelOptions.Mods
         private static ModPanelHolder instance;
         public static ModPanelHolder Instance
         {
-            get => instance ??= new();
+            get
+            {
+                if (instance == null || !instance.Valid())
+                {
+                    instance = new();
+                }
+
+                return instance;
+            }
         }
 
         public override void OnHide()
