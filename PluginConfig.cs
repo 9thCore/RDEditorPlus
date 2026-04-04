@@ -31,6 +31,7 @@ namespace RDEditorPlus
         public const string CATEGORY_WINDOWS = "Windows";
         public const string CATEGORY_NODEEDITOR = "NodeEditor";
         public const string CATEGORY_OPTIMISATIONS = "Optimisation";
+        public const string CATEGORY_LEVELOPTIONS = "LevelOptions";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -100,6 +101,10 @@ namespace RDEditorPlus
             "A value of 0 is equivalent to no buffer.\n" +
             "Only takes effect if " + nameof(optimisationsTimelinePartitions) + " is enabled.";
 
+        public const string PATCH_LEVEL_OPTIONS = "Toggle for all level option functionality.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_LEVEL_OPTIONS_CUSTOM_CLASS = "If a dropdown for custom classes should be provided.\n" +
+            "Only a few select custom classes will be available.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -133,6 +138,9 @@ namespace RDEditorPlus
         public static TimelineOptimisations OptimisationsTimelineLevel => Instance.optimisationsTimeline.Value;
         public static bool OptimisationsTimelinePartitionsEnabled => Instance.optimisationsTimelinePartitions.Value;
         public static int OptimisationsTimelinePartitionsBuffer => Instance.optimisationsTimelinePartitionsBuffer.Value;
+
+        public static bool LevelOptionsEnabled => Instance.levelOptions.Value;
+        public static bool LevelOptionsCustomClassEnabled => Instance.levelOptionsCustomClass.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -228,6 +236,13 @@ namespace RDEditorPlus
 
         [Config<int>(PATCH_OPTIMISATIONS_TIMELINE_PARTITIONS_BUFFER, 0)]
         public readonly ConfigEntry<int> optimisationsTimelinePartitionsBuffer;
+
+        [Category(CATEGORY_LEVELOPTIONS)]
+        [Config<bool>(PATCH_LEVEL_OPTIONS, false)]
+        public readonly ConfigEntry<bool> levelOptions;
+
+        [Config<bool>(PATCH_LEVEL_OPTIONS_CUSTOM_CLASS, false)]
+        public readonly ConfigEntry<bool> levelOptionsCustomClass;
 #pragma warning restore 0649
 
 

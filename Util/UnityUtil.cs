@@ -104,5 +104,20 @@ namespace RDEditorPlus.Util
             result = component.GetComponentInParent<T>();
             return result != null;
         }
+
+        public static void CreateDropdown(Transform parent, out Dropdown dropdown, out RectTransform dropdownRT)
+        {
+            var controlInstance = GameObject.Instantiate(RDConstants.data.dropdownControlPrefab);
+
+            dropdown = controlInstance.GetComponentInChildren<Dropdown>();
+
+            dropdownRT = dropdown.transform as RectTransform;
+            dropdownRT.SetParent(parent);
+            dropdownRT.localPosition = Vector3.zero;
+            dropdownRT.localScale = Vector3.one;
+
+            GameObject.DestroyImmediate(dropdown.GetComponent<EditorDropdown>());
+            GameObject.DestroyImmediate(controlInstance);
+        }
     }
 }

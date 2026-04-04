@@ -62,6 +62,7 @@ namespace RDEditorPlus
             Patch.Optimisation.OptTimeline.RecullOnlyIfRequired.PatchHandler.Instance.Patch(harmony);
             Patch.Optimisation.OptTimeline.ChangeParents.PatchHandler.Instance.Patch(harmony);
             Patch.Optimisation.OptTimeline.ChangeParents.Partition.PatchHandler.Instance.Patch(harmony);
+            Patch.LevelOptions.CustomClass.PatchHandler.Instance.Patch(harmony);
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
         }
