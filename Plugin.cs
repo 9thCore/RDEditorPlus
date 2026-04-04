@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using RDEditorPlus.Patch;
 using RDEditorPlus.Util;
+using System.Linq;
 
 namespace RDEditorPlus
 {
@@ -47,22 +48,19 @@ namespace RDEditorPlus
             PatchUtil.PatchNested(harmony, typeof(Patch_scnEditor));
             PatchUtil.PatchNested(harmony, typeof(Patch_RDLevelData));
 
-            Patch.SubRows.PatchHandler.Instance.Patch(harmony);
-            Patch.SubRows.Patient.PatchHandler.Instance.Patch(harmony);
-            Patch.SubRows.Window.PatchHandler.Instance.Patch(harmony);
-            Patch.SubRows.Room.PatchHandler.Instance.Patch(harmony);
-            Patch.SubRows.Sprite.PatchHandler.Instance.Patch(harmony);
-            Patch.CustomMethod.Autocomplete.PatchHandler.Instance.Patch(harmony);
-            Patch.Rows.BeatSwitch.PatchHandler.Instance.Patch(harmony);
-            Patch.Select.MultiEdit.PatchHandler.Instance.Patch(harmony);
-            Patch.Windows.MoreWindows.PatchHandler.Instance.Patch(harmony);
-            Patch.Windows.MoreWindows.SubRowDisabled.PatchHandler.Instance.Patch(harmony);
-            Patch.LevelNode.PatchHandler.Instance.Patch(harmony);
-            Patch.NodeEditor.PatchHandler.Instance.Patch(harmony);
-            Patch.Optimisation.OptTimeline.RecullOnlyIfRequired.PatchHandler.Instance.Patch(harmony);
-            Patch.Optimisation.OptTimeline.ChangeParents.PatchHandler.Instance.Patch(harmony);
-            Patch.Optimisation.OptTimeline.ChangeParents.Partition.PatchHandler.Instance.Patch(harmony);
-            Patch.LevelOptions.CustomClass.PatchHandler.Instance.Patch(harmony);
+            var baseType = typeof(BasePatchHandler);
+            foreach (var type in baseType.Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType) && !type.IsAbstract))
+            {
+                var property = AccessTools.PropertyGetter(type, "Instance");
+                if (property == null)
+                {
+                    Plugin.LogError($"{type.FullName} does not have an Instance property! Can't patch");
+                }
+                else
+                {
+                    (property.Invoke(null, []) as BasePatchHandler)?.Patch(harmony);
+                }
+            }
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} successfully loaded.");
         }
