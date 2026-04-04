@@ -119,5 +119,104 @@ namespace RDEditorPlus.Util
             GameObject.DestroyImmediate(dropdown.GetComponent<EditorDropdown>());
             GameObject.DestroyImmediate(controlInstance);
         }
+
+        public static void CreateScrollView(Transform parent, out ScrollRect scrollRect, out RectTransform contentRT)
+        {
+            GameObject scrollviewGO = new("scrollview");
+            scrollRect = scrollviewGO.AddComponent<ScrollRect>();
+
+            var scrollviewRT = scrollviewGO.transform as RectTransform;
+            scrollviewRT.SetParent(parent, worldPositionStays: false);
+            scrollviewRT.anchorMin = Vector2.zero;
+            scrollviewRT.anchorMax = Vector2.one;
+            scrollviewRT.offsetMin = new Vector2(4f, 10f);
+            scrollviewRT.offsetMax = new Vector2(-4f, -20f);
+
+            CreateScrollViewport(scrollviewRT, out contentRT, out var viewportRT);
+            CreateScrollbar(scrollviewRT, out var scrollbar);
+
+            scrollRect.content = contentRT;
+            scrollRect.viewport = viewportRT;
+            scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            scrollRect.verticalScrollbar = scrollbar;
+            scrollRect.horizontal = false;
+            scrollRect.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+            scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+        }
+
+        private static void CreateScrollViewport(Transform parent, out RectTransform contentRT, out RectTransform viewportRT)
+        {
+            GameObject viewportGO = new("viewport");
+
+            var viewportImage = viewportGO.AddComponent<Image>();
+            viewportImage.sprite = AssetUtil.InputFieldSprite;
+            viewportImage.type = Image.Type.Tiled;
+            viewportImage.color = Color.Lerp(Color.gray, Color.black, 0.65f);
+
+            viewportGO.AddComponent<Mask>();
+
+            viewportRT = viewportGO.transform as RectTransform;
+            viewportRT.SetParent(parent, worldPositionStays: false);
+            viewportRT.anchorMin = Vector2.zero;
+            viewportRT.anchorMax = Vector2.one;
+            viewportRT.offsetMin = Vector2.zero;
+            viewportRT.offsetMax = Vector2.zero;
+
+            GameObject contentGO = new("content");
+
+            contentRT = contentGO.AddComponent<RectTransform>();
+            contentRT.SetParent(viewportRT, worldPositionStays: false);
+            contentRT.anchorMin = Vector2.zero;
+            contentRT.anchorMax = Vector2.one;
+            contentRT.offsetMin = Vector2.zero;
+            contentRT.offsetMax = Vector2.zero;
+        }
+
+        private static void CreateScrollbar(Transform parent, out Scrollbar scrollbar)
+        {
+            GameObject scrollbarGO = new("scrollbar");
+            scrollbar = scrollbarGO.AddComponent<Scrollbar>();
+
+            var scrollbarImage = scrollbarGO.AddComponent<Image>();
+            scrollbarImage.enabled = false;
+
+            var scrollbarRT = scrollbarGO.transform as RectTransform;
+            scrollbarRT.SetParent(parent, worldPositionStays: false);
+            scrollbarRT.anchorMin = new Vector2(1f, 0f);
+            scrollbarRT.anchorMax = Vector2.one;
+            scrollbarRT.offsetMin = new Vector2(-10f, 5f);
+            scrollbarRT.offsetMax = new Vector2(-5f, -5f);
+
+            GameObject slidingAreaGO = new("slidingArea");
+
+            var slidingAreaImage = slidingAreaGO.AddComponent<Image>();
+            slidingAreaImage.sprite = AssetUtil.InputFieldSprite;
+            slidingAreaImage.type = Image.Type.Tiled;
+            slidingAreaImage.color = Color.Lerp(Color.gray, Color.black, 0.75f);
+
+            var slidingAreaRT = slidingAreaGO.transform as RectTransform;
+            slidingAreaRT.SetParent(scrollbarRT, worldPositionStays: false);
+            slidingAreaRT.anchorMin = Vector2.zero;
+            slidingAreaRT.anchorMax = Vector2.one;
+            slidingAreaRT.offsetMin = Vector2.zero;
+            slidingAreaRT.offsetMax = Vector2.zero;
+
+            GameObject handleGO = new("handle");
+
+            var handleImage = handleGO.AddComponent<Image>();
+            handleImage.sprite = AssetUtil.ButtonSprite;
+            handleImage.type = Image.Type.Tiled;
+
+            var handleRT = handleGO.transform as RectTransform;
+            handleRT.SetParent(slidingAreaRT, worldPositionStays: false);
+            handleRT.offsetMin = Vector2.zero;
+            handleRT.offsetMax = Vector2.zero;
+
+            scrollbar.handleRect = handleRT;
+            scrollbar.targetGraphic = handleImage;
+            scrollbar.image = scrollbarImage;
+        }
     }
 }
