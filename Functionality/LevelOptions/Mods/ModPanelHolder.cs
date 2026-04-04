@@ -161,9 +161,9 @@ namespace RDEditorPlus.Functionality.LevelOptions.Mods
 
         private static ref string[] LevelMods => ref scnEditor.instance.levelSettings.mods;
 
-        private static string[] DefaultMods => ["bombBeats", "smoothShake", "rotateShake", "cpuIsP2On2P", "startImmediately",
-            "booleansDefaultToTrue", "classicHitParticles", "legacyTaggedEvents", "playerDrives7thBeat",
-            "runTaggedEventsWhileScrubbing", "noShadowRowWeighting", "oldVFXEasing"];
+        private static string[] DefaultMods => ["bombBeats", "cpuIsP2On2P", "startImmediately", "booleansDefaultToTrue",
+            "classicHitParticles", "legacyTaggedEvents", "playerDrives7thBeat", "runTaggedEventsWhileScrubbing",
+            "noShadowRowWeighting", "oldVFXEasing", "adaptRowsToRoomHeight", "bossLevel", "showHitStripOnlyOnActiveBeats"];
 
         public const string ModListFile = "mods.txt";
     }
