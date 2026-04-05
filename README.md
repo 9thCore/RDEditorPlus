@@ -21,6 +21,16 @@ Features:
 	- Can be used to merge together levels, as well as crudely edit existing levels by removing select events
 - Adds some basic optimisations
 	- Two timeline optimisations available, which may or may not cause issues in other areas
+	- The second timeline optimisation - `ChangeParents` - comes with an optional "event partitioning" system that can improve performance
+- Add a dropdown selector for the level's custom class
+	- Custom class list can be customised with a file in the mod folder
+	- Any custom classes not in this list, but used by the current level, will also be present in the list, but with a reddish hue
+		- After selecting another class, this will disappear from the list. (But you can always undo!)
+- Add a menu used for selecting the level's mods
+	- Mod list can be customised with a file in the mod folder
+	- Any mods not in this list, but used by the current level, will not be editable at all as they will not appear in the UI
+- Add an optional vanilla bugfix that helps with the subrow system
+	- On undo, row and sprite events were not being properly reassigned to the correct event list, so they were treated as part of another row's list by the subrow system
 
 Installation:  
 - [Install BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html) (Any 5.4.* should work just fine, even latest)

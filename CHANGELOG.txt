@@ -1,1 +1,5 @@
-- Add event partitioning to the timeline, for a further hopeful performance gain
+- Add a dropdown for the level custom class
+  - Custom class list can be customised with a file in the root mod folder
+- Add a selector for the level mods
+  - Mod list can be customised with a file in the root mod folder
+- Fix vanilla bug that was affecting the subrow system, but that is enable-able separately
