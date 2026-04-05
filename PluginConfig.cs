@@ -34,6 +34,7 @@ namespace RDEditorPlus
         public const string CATEGORY_NODEEDITOR = "NodeEditor";
         public const string CATEGORY_OPTIMISATIONS = "Optimisation";
         public const string CATEGORY_LEVELOPTIONS = "LevelOptions";
+        public const string CATEGORY_BUGFIXES = "BugFixes";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -109,6 +110,10 @@ namespace RDEditorPlus
         public const string PATCH_LEVEL_OPTIONS_MODS = "If a menu for selecting mods should be provided.\n" +
             "The list of available mods will be fetched from \"BepInEx/plugins/RDEditorPlus/" + ModPanelHolder.ModListFile + "\", where the mods are expected to be separated by newlines (empty lines are ignored), or be given a sensible default otherwise (the useful mods that were available when the patch was last updated).";
 
+        public const string PATCH_BUG_FIXES = "Toggle for all vanilla bug fix attempts.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_BUG_FIXES_WRONG_EVENT_LIST = "Patch a bug where, after an undo, level events are not properly reassigned to the correct event list, in the case of rows and sprites.\n" +
+            "Will increase load time on undos, because it has more work to do.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -146,6 +151,9 @@ namespace RDEditorPlus
         public static bool LevelOptionsEnabled => Instance.levelOptions.Value;
         public static bool LevelOptionsCustomClassEnabled => Instance.levelOptionsCustomClass.Value;
         public static bool LevelOptionsModsEnabled => Instance.levelOptionsMods.Value;
+
+        public static bool BugFixesEnabled => Instance.bugFixes.Value;
+        public static bool BugFixesWrongEventListEnabled => Instance.bugFixesWrongEventList.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -251,6 +259,13 @@ namespace RDEditorPlus
 
         [Config<bool>(PATCH_LEVEL_OPTIONS_MODS, false)]
         public readonly ConfigEntry<bool> levelOptionsMods;
+
+        [Category(CATEGORY_BUGFIXES)]
+        [Config<bool>(PATCH_BUG_FIXES, false)]
+        public readonly ConfigEntry<bool> bugFixes;
+
+        [Config<bool>(PATCH_BUG_FIXES_WRONG_EVENT_LIST, false)]
+        public readonly ConfigEntry<bool> bugFixesWrongEventList;
 #pragma warning restore 0649
 
 
