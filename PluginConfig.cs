@@ -62,6 +62,11 @@ namespace RDEditorPlus
             "Only does something if " + nameof(customMethodsAutocomplete) + " is set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ".\n" +
             "The file will only be requested once the editor is loaded, even if more than the specified amount of days have passed.\n" +
             "The file will be re-downloaded if it does not already exist.";
+        public const string PATCH_CUSTOM_METHODS_VARIABLE_ALIAS = "Allow creating aliases for variables or expressions, to be used in other expressions.\n" +
+            "Replaces the alias with its contents when used in an expression.\n" +
+            "Alias names must start with a letter or underscore, and can be followed by any number of digits, underscores or letters. They cannot contain spaces.\n" +
+            "The alias cannot be an existing field, method or boolean literal, nor can an alias be defined twice.\n" +
+            "Aliases must be defined top-to-bottom, e.g. if the alias Alias2 uses Alias1 in its expression, then Alias1 must be defined before Alias2. This also means an alias cannot reference itself.";
 
         public const string PATCH_ROW_TOGGLE = "Toggle for all row tab (patients) functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_ROW_BEAT_SWITCH = "Whether a button that switches the selected beat from a classic beat to a oneshot beat (or vice-versa) should be added to their respective inspectors.";
@@ -127,6 +132,7 @@ namespace RDEditorPlus
         public static bool CustomMethodsEnabled => Instance.customMethods.Value;
         public static CustomMethodAutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
         public static int CustomMethodsAutocompleteRefreshTime => Instance.customMethodsAutocompleteRefreshTime.Value;
+        public static bool CustomMethodsVariableAliasEnabled => Instance.customMethodsVariableAlias.Value;
 
         public static bool RowsEnabled => Instance.rows.Value;
         public static RowBeatSwitchBehaviour RowBeatSwitch => Instance.rowBeatSwitch.Value;
@@ -194,6 +200,9 @@ namespace RDEditorPlus
 
         [Config<int>(PATCH_CUSTOM_METHODS_AUTOCOMPLETE_REFRESH_TIME, 30)]
         public readonly ConfigEntry<int> customMethodsAutocompleteRefreshTime;
+
+        [Config<bool>(PATCH_CUSTOM_METHODS_VARIABLE_ALIAS, false)]
+        public readonly ConfigEntry<bool> customMethodsVariableAlias;
 
 
         [Category(CATEGORY_ROWS)]

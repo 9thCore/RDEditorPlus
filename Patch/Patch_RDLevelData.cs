@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using MonoMod.Cil;
+using RDEditorPlus.Functionality.CustomMethod;
 using RDEditorPlus.Functionality.Windows;
 using RDLevelEditor;
 using System;
@@ -16,6 +17,7 @@ namespace RDEditorPlus.Patch
             private static void Postfix(Dictionary<string, object> rootDict)
             {
                 if (scnEditor.instance == null
+                    || !scnEditor.instance.changingFile
                     || RDLevelData.decodingFailed)
                 {
                     return;
@@ -30,6 +32,11 @@ namespace RDEditorPlus.Patch
                 if (PluginConfig.WindowsEnabled && PluginConfig.WindowsMoreEnabled)
                 {
                     MoreWindowManager.Instance.DecodeModData(dict);
+                }
+
+                if (PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsVariableAliasEnabled)
+                {
+                    VariableAliasManager.Instance.DecodeModData(dict);
                 }
             }
         }
@@ -56,22 +63,11 @@ namespace RDEditorPlus.Patch
 
                 StringBuilder builder = null;
 
-                if (PluginConfig.WindowsEnabled && PluginConfig.WindowsMoreEnabled
-                    && MoreWindowManager.Instance.TryConstructJSONData(out string moreWindowData))
-                {
-                    if (builder == null)
-                    {
-                        builder = new(Indentation);
-                    }
-                    else
-                    {
-                        builder.Append(",");
-                        builder.Append(Environment.NewLine);
-                        builder.Append(Indentation);
-                    }
+                BuildData(ref builder, PluginConfig.WindowsEnabled && PluginConfig.WindowsMoreEnabled,
+                    MoreWindowManager.Instance.TryConstructJSONData);
 
-                    builder.Append(moreWindowData);
-                }
+                BuildData(ref builder, PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsVariableAliasEnabled,
+                    VariableAliasManager.Instance.TryConstructJSONData);
 
                 if (builder == null)
                 {
@@ -85,7 +81,30 @@ namespace RDEditorPlus.Patch
             }
         }
 
+        private static void BuildData(ref StringBuilder builder, bool guard, DataFetch dataFetch)
+        {
+            if (!guard || !dataFetch(out string data))
+            {
+                return;
+            }
+
+            if (builder == null)
+            {
+                builder = new(Indentation);
+            }
+            else
+            {
+                builder.Append(",");
+                builder.Append(Environment.NewLine);
+                builder.Append(Indentation);
+            }
+
+            builder.Append(data);
+        }
+
         private const string ModDataKey = "mod_rdEditorPlus";
         private const string Indentation = "\t\t";
+
+        private delegate bool DataFetch(out string result);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.CustomMethod;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections.Generic;
@@ -34,6 +35,12 @@ namespace RDEditorPlus.Patch
                     && SubRowStorage.Instance.TryConstructJSONData(__instance, out string subRowData))
                 {
                     (builder ??= new()).Append(subRowData);
+                }
+
+                if (PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsVariableAliasEnabled
+                    && VariableAliasManager.Instance.TryConstructEventJSONData(__instance, out string aliasData))
+                {
+                    (builder ??= new()).Append(aliasData);
                 }
 
                 if (builder == null)
