@@ -18,6 +18,20 @@ namespace RDEditorPlus.Patch
             }
         }
 
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.UndoOrRedo))]
+        private static class UndoOrRedo
+        {
+            private static void Prefix()
+            {
+                LevelUtil.CurrentlyUndoing = true;
+            }
+
+            private static void Postfix()
+            {
+                LevelUtil.CurrentlyUndoing = false;
+            }
+        }
+
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.SetLevelEventControlType))]
         private static class SetLevelEventControlType
         {
