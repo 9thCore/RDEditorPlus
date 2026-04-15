@@ -13,6 +13,7 @@ namespace RDEditorPlus.Patch.Select.MultiEdit
             private static bool Prefix()
             {
                 if (!InspectorUtil.CanMultiEdit()
+                    || methodInput == null
                     || methodInput.EqualValueForSelectedEvents())
                 {
                     return true;
