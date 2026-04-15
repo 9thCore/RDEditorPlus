@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using RDEditorPlus.Functionality.CustomMethod;
+using RDEditorPlus.Functionality.CustomMethod.VariableAlias;
 using RDLevelEditor;
 
 namespace RDEditorPlus.Patch.CustomMethod.VariableAlias

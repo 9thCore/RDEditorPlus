@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using MonoMod.Cil;
 using RDEditorPlus.ExtraData;
-using RDEditorPlus.Functionality.CustomMethod;
+using RDEditorPlus.Functionality.CustomMethod.VariableAlias;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System.Collections.Generic;

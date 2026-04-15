@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace RDEditorPlus.Functionality.CustomMethod
+namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 {
     public class VariableAliasManager : MonoBehaviour
     {
