@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using static PolygonWave;
 
 namespace RDEditorPlus.Util
 {
@@ -118,6 +119,43 @@ namespace RDEditorPlus.Util
 
             GameObject.DestroyImmediate(dropdown.GetComponent<EditorDropdown>());
             GameObject.DestroyImmediate(controlInstance);
+        }
+
+        public static GameObject CreateInputField(Transform parent, out InputField inputField, out RectTransform inputFieldRT, Vector4 textPadding)
+        {
+            GameObject inputFieldHolder = new("inputField");
+
+            var image = inputFieldHolder.AddComponent<Image>();
+            image.type = Image.Type.Tiled;
+            image.sprite = AssetUtil.InputFieldSprite;
+
+            inputField = inputFieldHolder.AddComponent<InputField>();
+            inputField.caretColor = Color.black;
+
+            inputFieldRT = inputFieldHolder.transform as RectTransform;
+            inputFieldRT.SetParent(parent);
+            inputFieldRT.localScale = Vector3.one;
+            inputFieldRT.anchorMin = Vector2.zero;
+            inputFieldRT.anchorMax = Vector2.one;
+
+            GameObject textObject = new("text");
+
+            var text = textObject.AddComponent<Text>();
+            text.ApplyRDFont();
+            text.alignment = TextAnchor.LowerLeft;
+            text.color = Color.black;
+
+            var textRT = textObject.transform as RectTransform;
+            textRT.SetParent(inputFieldRT);
+            textRT.localScale = Vector3.one;
+            textRT.anchorMin = Vector2.zero;
+            textRT.anchorMax = Vector2.one;
+            textRT.offsetMin = new Vector2(textPadding.x, textPadding.y);
+            textRT.offsetMax = new Vector2(textPadding.z, textPadding.w);
+
+            inputField.textComponent = text;
+
+            return inputFieldHolder;
         }
 
         public static void CreateScrollView(Transform parent, out ScrollRect scrollRect, out RectTransform contentRT)

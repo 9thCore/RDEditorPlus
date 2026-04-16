@@ -27,6 +27,11 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             }
         }
 
+        public void UpdateAliasDataLength()
+        {
+            aliasDataLongestToShortest = aliasData.OrderByDescending(alias => alias.Alias.Length).ToArray();
+        }
+
         public string ExpandAliases(string expression, bool onlyInBraces)
         {
             if (onlyInBraces)
@@ -45,56 +50,52 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             {
                 StringBuilder builder = new(expression);
 
-                foreach (var alias in aliasData)
+                foreach (var alias in aliasDataLongestToShortest)
                 {
-                    builder.Replace(alias.Key, alias.Value.ParsedText);
+                    builder.Replace(alias.Alias, alias.ExpandedExpression);
                 }
 
                 return builder.ToString();
             }
         }
 
-        public bool TryGetOriginalAlias(string alias, out string original)
+        public List<DisplayAliasData> GetDisplayAliasData()
         {
-            if (aliasData.TryGetValue(alias, out var value))
+            List<DisplayAliasData> result = [];
+
+            foreach (var alias in aliasData)
             {
-                original = value.OriginalText;
-                return true;
+                result.Add(new DisplayAliasData(alias.Alias, alias.Expression));
             }
 
-            original = default;
-            return false;
-        }
-
-        public bool TryGetParsedAlias(string alias, out string parsed)
-        {
-            if (aliasData.TryGetValue(alias, out var value))
-            {
-                parsed = value.ParsedText;
-                return true;
-            }
-
-            parsed = default;
-            return false;
+            return result;
         }
 
         public void Clear() => aliasData.Clear();
         public void ClearOriginalValues() => expandedEventsAliasData.Clear();
+        public void Remove(int index)
+        {
+            aliasData.RemoveAt(index);
+            UpdateAliasDataLength();
+        }
+
+        public void SetAlias(int index, string alias)
+        {
+            aliasData[index].SetAlias(alias);
+            UpdateAliasDataLength();
+        }
+
+        public void SetExpression(int index, string expression)
+        {
+            aliasData[index].SetExpression(expression);
+        }
+
+        public bool AliasExists(string alias) => aliasData.Any(data => data.Alias == alias);
 
         public void CreateAlias(string alias, string expression)
         {
-            if (aliasData.ContainsKey(alias))
+            if (AliasExists(alias))
             {
-                return;
-            }
-
-            expression = ExpandAliases(expression, onlyInBraces: false);
-
-            // Field reference, so keep it without parenthesis in order to be able to set it
-            var type = LevelEvent_Base.level.GetType();
-            if (type.GetField(expression) != null)
-            {
-                aliasData.Add(alias, new AliasReplacement(expression, expression));
                 return;
             }
 
@@ -112,17 +113,11 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 }
             }
 
-            aliasData.Add(alias, new AliasReplacement(expression, $"({parser})"));
+            aliasData.Add(new AliasData(alias, parser.ToString()));
         }
 
         public bool Validate(string alias, out FailureReason reason)
         {
-            if (aliasData.ContainsKey(alias))
-            {
-                reason = FailureReason.AliasAlreadyExists;
-                return false;
-            }
-
             if (!AliasNameFormat.IsMatch(alias))
             {
                 reason = FailureReason.AliasNameIsWrong;
@@ -141,7 +136,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 return false;
             }
 
-            var type = typeof(LevelEvent_Base);
+            var type = typeof(LevelBase);
             if (type.GetField(alias) != null || type.GetProperty(alias) != null || type.GetMethod(alias) != null)
             {
                 reason = FailureReason.AliasIsFieldOrMethod;
@@ -154,15 +149,12 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
         public void DecodeModData(Dictionary<string, object> data)
         {
+            Clear();
+
             if (data == null)
             {
-                Clear();
+                UpdateAliasDataLength();
                 return;
-            }
-
-            if (LevelUtil.CurrentlyUndoing)
-            {
-                Clear();
             }
 
             if (data.TryGetValue(AliasKey, out var value) && value is List<object> aliasDefinitions)
@@ -173,6 +165,10 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                     {
                         var alias = aliasDefinition[0].ToString();
                         
+                        if (AliasExists(alias))
+                        {
+                            Plugin.LogInfo($"Could not register alias {alias} because: it already exists");
+                        }
                         if (!Validate(alias, out var reason))
                         {
                             Plugin.LogInfo($"Could not register alias {alias} because: {reason}");
@@ -185,10 +181,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                     }
                 }
             }
-            else
-            {
-                Clear();
-            }
+
+            UpdateAliasDataLength();
         }
 
         public bool TryConstructJSONData(out string data)
@@ -204,7 +198,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             sb.Append($"\"{AliasKey}\": [");
 
             bool first = true;
-            foreach (var kvp in aliasData)
+            foreach (var alias in aliasData)
             {
                 if (!first)
                 {
@@ -212,7 +206,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 }
                 first = false;
 
-                sb.Append($"[\"{kvp.Key}\", \"{kvp.Value.OriginalText}\"]");
+                sb.Append($"[\"{alias.Alias}\", \"{alias.Expression}\"]");
             }
 
             sb.Append(']');
@@ -359,9 +353,10 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         {
             AliasNameIsWrong,
             AliasIsBoolean,
-            AliasAlreadyExists,
             AliasIsFieldOrMethod
         }
+
+        public record DisplayAliasData(string Alias, string Expression);
 
         public const string AliasKey = "variableAlias";
 
@@ -378,7 +373,9 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             expandedEventsAliasData.Add(levelEvent, dict);
         }
 
-        private readonly SortedDictionary<string, AliasReplacement> aliasData = new(new AliasComparer());
+        private AliasData[] aliasDataLongestToShortest = [];
+
+        private readonly List<AliasData> aliasData = [];
         private readonly Dictionary<LevelEvent_Base, Dictionary<string, object>> expandedEventsAliasData = [];
 
         private static VariableAliasManager instance;
@@ -483,24 +480,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             public abstract void ExpandAliases(VariableAliasManager manager, LevelEvent_Base levelEvent);
         }
 
-        private class AliasComparer : IComparer<string>
-        {
-            public int Compare(string x, string y)
-            {
-                if (x == y)
-                {
-                    return 0;
-                }
-
-                if (x.Length > y.Length)
-                {
-                    return -1;
-                }
-
-                return 1;
-            }
-        }
-
         private enum UnderlyingType
         {
             None,
@@ -512,7 +491,25 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
         private const string AliasDynamicKeyPrefix = "mod_rdEditorPlus_alias_";
 
-        private record AliasReplacement(string OriginalText, string ParsedText);
         private record ReplacementValues(string KeyPart, object Value);
+
+        private class AliasData(string key, string expression)
+        {
+            public string Alias { get; private set; } = key;
+            public string Expression { get; private set; } = expression;
+
+            public string ExpandedExpression { get; private set; } = expression;
+
+            public void Expand()
+            {
+                ExpandedExpression = Expression;
+            }
+
+            public void SetAlias(string alias) => Alias = alias;
+            public void SetExpression(string expression)
+            {
+
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RDLevelEditor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,20 +10,14 @@ namespace RDEditorPlus.Util
 {
     public static class AssetUtil
     {
-        [Filename("editor-inputfield-2px")]
-        public static Sprite InputFieldSprite { get; private set; }
+        [Filename("editor-inputfield-2px")] public static Sprite InputFieldSprite { get; private set; }
+        [Filename("editor-button-2px")] public static Sprite ButtonSprite { get; private set; }
+        [Filename("editor_browse1")] public static Sprite Browse1Sprite { get; private set; }
+        [Filename("editor-checkmark")] public static Sprite CheckmarkSprite { get; private set; }
 
-        [Filename("editor-button-2px")]
-        public static Sprite ButtonSprite { get; private set; }
+        [Filename("RDLatinFontPoint")] public static Font StandardFont { get; private set; }
 
-        [Filename("editor_browse1")]
-        public static Sprite Browse1Sprite { get; private set; }
-
-        [Filename("editor-checkmark")]
-        public static Sprite CheckmarkSprite { get; private set; }
-
-        [Filename("RDLatinFontPoint")]
-        public static Font StandardFont { get; private set; }
+        public static Sprite PulseTrashSprite { get; private set; }
 
         public static void ApplyRDFont(this Text text)
         {
@@ -41,6 +36,23 @@ namespace RDEditorPlus.Util
 
             FetchEditorAssets<Sprite>();
             FetchEditorAssets<Font>();
+        }
+
+        public static void FetchEditorAssetsManual(scnEditor instance)
+        {
+            if (fetchedManual)
+            {
+                return;
+            }
+
+            fetchedManual = true;
+
+            PulseTrashSprite = (instance.inspectorPanelManager
+                .Get<InspectorPanel_PulseFreeTimeBeat>()
+                .properties.First(property => property.name == "action")
+                .control as PropertyControl_ToggleGroup).toggleGroup
+                .transform.Find("Remove").Find("Background").Find("icon")
+                .GetComponent<Image>().sprite;
         }
 
         private static void FetchEditorAssets<T>() where T : UnityEngine.Object
@@ -63,13 +75,16 @@ namespace RDEditorPlus.Util
             return properties
                 .Where(property => property.PropertyType == typeof(T))
                 .Select(property => new AssetDefinition(property, property.GetCustomAttribute<FilenameAttribute>()))
-                .ToDictionary(property => property.Name);
+                .Where(definition => definition.Valid)
+                .ToDictionary(definition => definition.Name);
         }
 
         private static bool fetched = false;
+        private static bool fetchedManual = false;
 
         private record AssetDefinition(PropertyInfo Property, FilenameAttribute Attribute)
         {
+            public bool Valid => Attribute != null;
             public string Name => Attribute.Name;
         }
 

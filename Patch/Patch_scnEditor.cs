@@ -18,6 +18,15 @@ namespace RDEditorPlus.Patch
             }
         }
 
+        [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.Start))]
+        private static class Start
+        {
+            private static void Postfix(scnEditor __instance)
+            {
+                AssetUtil.FetchEditorAssetsManual(__instance);
+            }
+        }
+
         [HarmonyPatch(typeof(scnEditor), nameof(scnEditor.UndoOrRedo))]
         private static class UndoOrRedo
         {
