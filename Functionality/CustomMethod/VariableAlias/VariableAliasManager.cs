@@ -529,9 +529,11 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             public AliasData(VariableAliasManager manager, string alias, string expression, int index)
             {
                 this.manager = manager;
+                this.expression = expression;
                 Alias = alias;
                 Index = index;
-                Expression = expression;
+
+                UpdateExpandedExpression();
             }
 
             public string Alias { get; set; }
@@ -549,12 +551,28 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
             public void UpdateExpandedExpression()
             {
-                ExpandedExpression = manager.ExpandAliases(Expression.EvaluateScientificLiterals(), Index - 1);
+                ExpandedExpression = manager.ExpandAliases(IntermediaryExpression, Index - 1);
                 Plugin.LogInfo($"Updated expansion for {Alias}: {Expression} -> {ExpandedExpression}");
             }
 
+            private string IntermediaryExpression => WrapInParenthesisIfRequired(expression.EvaluateScientificLiterals());
+
             private string expression;
             private readonly VariableAliasManager manager;
+
+            private string WrapInParenthesisIfRequired(string text)
+            {
+                string trimmed = text.Trim();
+
+                if (trimmed.IsExpressionWrappedInParenthesis()
+                    || bool.TryParse(trimmed, out _) || float.TryParse(trimmed, out _)
+                    || manager.AliasExists(trimmed) || typeof(LevelBase).GetField(trimmed) != null)
+                {
+                    return text;
+                }
+
+                return $"({text})";
+            }
         }
     }
 }

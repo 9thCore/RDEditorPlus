@@ -5,6 +5,33 @@ namespace RDEditorPlus.Util
 {
     public static class StringUtil
     {
+        public static bool IsExpressionWrappedInParenthesis(this string text)
+        {
+            if (text.Length == 0)
+            {
+                return false;
+            }
+
+            if (text[0] != '(' || text[text.Length - 1] != ')')
+            {
+                return false;
+            }
+
+            int runningTotal = 1;
+            for (int i = 1; i < text.Length - 1; i++)
+            {
+                if (text[i] == '(') runningTotal++;
+                else if (text[i] == ')') runningTotal--;
+
+                if (runningTotal == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static string EvaluateScientificLiterals(this string text)
         {
             StringBuilder parser = null;
