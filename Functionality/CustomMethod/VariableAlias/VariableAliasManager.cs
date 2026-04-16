@@ -93,8 +93,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 return;
             }
 
-            var replaced = expression.EvaluateScientificLiterals();
-            var data = new AliasData(this, alias, replaced, aliasData.Count);
+            var data = new AliasData(this, alias, expression, aliasData.Count);
             aliasData.Add(data);
         }
 
@@ -550,7 +549,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
             public void UpdateExpandedExpression()
             {
-                ExpandedExpression = manager.ExpandAliases(Expression, Index - 1);
+                ExpandedExpression = manager.ExpandAliases(Expression.EvaluateScientificLiterals(), Index - 1);
                 Plugin.LogInfo($"Updated expansion for {Alias}: {Expression} -> {ExpandedExpression}");
             }
 
