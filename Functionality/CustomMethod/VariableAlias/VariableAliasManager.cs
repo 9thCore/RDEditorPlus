@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using RDEditorPlus.Util;
+﻿using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Collections.Generic;
@@ -27,36 +26,30 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             }
         }
 
-        public void UpdateAliasDataLength()
-        {
-            aliasDataLongestToShortest = aliasData.OrderByDescending(alias => alias.Alias.Length).ToArray();
-        }
-
         public string ExpandAliases(string expression, bool onlyInBraces)
         {
-            if (onlyInBraces)
+            if (!onlyInBraces)
             {
-                var matches = CurlyBraceFormat.Matches(expression);
-
-                Plugin.LogInfo(expression);
-                foreach (Match match in matches)
-                {
-                    Plugin.LogWarn(match.Value);
-                }
-
-                return expression;
+                return ExpandAliases(expression);
             }
-            else
+
+            StringBuilder reconstructor = null;
+
+            var matches = CurlyBraceFormat.Matches(expression);
+
+            for (int i = matches.Count - 1; i >= 0; i--)
             {
-                StringBuilder builder = new(expression);
+                var match = matches[i];
 
-                foreach (var alias in aliasDataLongestToShortest)
+                if (TryExpandAliases(match.Value, out string result))
                 {
-                    builder.Replace(alias.Alias, alias.ExpandedExpression);
+                    (reconstructor ??= new(expression))
+                        .Remove(match.Index, match.Length)
+                        .Insert(match.Index, result);
                 }
-
-                return builder.ToString();
             }
+
+            return reconstructor == null ? expression : reconstructor.ToString();
         }
 
         public List<DisplayAliasData> GetDisplayAliasData()
@@ -76,18 +69,19 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         public void Remove(int index)
         {
             aliasData.RemoveAt(index);
-            UpdateAliasDataLength();
+            UpdateAliasExpansionsFrom(index + 1);
         }
 
         public void SetAlias(int index, string alias)
         {
-            aliasData[index].SetAlias(alias);
-            UpdateAliasDataLength();
+            aliasData[index].Alias = alias;
+            UpdateAliasExpansionsFrom(index + 1);
         }
 
         public void SetExpression(int index, string expression)
         {
-            aliasData[index].SetExpression(expression);
+            aliasData[index].Expression = expression;
+            UpdateAliasExpansionsFrom(index + 1);
         }
 
         public bool AliasExists(string alias) => aliasData.Any(data => data.Alias == alias);
@@ -99,21 +93,9 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 return;
             }
 
-            StringBuilder parser = new(expression);
-
-            // This conversion is needed because RDCode does not support scientific literals
-            var matches = ScientificLiteralFormat.Matches(expression);
-            for (int i = matches.Count - 1; i >= 0; i--)
-            {
-                if (float.TryParse(matches[i].Value, out var floatValue))
-                {
-                    parser
-                        .Remove(matches[i].Index, matches[i].Length)
-                        .Insert(matches[i].Index, floatValue.AsRawValue());
-                }
-            }
-
-            aliasData.Add(new AliasData(alias, parser.ToString()));
+            var replaced = expression.EvaluateScientificLiterals();
+            var data = new AliasData(this, alias, replaced, aliasData.Count);
+            aliasData.Add(data);
         }
 
         public bool Validate(string alias, out FailureReason reason)
@@ -153,7 +135,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
             if (data == null)
             {
-                UpdateAliasDataLength();
                 return;
             }
 
@@ -181,8 +162,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                     }
                 }
             }
-
-            UpdateAliasDataLength();
         }
 
         public bool TryConstructJSONData(out string data)
@@ -373,15 +352,68 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             expandedEventsAliasData.Add(levelEvent, dict);
         }
 
-        private AliasData[] aliasDataLongestToShortest = [];
+        private void UpdateAliasExpansionsFrom(int index)
+        {
+            for (int i = index; i < aliasData.Count; i++)
+            {
+                aliasData[i].UpdateExpandedExpression();
+            }
+        }
+
+        private bool TryExpandAliases(string expression, out string result, int highestIndexAllowed = int.MaxValue)
+        {
+            StringBuilder reconstructor = null;
+
+            var matches = VariableTokenLookup.Matches(expression);
+
+            if (matches.Count == 0)
+            {
+                result = expression;
+                return false;
+            }
+
+            int maxIndex = Math.Min(highestIndexAllowed, aliasData.Count - 1);
+
+            for (int i = matches.Count - 1; i >= 0; i--)
+            {
+                var match = matches[i];
+
+                for (int j = 0; j <= maxIndex; j++)
+                {
+                    var data = aliasData[j];
+
+                    if (data.Alias == match.Value)
+                    {
+                        (reconstructor ??= new(expression))
+                            .Remove(match.Index, match.Length)
+                            .Insert(match.Index, data.ExpandedExpression);
+                    }
+                }
+            }
+
+            if (reconstructor != null)
+            {
+                result = reconstructor.ToString();
+                return true;
+            }
+
+            result = expression;
+            return false;
+        }
+
+        private string ExpandAliases(string text, int highestIndexAllowed = int.MaxValue)
+        {
+            TryExpandAliases(text, out string result, highestIndexAllowed);
+            return result;
+        }
 
         private readonly List<AliasData> aliasData = [];
         private readonly Dictionary<LevelEvent_Base, Dictionary<string, object>> expandedEventsAliasData = [];
 
         private static VariableAliasManager instance;
 
-        private readonly static Regex ScientificLiteralFormat = new(@"\-?\d+(?:\.\d+)?e[\-\+]?\d+");
         private readonly static Regex AliasNameFormat = new(@"^[a-zA-Z_][a-zA-Z0-9_]*$");
+        private readonly static Regex VariableTokenLookup = new(@"[a-zA-Z_][a-zA-Z0-9_]*");
         private readonly static Regex CurlyBraceFormat = new(@"(?:{([^{}])+})");
 
         private readonly static Dictionary<Type, List<ExpressionCapable>> ExpressionCapableTypes = [];
@@ -493,23 +525,37 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
         private record ReplacementValues(string KeyPart, object Value);
 
-        private class AliasData(string key, string expression)
+        private class AliasData
         {
-            public string Alias { get; private set; } = key;
-            public string Expression { get; private set; } = expression;
-
-            public string ExpandedExpression { get; private set; } = expression;
-
-            public void Expand()
+            public AliasData(VariableAliasManager manager, string alias, string expression, int index)
             {
-                ExpandedExpression = Expression;
+                this.manager = manager;
+                Alias = alias;
+                Index = index;
+                Expression = expression;
             }
 
-            public void SetAlias(string alias) => Alias = alias;
-            public void SetExpression(string expression)
+            public string Alias { get; set; }
+            public string Expression
             {
-
+                get => expression;
+                set
+                {
+                    expression = value;
+                    UpdateExpandedExpression();
+                }
             }
+            public int Index { get; set; }
+            public string ExpandedExpression { get; private set; }
+
+            public void UpdateExpandedExpression()
+            {
+                ExpandedExpression = manager.ExpandAliases(Expression, Index - 1);
+                Plugin.LogInfo($"Updated expansion for {Alias}: {Expression} -> {ExpandedExpression}");
+            }
+
+            private string expression;
+            private readonly VariableAliasManager manager;
         }
     }
 }
