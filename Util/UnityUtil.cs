@@ -141,6 +141,7 @@ namespace RDEditorPlus.Util
             GameObject textObject = new("text");
 
             var text = textObject.AddComponent<Text>();
+            text.raycastTarget = false;
             text.ApplyRDFont();
             text.alignment = TextAnchor.LowerLeft;
             text.color = Color.black;

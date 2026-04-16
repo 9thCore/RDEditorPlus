@@ -72,6 +72,7 @@ namespace RDEditorPlus.Util
 
         public static void SetupMixedText(Text text, string mixedText = null)
         {
+            text.raycastTarget = false;
             text.text = mixedText ?? MixedText;
             text.color = Color.black.WithAlpha(MixedTextAlpha);
         }

@@ -141,6 +141,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             GameObject deleteIconHolder = new("icon");
 
             var deleteIcon = deleteIconHolder.AddComponent<Image>();
+            deleteIcon.raycastTarget = false;
             deleteIcon.color = Color.white;
             deleteIcon.sprite = AssetUtil.PulseTrashSprite;
 
@@ -178,6 +179,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             GameObject equalsHolder = new("equals");
 
             equals = equalsHolder.AddComponent<Text>();
+            equals.raycastTarget = false;
             equals.ApplyRDFont();
             equals.color = Color.white;
             equals.text = "=";
