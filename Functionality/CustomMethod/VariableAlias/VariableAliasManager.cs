@@ -264,6 +264,10 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                     {
                         builder.Append($"[{floatExpression2.x.ToJsonValue()}, {floatExpression2.y.ToJsonValue()}]");
                     }
+                    else if (alias.Value is string text)
+                    {
+                        builder.Append($"\"{text.WithEscapedQuotes()}\"");
+                    }
                     else
                     {
                         builder.Append($"\"{alias.Value}\"");

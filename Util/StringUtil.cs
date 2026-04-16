@@ -5,6 +5,8 @@ namespace RDEditorPlus.Util
 {
     public static class StringUtil
     {
+        public static string WithEscapedQuotes(this string text) => text.Replace("\"", "\\\"");
+
         public static bool IsExpressionWrappedInParenthesis(this string text)
         {
             if (text.Length == 0)
