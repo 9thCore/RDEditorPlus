@@ -380,6 +380,10 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             for (int i = matches.Count - 1; i >= 0; i--)
             {
                 var match = matches[i];
+                if (expression.IsInsideStringLiteral(match.Index))
+                {
+                    continue;
+                }
 
                 for (int j = 0; j <= maxIndex; j++)
                 {
@@ -390,6 +394,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                         (reconstructor ??= new(expression))
                             .Remove(match.Index, match.Length)
                             .Insert(match.Index, data.ExpandedExpression);
+
+                        break;
                     }
                 }
             }

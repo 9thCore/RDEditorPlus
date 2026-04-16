@@ -1,10 +1,26 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace RDEditorPlus.Util
 {
     public static class StringUtil
     {
+        public static bool IsInsideStringLiteral(this string text, int index)
+        {
+            bool inside = false;
+
+            for (int i = 0; i < index; i++)
+            {
+                if (text[i] == '"')
+                {
+                    inside = !inside;
+                }
+            }
+
+            return inside;
+        }
+
         public static string WithEscapedQuotes(this string text) => text.Replace("\"", "\\\"");
 
         public static bool IsExpressionWrappedInParenthesis(this string text)
