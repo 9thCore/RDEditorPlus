@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MonoMod.Cil;
 using RDEditorPlus.Functionality.CustomMethod.VariableAlias;
+using RDEditorPlus.Functionality.CustomMethod.VariableDisplay;
 using RDEditorPlus.Functionality.Windows;
 using RDLevelEditor;
 using System;
@@ -37,6 +38,11 @@ namespace RDEditorPlus.Patch
                 {
                     VariableAliasManager.Instance.DecodeModData(dict);
                 }
+
+                if (PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsVariableDisplayEnabled)
+                {
+                    VariableDisplayManager.Instance.DecodeModData(dict);
+                }
             }
         }
 
@@ -67,6 +73,9 @@ namespace RDEditorPlus.Patch
 
                 BuildData(ref builder, PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsVariableAliasEnabled,
                     VariableAliasManager.Instance.TryConstructJSONData);
+
+                BuildData(ref builder, PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsVariableDisplayEnabled,
+                    VariableDisplayManager.Instance.TryConstructJSONData);
 
                 if (builder == null)
                 {

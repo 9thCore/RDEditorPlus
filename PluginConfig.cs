@@ -72,6 +72,11 @@ namespace RDEditorPlus
             "If an alias is not just a variable or literal (e.g. 'i0', '3.1', '1e-1' or 'true'), it will be wrapped in parenthesis if it is not already (e.g. '(i0 + 3)' will not be wrapped a second time, but 'f1 - 0.3' and '(2 +i8) -(f0+ 9)' will).\n" +
             "Aliases that are just variables (e.g. 'i0', 'f1') can be used in the left hand side of a Call Custom Method (e.g. 'test = 3.1', where 'test' is 'f0') and work as expected, setting the field's value.\n" +
             "Scientific literals are allowed and will be translated to a format RDCode understands, the number's decimal form (e.g. '1e3' is translated to '1000', and '3.1e-1' will be 0.31).";
+        public const string PATCH_CUSTOM_METHODS_VARIABLE_DISPLAY = "Allow setting variables or expressions to display when no event is selected.\n" +
+            "If " + nameof(customMethodsVariableAlias) + " is enabled, then using an alias name works too.\n" +
+            "Unlike the default display, boolean display will not be affected by the \"booleansDefaultToTrue\" mod.\n" +
+            "Boolean expressions will be displayed if they're true, and numerical expressions will be displayed if they're not 0.\n" +
+            "Defaults to b0, b1, ..., b9, i0, i1, ..., i9, f0, f1, ..., f9 in this order (basically, default display).";
 
         public const string PATCH_ROW_TOGGLE = "Toggle for all row tab (patients) functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_ROW_BEAT_SWITCH = "Whether a button that switches the selected beat from a classic beat to a oneshot beat (or vice-versa) should be added to their respective inspectors.";
@@ -138,6 +143,7 @@ namespace RDEditorPlus
         public static CustomMethodAutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
         public static int CustomMethodsAutocompleteRefreshTime => Instance.customMethodsAutocompleteRefreshTime.Value;
         public static bool CustomMethodsVariableAliasEnabled => Instance.customMethodsVariableAlias.Value;
+        public static bool CustomMethodsVariableDisplayEnabled => Instance.customMethodsVariableDisplay.Value;
 
         public static bool RowsEnabled => Instance.rows.Value;
         public static RowBeatSwitchBehaviour RowBeatSwitch => Instance.rowBeatSwitch.Value;
@@ -208,6 +214,9 @@ namespace RDEditorPlus
 
         [Config<bool>(PATCH_CUSTOM_METHODS_VARIABLE_ALIAS, false)]
         public readonly ConfigEntry<bool> customMethodsVariableAlias;
+
+        [Config<bool>(PATCH_CUSTOM_METHODS_VARIABLE_DISPLAY, false)]
+        public readonly ConfigEntry<bool> customMethodsVariableDisplay;
 
 
         [Category(CATEGORY_ROWS)]
