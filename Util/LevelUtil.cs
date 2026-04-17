@@ -11,6 +11,7 @@ namespace RDEditorPlus.Util
     {
         public static bool DisableTargetIDWarning { get; private set; } = false;
         public static bool CurrentlyUndoing { get; set; } = false;
+        public static bool ForceEventRecull { get; set; } = false;
 
         public static bool TryLevelLoad(string path,
             out RDLevelSettings settings,

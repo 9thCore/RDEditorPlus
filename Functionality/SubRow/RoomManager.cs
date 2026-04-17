@@ -255,6 +255,7 @@ namespace RDEditorPlus.Functionality.SubRow
             }
 
             float scroll = float.IsNaN(scrollPosition) ? 0 : scrollPosition;
+            LevelUtil.ForceEventRecull = true;
 
             roomLayoutGroupCache.OffsetMinY(-roomTabOffset - extraOffset + scroll);
             roomLayoutGroupCache.OffsetMaxY(-roomTabOffset + scroll);

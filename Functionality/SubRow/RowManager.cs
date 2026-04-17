@@ -148,6 +148,7 @@ namespace RDEditorPlus.Functionality.SubRow
                 - extraOffset;
 
             float scroll = float.IsNaN(scrollPosition) ? 0 : scrollPosition;
+            LevelUtil.ForceEventRecull = true;
 
             tab.rowsListRect.OffsetMinY(baseOffset + scroll);
             tab.rowsListRect.OffsetMaxY(scroll);

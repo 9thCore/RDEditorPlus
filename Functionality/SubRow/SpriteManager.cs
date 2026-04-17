@@ -81,6 +81,7 @@ namespace RDEditorPlus.Functionality.SubRow
             }
 
             tab.headersListRect.SizeDeltaY(tab.spriteHeaders.Count * scnEditor.instance.cellHeight + extraOffset);
+            LevelUtil.ForceEventRecull = true;
         }
 
         public override int? GetCurrentTabMaxUsedY()
