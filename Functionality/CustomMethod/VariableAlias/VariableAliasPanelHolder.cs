@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.ArbitraryPanel;
+using RDEditorPlus.Functionality.Mixins;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 {
-    internal class VariableAliasPanelHolder : ArbitraryPanelHolder
+    internal class VariableAliasPanelHolder : ArbitraryPanelHolder, IExtensibleUIList<VariableAliasPanelHolder.AliasDescriptor>
     {
         private static VariableAliasPanelHolder instance;
         public static VariableAliasPanelHolder Instance
@@ -37,69 +38,30 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             UpdateUI();
         }
 
+        IList<AliasDescriptor> IExtensibleUIList<AliasDescriptor>.VariableList => aliasDescriptors;
+        AliasDescriptor IExtensibleUIList<AliasDescriptor>.CreateElement(int index) => CreateAliasDescriptor(index);
+        RectTransform IExtensibleUIList<AliasDescriptor>.ContentRectTransform => contentRT;
+        IExtensibleUIList<AliasDescriptor>.IListCreatorElement IExtensibleUIList<AliasDescriptor>.CreatorElement => creatorAliasDescriptor;
+
         private void UpdateUI()
         {
-            int index = 0;
             var displayAliasData = VariableAliasManager.Instance.GetDisplayAliasData();
 
-            if (aliasDescriptors.Count < displayAliasData.Count)
-            {
-                for (int i = aliasDescriptors.Count; i < displayAliasData.Count; i++)
-                {
-                    aliasDescriptors.Add(CreateAliasDescriptor(aliasDescriptors.Count));
-                }
-            }
+            this.EnsureListElements(displayAliasData.Count);
 
-            for (int i = displayAliasData.Count; i < aliasDescriptors.Count; i++)
-            {
-                aliasDescriptors[i].SetActive(false);
-            }
-
+            int index = 0;
             foreach (var data in displayAliasData)
             {
-                aliasDescriptors[index].SetActive(true);
-                aliasDescriptors[index].SetDownVisibility(true);
                 aliasDescriptors[index++].Set(data.Alias, data.Expression);
-            }
-
-            if (TryFindLastActiveAliasDescriptor(out var aliasDescriptor))
-            {
-                aliasDescriptor.SetDownVisibility(false);
             }
 
             UpdateContentSize();
         }
 
-        private void UpdateContentSize()
-        {
-            if (!TryFindLastActiveAliasDescriptor(out var aliasDescriptor))
-            {
-                contentRT.SizeDeltaY(0f);
-                creatorAliasDescriptor.MoveTo(AliasStartY + ArbitraryNewAliasOffset + 1.5f);
-                return;
-            }
-
-            var position = aliasDescriptor.Position;
-            creatorAliasDescriptor.MoveTo(position + ArbitraryNewAliasOffset);
-
-            float size = Math.Max(0f, AliasBeginScrollY - position);
-            contentRT.SizeDeltaY(size);
-        }
+        private void UpdateContentSize() => this.UpdateContentSize(AliasCreatorStartY, ArbitraryNewAliasOffset, AliasBeginScrollY);
 
         private bool AnyOtherAliasesWithThisName(BaseAliasDescriptor aliasDescriptor)
             => aliasDescriptors.Any(descriptor => descriptor != aliasDescriptor && descriptor.Active && descriptor.SameAlias(aliasDescriptor));
-
-        private bool TryFindLastActiveAliasDescriptor(out AliasDescriptor aliasDescriptor)
-        {
-            if (!aliasDescriptors.Any(aliasDescriptor => aliasDescriptor.Active))
-            {
-                aliasDescriptor = default;
-                return false;
-            }
-
-            aliasDescriptor = aliasDescriptors.Last(aliasDescriptor => aliasDescriptor.Active);
-            return true;
-        }
 
         private void RemoveAlias(int index)
         {
@@ -152,66 +114,19 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             }
         }
 
+        private void MoveDown(int index) => Move(index, 1);
+        private void MoveUp(int index) => Move(index, -1);
+
         private AliasDescriptor CreateAliasDescriptor(int index)
         {
             CreateBaseAliasDescriptorComponents(ref lastAliasPosition, out var holderRT, out var name, out var expression, out var equals);
 
-            CreateButton(holderRT, "delete", AssetUtil.PulseTrashSprite, new Vector2(AliasLeftEdgePadding / 2f, AliasHeight / 2f),
-                AliasDeleteIconSize, AliasDeleteAnchor, AliasDeleteIconPadding, DeleteColor, () => RemoveAlias(index), out var delete, out _);
-            delete.colors = DeleteColorBlock;
-
-            CreateButton(holderRT, "down", AssetUtil.RowDownArrowSprite,
-                    new Vector2(-BaseAliasRightEdgePadding - AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
-                    AliasOrderAnchor, AliasOrderIconPadding, ReorderColor, () => Move(index, 1), out var down, out _);
-            down.colors = ReorderColorBlock;
-
-            Button up = null;
-            if (index > 0)
-            {
-
-                CreateButton(holderRT, "up", AssetUtil.RowDownArrowSprite,
-                    new Vector2(-AliasRightEdgePadding + AliasOrderSeparation + AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
-                    AliasOrderAnchor, AliasOrderIconPadding, ReorderColor, () => Move(index, -1), out up, out var image);
-                up.colors = ReorderColorBlock;
-
-                image.transform.Rotate(0f, 0f, 180f);
-            }
+            this.CreateButtons(holderRT, index, AliasLeftEdgePadding, AliasRightEdgePadding, AliasHeight, AliasOrderSeparation,
+                AliasDeleteIconPadding, AliasOrderIconPadding, DeleteColorBlock, ReorderColorBlock,
+                () => RemoveAlias(index), () => MoveDown(index), () => MoveUp(index),
+                out var delete, out var up, out var down);
 
             return new AliasDescriptor(index, name, expression, delete, equals, up, down, this);
-        }
-
-        private void CreateButton(RectTransform parent, string name, Sprite sprite, Vector2 position, float size, float anchor,
-            float padding, Color color, UnityAction onClick, out Button button, out Image icon)
-        {
-            GameObject backgroundHolder = new(name);
-
-            var background = backgroundHolder.AddComponent<Image>();
-            background.color = color;
-            background.type = Image.Type.Tiled;
-            background.sprite = AssetUtil.ButtonSprite;
-
-            var backgroundRT = background.rectTransform;
-            backgroundRT.SetParent(parent, worldPositionStays: false);
-            backgroundRT.anchorMin = backgroundRT.anchorMax = new Vector2(anchor, 0f);
-            backgroundRT.sizeDelta = new Vector2(size, size);
-            backgroundRT.anchoredPosition = position;
-
-            button = backgroundHolder.AddComponent<Button>();
-            button.onClick.AddListener(onClick);
-
-            GameObject iconHolder = new("icon");
-
-            icon = iconHolder.AddComponent<Image>();
-            icon.raycastTarget = false;
-            icon.color = Color.white;
-            icon.sprite = sprite;
-
-            var iconRT = icon.rectTransform;
-            iconRT.SetParent(backgroundRT, worldPositionStays: false);
-            iconRT.anchorMin = Vector2.zero;
-            iconRT.anchorMax = Vector2.one;
-            iconRT.offsetMin = new Vector2(padding, padding);
-            iconRT.offsetMax = new Vector2(-padding, -padding);
         }
 
         private void CreateBaseAliasDescriptorComponents(ref float position, out RectTransform holderRT, out InputField name, out InputField expression, out Text equals)
@@ -308,8 +223,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private readonly List<AliasDescriptor> aliasDescriptors = [];
 
         private readonly static Vector4 TextPadding = new(2f, 0f, -2f, 0f);
-        private readonly static Color DeleteColor = Color.white;
-        private readonly static Color ReorderColor = Color.white;
         private readonly static ColorBlock DeleteColorBlock = new()
         {
             normalColor = "C02020FF".HexToColor(),
@@ -337,6 +250,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const float AliasSeparation = 2f;
         private const float AliasDescriptionHeight = 12f;
         private const float AliasStartY = -AliasDescriptionHeight - AliasSeparation;
+        private const float AliasCreatorStartY = AliasStartY + 1.5f;
         private const float AliasHeight = 11f;
         private const float AliasLeftEdgePadding = 2f + AliasDeleteIconSize + AliasDeleteSeparation;
         private const float AliasRightEdgePadding = BaseAliasRightEdgePadding + AliasOrderIconSize * 2f + AliasOrderSeparation * 2f;
@@ -345,12 +259,10 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const float AliasBeginScrollY = -130f;
         private const float AliasDeleteIconSize = AliasHeight;
         private const float AliasDeleteIconPadding = 1f;
-        private const float AliasDeleteAnchor = 0f;
         private const float AliasDeleteSeparation = 2f;
         private const float AliasOrderIconSize = AliasHeight;
         private const float AliasOrderIconPadding = 3f;
         private const float AliasOrderSeparation = 2f;
-        private const float AliasOrderAnchor = 1f;
         private const float BaseAliasRightEdgePadding = 11f;
         private const float ArbitraryNewAliasOffset = -7.5f;
 
@@ -359,7 +271,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const string DisallowedFirstCharacters = "0123456789";
         private const string AddAliasPlaceholder = "New...";
 
-        private class CreatorAliasDescriptor : BaseAliasDescriptor
+        private class CreatorAliasDescriptor : BaseAliasDescriptor, IExtensibleUIList<AliasDescriptor>.IListCreatorElement
         {
             public CreatorAliasDescriptor(InputField name, InputField expression, Text equals, VariableAliasPanelHolder panel)
                 : base(name, expression, equals, panel)
@@ -414,14 +326,14 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
         private class AliasDescriptor(int index, InputField name, InputField expression, Button delete, Text equals,
             Button up, Button down, VariableAliasPanelHolder panel)
-            : BaseAliasDescriptor(name, expression, equals, panel)
+            : BaseAliasDescriptor(name, expression, equals, panel), IExtensibleUIList<AliasDescriptor>.IListElement
         {
             public int Index { get; init; } = index;
             public Button Delete { get; init; } = delete;
             public Button Up { get; init; } = up;
             public Button Down { get; init; } = down;
 
-            public void SetDownVisibility(bool visible)
+            public void SetDownArrowVisibility(bool visible)
             {
                 Down.gameObject.SetActive(visible);
             }

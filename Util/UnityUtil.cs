@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using static PolygonWave;
 
@@ -104,6 +105,41 @@ namespace RDEditorPlus.Util
         {
             result = component.GetComponentInParent<T>();
             return result != null;
+        }
+
+        public static void CreateButton(Transform parent, Sprite iconSprite, Vector2 position, Vector2 size, Vector2 anchorMin,
+            Vector2 anchorMax, Vector4 iconPadding, UnityAction onClick, out Button button, out Image icon)
+        {
+            GameObject backgroundHolder = new("button");
+
+            var background = backgroundHolder.AddComponent<Image>();
+            background.color = Color.white;
+            background.type = Image.Type.Tiled;
+            background.sprite = AssetUtil.ButtonSprite;
+
+            var backgroundRT = background.rectTransform;
+            backgroundRT.SetParent(parent, worldPositionStays: false);
+            backgroundRT.anchorMin = anchorMin;
+            backgroundRT.anchorMax = anchorMax;
+            backgroundRT.sizeDelta = size;
+            backgroundRT.anchoredPosition = position;
+
+            button = backgroundHolder.AddComponent<Button>();
+            button.onClick.AddListener(onClick);
+
+            GameObject iconHolder = new("icon");
+
+            icon = iconHolder.AddComponent<Image>();
+            icon.raycastTarget = false;
+            icon.color = Color.white;
+            icon.sprite = iconSprite;
+
+            var iconRT = icon.rectTransform;
+            iconRT.SetParent(backgroundRT, worldPositionStays: false);
+            iconRT.anchorMin = Vector2.zero;
+            iconRT.anchorMax = Vector2.one;
+            iconRT.offsetMin = new Vector2(iconPadding.x, iconPadding.y);
+            iconRT.offsetMax = new Vector2(iconPadding.z, iconPadding.w);
         }
 
         public static void CreateDropdown(Transform parent, out Dropdown dropdown, out RectTransform dropdownRT)
