@@ -78,7 +78,7 @@ namespace RDEditorPlus.Util
                 return true;
             }
 
-            return !char.IsLetter(text[index - 1]);
+            return text[index - 1] != '_' && !char.IsLetter(text[index - 1]);
         }
 
         private static readonly string RawValueFormat = "0." + new string('#', 52);
