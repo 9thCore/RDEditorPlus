@@ -55,8 +55,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 aliasDescriptors[i].SetActive(false);
             }
 
-            UpdateContentSize();
-
             foreach (var data in displayAliasData)
             {
                 aliasDescriptors[index].SetActive(true);
@@ -64,20 +62,25 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 aliasDescriptors[index++].Set(data.Alias, data.Expression);
             }
 
-            aliasDescriptors.Last(aliasDescriptor => aliasDescriptor.Active).SetDownVisibility(false);
+            if (TryFindLastActiveAliasDescriptor(out var aliasDescriptor))
+            {
+                aliasDescriptor.SetDownVisibility(false);
+            }
+
+            UpdateContentSize();
         }
 
         private void UpdateContentSize()
         {
-            if (!aliasDescriptors.Any(descriptor => descriptor.Active))
+            if (!TryFindLastActiveAliasDescriptor(out var aliasDescriptor))
             {
                 contentRT.SizeDeltaY(0f);
-                creatorAliasDescriptor.MoveTo(AliasStartY);
+                creatorAliasDescriptor.MoveTo(AliasStartY + ArbitraryNewAliasOffset + 1.5f);
                 return;
             }
 
-            var position = aliasDescriptors.Last(descriptor => descriptor.Active).Position;
-            creatorAliasDescriptor.MoveTo(position - 7.5f);
+            var position = aliasDescriptor.Position;
+            creatorAliasDescriptor.MoveTo(position + ArbitraryNewAliasOffset);
 
             float size = Math.Max(0f, AliasBeginScrollY - position);
             contentRT.SizeDeltaY(size);
@@ -85,6 +88,18 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
         private bool AnyOtherAliasesWithThisName(BaseAliasDescriptor aliasDescriptor)
             => aliasDescriptors.Any(descriptor => descriptor != aliasDescriptor && descriptor.SameAlias(aliasDescriptor));
+
+        private bool TryFindLastActiveAliasDescriptor(out AliasDescriptor aliasDescriptor)
+        {
+            if (!aliasDescriptors.Any(aliasDescriptor => aliasDescriptor.Active))
+            {
+                aliasDescriptor = default;
+                return false;
+            }
+
+            aliasDescriptor = aliasDescriptors.Last(aliasDescriptor => aliasDescriptor.Active);
+            return true;
+        }
 
         private void RemoveAlias(int index)
         {
@@ -341,6 +356,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const float AliasOrderSeparation = 2f;
         private const float AliasOrderAnchor = 1f;
         private const float BaseAliasRightEdgePadding = 11f;
+        private const float ArbitraryNewAliasOffset = -7.5f;
 
         private const float NullExpressionPlaceholderAlpha = 0.25f;
         private const float AddAliasPlaceholderAlpha = 0.25f;
