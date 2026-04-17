@@ -160,19 +160,21 @@ namespace RDEditorPlus.Functionality.Windows
 
         public void DecodeModData(Dictionary<string, object> data)
         {
+            int baseExtraCount = Math.Max(0, RDLevelData.current.windowCount - RDEditorConstants.WindowCount);
+
             if (data == null)
             {
-                SetActiveExtraWindows(0);
+                SetActiveExtraWindows(baseExtraCount);
                 return;
             }
 
             if (data.TryGetValue(ExtraWindowCountKey, out var value) && value is int count)
             {
-                SetActiveExtraWindows(count);
+                SetActiveExtraWindows(Math.Max(count, baseExtraCount));
             }
             else
             {
-                SetActiveExtraWindows(0);
+                SetActiveExtraWindows(baseExtraCount);
             }
         }
 
