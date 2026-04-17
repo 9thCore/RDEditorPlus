@@ -151,6 +151,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
             if (data == null)
             {
+                OnDataRefresh?.Invoke();
                 return;
             }
 
@@ -178,6 +179,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                     }
                 }
             }
+
+            OnDataRefresh?.Invoke();
         }
 
         public bool TryConstructJSONData(out string data)
@@ -402,6 +405,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         }
 
         public record DisplayAliasData(string Alias, string Expression);
+
+        public Action OnDataRefresh;
 
         public const string AliasKey = "variableAlias";
 

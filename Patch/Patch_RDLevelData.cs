@@ -17,7 +17,6 @@ namespace RDEditorPlus.Patch
             private static void Postfix(Dictionary<string, object> rootDict)
             {
                 if (scnEditor.instance == null
-                    || !scnEditor.instance.changingFile
                     || RDLevelData.decodingFailed)
                 {
                     return;

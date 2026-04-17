@@ -20,6 +20,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                 if (instance == null || !instance.Valid())
                 {
                     instance = new();
+                    VariableAliasManager.Instance.OnDataRefresh += instance.UpdateUI;
                 }
 
                 return instance;
