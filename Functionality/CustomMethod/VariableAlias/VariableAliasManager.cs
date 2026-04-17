@@ -632,7 +632,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             public void UpdateExpandedExpression()
             {
                 ExpandedExpression = manager.ExpandAliases(IntermediaryExpression, Index - 1);
-                Plugin.LogInfo($"Updated expansion for {Alias}: {Expression} -> {ExpandedExpression}");
             }
 
             public void SwapWith(AliasData other)
