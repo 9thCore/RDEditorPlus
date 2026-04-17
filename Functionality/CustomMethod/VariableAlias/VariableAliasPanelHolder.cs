@@ -87,7 +87,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         }
 
         private bool AnyOtherAliasesWithThisName(BaseAliasDescriptor aliasDescriptor)
-            => aliasDescriptors.Any(descriptor => descriptor != aliasDescriptor && descriptor.SameAlias(aliasDescriptor));
+            => aliasDescriptors.Any(descriptor => descriptor != aliasDescriptor && descriptor.Active && descriptor.SameAlias(aliasDescriptor));
 
         private bool TryFindLastActiveAliasDescriptor(out AliasDescriptor aliasDescriptor)
         {
