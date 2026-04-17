@@ -142,11 +142,13 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             CreateBaseAliasDescriptorComponents(ref lastAliasPosition, out var holderRT, out var name, out var expression, out var equals);
 
             CreateButton(holderRT, "delete", AssetUtil.PulseTrashSprite, new Vector2(AliasLeftEdgePadding / 2f, AliasHeight / 2f),
-                AliasDeleteIconSize, AliasDeleteAnchor, AliasDeleteIconPadding, Color.red, () => RemoveAlias(index), out var delete, out _);
+                AliasDeleteIconSize, AliasDeleteAnchor, AliasDeleteIconPadding, DeleteColor, () => RemoveAlias(index), out var delete, out _);
+            delete.colors = DeleteColorBlock;
 
             CreateButton(holderRT, "down", AssetUtil.RowDownArrowSprite,
                     new Vector2(-BaseAliasRightEdgePadding - AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
-                    AliasOrderAnchor, AliasOrderIconPadding, Color.blue, () => Move(index, 1), out var down, out _);
+                    AliasOrderAnchor, AliasOrderIconPadding, ReorderColor, () => Move(index, 1), out var down, out _);
+            down.colors = ReorderColorBlock;
 
             Button up = null;
             if (index > 0)
@@ -154,7 +156,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
                 CreateButton(holderRT, "up", AssetUtil.RowDownArrowSprite,
                     new Vector2(-AliasRightEdgePadding + AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
-                    AliasOrderAnchor, AliasOrderIconPadding, Color.blue, () => Move(index, -1), out up, out var image);
+                    AliasOrderAnchor, AliasOrderIconPadding, ReorderColor, () => Move(index, -1), out up, out var image);
+                up.colors = ReorderColorBlock;
 
                 image.transform.Rotate(0f, 0f, 180f);
             }
@@ -294,6 +297,28 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private readonly List<AliasDescriptor> aliasDescriptors = [];
 
         private readonly static Vector4 TextPadding = new(2f, 0f, -2f, 0f);
+        private readonly static Color DeleteColor = Color.white;
+        private readonly static Color ReorderColor = Color.white;
+        private readonly static ColorBlock DeleteColorBlock = new()
+        {
+            normalColor = "C02020FF".HexToColor(),
+            highlightedColor = "FF3131FF".HexToColor(),
+            pressedColor = "9B1A1AFF".HexToColor(),
+            selectedColor = "C04040FF".HexToColor(),
+            disabledColor = "A7ABABFF".HexToColor(),
+            colorMultiplier = 1f,
+            fadeDuration = 0.1f
+        };
+        private readonly static ColorBlock ReorderColorBlock = new()
+        {
+            normalColor = "9B9B9BFF".HexToColor(),
+            highlightedColor = "BDBDBDFF".HexToColor(),
+            pressedColor = "242424FF".HexToColor(),
+            selectedColor = "BDBDBDFF".HexToColor(),
+            disabledColor = "C8C8C8FF".HexToColor(),
+            colorMultiplier = 1f,
+            fadeDuration = 0.1f
+        };
 
         private static char OnValidateInput(string _, int index, char value)
             => (index != 0 || DisallowedFirstCharacters.IndexOf(value) == -1) ? value : '\0';
