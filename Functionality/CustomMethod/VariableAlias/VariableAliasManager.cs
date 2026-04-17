@@ -65,7 +65,11 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         }
 
         public void Clear() => aliasData.Clear();
-        public void ClearOriginalValues() => expandedEventsAliasData.Clear();
+        public void ClearOriginalValues()
+        {
+            expandedEventsAliasData.Clear();
+            expandedCustomConditionalAliasData.Clear();
+        }
         public void Remove(int index)
         {
             aliasData.RemoveAt(index);
@@ -229,6 +233,17 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             }
         }
 
+        public void BeforeConditionalDeserialisation(Dictionary<string, object> dict)
+        {
+            if (!dict.TryGetValue(AliasCustomConditionalExpression, out object value)
+                || value is not string text)
+            {
+                return;
+            }
+
+            dict["expression"] = text;
+        }
+
         public void BeforeEventJSONConstruct(LevelEvent_Base levelEvent)
         {
             if (!ExpressionCapableTypes.TryGetValue(levelEvent.GetType(), out var list))
@@ -240,6 +255,17 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             {
                 expressionCapable.ExpandAliases(this, levelEvent);
             }
+        }
+
+        public void BeforeConditionalJSONConstruct(Conditional conditional)
+        {
+            if (conditional is not Conditional_Custom customConditional)
+            {
+                return;
+            }
+
+            expandedCustomConditionalAliasData[customConditional.id] = customConditional.customExpression;
+            customConditional.customExpression = ExpandAliases(customConditional.customExpression, onlyInBraces: false);
         }
 
         public void RecoverEventData(LevelEvent_Base levelEvent)
@@ -257,6 +283,17 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
                     expressionCapable.PropertyInfo.SetValue(levelEvent, value);
                 }
             }
+        }
+
+        public void RecoverConditionalData(Conditional conditional)
+        {
+            if (conditional is not Conditional_Custom customConditional
+                || !expandedCustomConditionalAliasData.TryGetValue(customConditional.id, out var data))
+            {
+                return;
+            }
+
+            customConditional.customExpression = data;
         }
 
         public bool TryConstructEventJSONData(LevelEvent_Base levelEvent, out string data)
@@ -293,6 +330,19 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
             data = default;
             return false;
+        }
+
+        public bool TryConstructConditionalJSONData(Conditional conditional, out string data)
+        {
+            if (conditional is not Conditional_Custom customConditional
+                || !expandedCustomConditionalAliasData.TryGetValue(customConditional.id, out string original))
+            {
+                data = default;
+                return false;
+            }
+
+            data = $", \"{AliasCustomConditionalExpression}\": \"{original}\"";
+            return true;
         }
 
         static VariableAliasManager()
@@ -431,6 +481,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
         private readonly List<AliasData> aliasData = [];
         private readonly Dictionary<LevelEvent_Base, Dictionary<string, object>> expandedEventsAliasData = [];
+        private readonly Dictionary<int, string> expandedCustomConditionalAliasData = [];
 
         private static VariableAliasManager instance;
 
@@ -544,6 +595,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         }
 
         private const string AliasDynamicKeyPrefix = "mod_rdEditorPlus_alias_";
+        private const string AliasCustomConditionalExpression = "mod_rdEditorPlus_alias_expression";
 
         private record ReplacementValues(string KeyPart, object Value);
 
