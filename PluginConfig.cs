@@ -63,10 +63,15 @@ namespace RDEditorPlus
             "The file will only be requested once the editor is loaded, even if more than the specified amount of days have passed.\n" +
             "The file will be re-downloaded if it does not already exist.";
         public const string PATCH_CUSTOM_METHODS_VARIABLE_ALIAS = "Allow creating aliases for variables or expressions, to be used in other expressions.\n" +
+            "This system does not allow creation of new, unique variables, but is meant to be a convenience for RDCode readability and bypassing field length limits by using an alias for a long expression.\n" +
             "Replaces the alias with its contents when used in an expression.\n" +
             "Alias names must start with a letter or underscore, and can be followed by any number of digits, underscores or letters. They cannot contain spaces.\n" +
             "The alias cannot be an existing field, method or boolean literal, nor can an alias be defined twice.\n" +
-            "Aliases must be defined top-to-bottom, e.g. if the alias Alias2 uses Alias1 in its expression, then Alias1 must be defined before Alias2. This also means an alias cannot reference itself.";
+            "Aliases must be defined top-to-bottom, e.g. if the alias Alias2 uses Alias1 in its expression, then Alias1 must be defined before Alias2. This also means an alias cannot reference itself.\n" +
+            "An alias' expression can be left empty and it will function as a pseudo-comment (as it will be replaced by empty space, when expanded).\n" +
+            "If an alias is not just a variable or literal (e.g. 'i0', '3.1', '1e-1' or 'true'), it will be wrapped in parenthesis if it is not already (e.g. '(i0 + 3)' will not be wrapped a second time, but 'f1 - 0.3' and '(2 +i8) -(f0+ 9)' will).\n" +
+            "Aliases that are just variables (e.g. 'i0', 'f1') can be used in the left hand side of a Call Custom Method (e.g. 'test = 3.1', where 'test' is 'f0') and work as expected, setting the field's value.\n" +
+            "Scientific literals are allowed and will be translated to a format RDCode understands, the number's decimal form (e.g. '1e3' is translated to '1000', and '3.1e-1' will be 0.31).";
 
         public const string PATCH_ROW_TOGGLE = "Toggle for all row tab (patients) functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_ROW_BEAT_SWITCH = "Whether a button that switches the selected beat from a classic beat to a oneshot beat (or vice-versa) should be added to their respective inspectors.";
