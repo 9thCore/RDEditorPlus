@@ -316,7 +316,7 @@ namespace RDEditorPlus.Functionality.SubRow
 
         public override void OverrideUsedRowCount(ref int usedRowCount)
         {
-            usedRowCount = Math.Max(usedRowCount, scnEditor.instance.timeline.maxUsedY);
+            usedRowCount = Math.Max(usedRowCount, scnEditor.instance.timeline.maxUsedY + 1);
         }
 
         public override bool AffectedByTallEventConfig()
