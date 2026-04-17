@@ -593,7 +593,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             {
                 string trimmed = text.Trim();
 
-                if (trimmed.IsExpressionWrappedInParenthesis()
+                if (trimmed.IsNullOrEmpty()
+                    || trimmed.IsExpressionWrappedInParenthesis()
                     || bool.TryParse(trimmed, out _) || float.TryParse(trimmed, out _)
                     || manager.AliasExists(trimmed) || typeof(LevelBase).GetField(trimmed) != null)
                 {

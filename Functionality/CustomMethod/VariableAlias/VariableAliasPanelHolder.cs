@@ -230,8 +230,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             UnityUtil.CreateInputField(holderRT, out name, out var nameRT, TextPadding);
             UnityUtil.CreateInputField(holderRT, out expression, out var expressionRT, TextPadding);
 
-            InspectorUtil.SetupMixedPlaceholder(expression, NullExpressionPlaceholder).color = Color.black.WithAlpha(NullExpressionPlaceholderAlpha);
-
             name.characterValidation = InputField.CharacterValidation.Alphanumeric;
             name.onValidateInput = OnValidateInput;
 
@@ -362,7 +360,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const float AddAliasPlaceholderAlpha = 0.25f;
 
         private const string DisallowedFirstCharacters = "0123456789";
-        private const string NullExpressionPlaceholder = "0";
         private const string AddAliasPlaceholder = "New...";
 
         private class CreatorAliasDescriptor : BaseAliasDescriptor
@@ -493,7 +490,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             public bool Active => Name.gameObject.activeSelf;
             public bool Valid => !Name.text.IsNullOrEmpty();
             public string Alias => Name.text;
-            public string Value => Expression.text.IsNullOrEmpty() ? NullExpressionPlaceholder : Expression.text;
+            public string Value => Expression.text;
 
             public virtual void SetActive(bool active)
             {
