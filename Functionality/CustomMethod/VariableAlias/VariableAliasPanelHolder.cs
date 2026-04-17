@@ -33,7 +33,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
 
         public override void OnShow()
         {
-            scrollbar.value = 1f;
             UpdateUI();
         }
 
@@ -264,8 +263,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             title.text = "Variable Alias Setup";
             title.color = Color.yellow;
 
-            UnityUtil.CreateScrollView(rectTransform, out var scrollRect, out contentRT);
-            scrollbar = scrollRect.verticalScrollbar;
+            UnityUtil.CreateScrollView(rectTransform, out _, out contentRT);
 
             GameObject aliasHolder = new("alias");
 
@@ -305,7 +303,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private float lastAliasPosition = AliasStartY;
 
         private readonly RectTransform contentRT;
-        private readonly Scrollbar scrollbar;
         private readonly CreatorAliasDescriptor creatorAliasDescriptor;
         private readonly List<AliasDescriptor> aliasDescriptors = [];
 
