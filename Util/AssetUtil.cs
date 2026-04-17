@@ -18,6 +18,7 @@ namespace RDEditorPlus.Util
         [Filename("RDLatinFontPoint")] public static Font StandardFont { get; private set; }
 
         public static Sprite PulseTrashSprite { get; private set; }
+        public static Sprite RowDownArrowSprite { get; private set; }
 
         public static void ApplyRDFont(this Text text)
         {
@@ -52,6 +53,11 @@ namespace RDEditorPlus.Util
                 .properties.First(property => property.name == "action")
                 .control as PropertyControl_ToggleGroup).toggleGroup
                 .transform.Find("Remove").Find("Background").Find("icon")
+                .GetComponent<Image>().sprite;
+
+            RowDownArrowSprite = instance.inspectorPanelManager
+                .Get<InspectorPanel_MakeRow>().container
+                .Find("reorder").Find("moveDown").Find("Image")
                 .GetComponent<Image>().sprite;
         }
 

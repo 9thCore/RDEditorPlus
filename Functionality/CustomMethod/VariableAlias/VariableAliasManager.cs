@@ -72,6 +72,19 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             UpdateAliasExpansionsFrom(index + 1);
         }
 
+        public void Swap(int index1, int index2)
+        {
+            aliasData[index1].SwapWith(aliasData[index2]);
+
+            int min = Math.Min(index1, index2);
+            int max = Math.Max(index1, index2);
+
+            for (int i = min; i <= max; i++)
+            {
+                aliasData[i].UpdateExpandedExpression();
+            }
+        }
+
         public void SetAlias(int index, string alias)
         {
             aliasData[index].Alias = alias;
@@ -563,6 +576,12 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             {
                 ExpandedExpression = manager.ExpandAliases(IntermediaryExpression, Index - 1);
                 Plugin.LogInfo($"Updated expansion for {Alias}: {Expression} -> {ExpandedExpression}");
+            }
+
+            public void SwapWith(AliasData other)
+            {
+                (expression, other.expression) = (other.expression, expression);
+                (Alias, other.Alias) = (other.Alias, Alias);
             }
 
             private string IntermediaryExpression => WrapInParenthesisIfRequired(expression.EvaluateScientificLiterals());

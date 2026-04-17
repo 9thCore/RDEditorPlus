@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
@@ -59,8 +60,11 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             foreach (var data in displayAliasData)
             {
                 aliasDescriptors[index].SetActive(true);
+                aliasDescriptors[index].SetDownVisibility(true);
                 aliasDescriptors[index++].Set(data.Alias, data.Expression);
             }
+
+            aliasDescriptors.Last(aliasDescriptor => aliasDescriptor.Active).SetDownVisibility(false);
         }
 
         private void UpdateContentSize()
@@ -118,43 +122,80 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             }
         }
 
+        private void Move(int index, int delta)
+        {
+            int other = index + delta;
+            if (other < 0 || other >= aliasDescriptors.Count)
+            {
+                return;
+            }
+
+            using (new SaveStateScope())
+            {
+                VariableAliasManager.Instance.Swap(index, other);
+                UpdateUI();
+            }
+        }
+
         private AliasDescriptor CreateAliasDescriptor(int index)
         {
             CreateBaseAliasDescriptorComponents(ref lastAliasPosition, out var holderRT, out var name, out var expression, out var equals);
 
-            GameObject deleteBackgroundHolder = new("delete");
+            CreateButton(holderRT, "delete", AssetUtil.PulseTrashSprite, new Vector2(AliasLeftEdgePadding / 2f, AliasHeight / 2f),
+                AliasDeleteIconSize, AliasDeleteAnchor, AliasDeleteIconPadding, Color.red, () => RemoveAlias(index), out var delete, out _);
 
-            var deleteBackground = deleteBackgroundHolder.AddComponent<Image>();
-            deleteBackground.color = Color.red;
-            deleteBackground.type = Image.Type.Tiled;
-            deleteBackground.sprite = AssetUtil.ButtonSprite;
+            CreateButton(holderRT, "down", AssetUtil.RowDownArrowSprite,
+                    new Vector2(-BaseAliasRightEdgePadding - AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
+                    AliasOrderAnchor, AliasOrderIconPadding, Color.blue, () => Move(index, 1), out var down, out _);
 
-            var deleteBackgroundRT = deleteBackground.rectTransform;
-            deleteBackgroundRT.SetParent(holderRT, worldPositionStays: false);
-            deleteBackgroundRT.anchorMin = deleteBackgroundRT.anchorMax = Vector2.zero;
-            deleteBackgroundRT.sizeDelta = new Vector2(AliasDeleteIconSize, AliasDeleteIconSize);
-            deleteBackgroundRT.anchoredPosition = new Vector2(AliasLeftEdgePadding / 2f, AliasHeight / 2f);
+            Button up = null;
+            if (index > 0)
+            {
 
-            var delete = deleteBackgroundHolder.AddComponent<Button>();
-            delete.onClick.AddListener(() => RemoveAlias(index));
+                CreateButton(holderRT, "up", AssetUtil.RowDownArrowSprite,
+                    new Vector2(-AliasRightEdgePadding + AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
+                    AliasOrderAnchor, AliasOrderIconPadding, Color.blue, () => Move(index, -1), out up, out var image);
 
-            GameObject deleteIconHolder = new("icon");
+                image.transform.Rotate(0f, 0f, 180f);
+            }
 
-            var deleteIcon = deleteIconHolder.AddComponent<Image>();
-            deleteIcon.raycastTarget = false;
-            deleteIcon.color = Color.white;
-            deleteIcon.sprite = AssetUtil.PulseTrashSprite;
-
-            var deleteIconRT = deleteIcon.rectTransform;
-            deleteIconRT.SetParent(deleteBackgroundRT, worldPositionStays: false);
-            deleteIconRT.anchorMin = Vector2.zero;
-            deleteIconRT.anchorMax = Vector2.one;
-            deleteIconRT.offsetMin = new Vector2(AliasDeleteIconPadding, AliasDeleteIconPadding);
-            deleteIconRT.offsetMax = new Vector2(-AliasDeleteIconPadding, -AliasDeleteIconPadding);
-
-            return new AliasDescriptor(index, name, expression, delete, equals, this);
+            return new AliasDescriptor(index, name, expression, delete, equals, up, down, this);
         }
-        
+
+        private void CreateButton(RectTransform parent, string name, Sprite sprite, Vector2 position, float size, float anchor,
+            float padding, Color color, UnityAction onClick, out Button button, out Image icon)
+        {
+            GameObject backgroundHolder = new(name);
+
+            var background = backgroundHolder.AddComponent<Image>();
+            background.color = color;
+            background.type = Image.Type.Tiled;
+            background.sprite = AssetUtil.ButtonSprite;
+
+            var backgroundRT = background.rectTransform;
+            backgroundRT.SetParent(parent, worldPositionStays: false);
+            backgroundRT.anchorMin = backgroundRT.anchorMax = new Vector2(anchor, 0f);
+            backgroundRT.sizeDelta = new Vector2(size, size);
+            backgroundRT.anchoredPosition = position;
+
+            button = backgroundHolder.AddComponent<Button>();
+            button.onClick.AddListener(onClick);
+
+            GameObject iconHolder = new("icon");
+
+            icon = iconHolder.AddComponent<Image>();
+            icon.raycastTarget = false;
+            icon.color = Color.white;
+            icon.sprite = sprite;
+
+            var iconRT = icon.rectTransform;
+            iconRT.SetParent(backgroundRT, worldPositionStays: false);
+            iconRT.anchorMin = Vector2.zero;
+            iconRT.anchorMax = Vector2.one;
+            iconRT.offsetMin = new Vector2(padding, padding);
+            iconRT.offsetMax = new Vector2(-padding, -padding);
+        }
+
         private void CreateBaseAliasDescriptorComponents(ref float position, out RectTransform holderRT, out InputField name, out InputField expression, out Text equals)
         {
             GameObject holder = new("alias");
@@ -262,13 +303,19 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const float AliasStartY = -AliasDescriptionHeight - AliasSeparation;
         private const float AliasHeight = 11f;
         private const float AliasLeftEdgePadding = 2f + AliasDeleteIconSize + AliasDeleteSeparation;
-        private const float AliasRightEdgePadding = 11f;
+        private const float AliasRightEdgePadding = BaseAliasRightEdgePadding + AliasOrderIconSize * 2f + AliasOrderSeparation;
         private const float AliasCenterPadding = 4f;
         private const float AliasNameRealEstate = 0.4f;
         private const float AliasBeginScrollY = -130f;
-        private const float AliasDeleteIconSize = 11f;
+        private const float AliasDeleteIconSize = AliasHeight;
         private const float AliasDeleteIconPadding = 1f;
+        private const float AliasDeleteAnchor = 0f;
         private const float AliasDeleteSeparation = 2f;
+        private const float AliasOrderIconSize = AliasHeight;
+        private const float AliasOrderIconPadding = 3f;
+        private const float AliasOrderSeparation = 2f;
+        private const float AliasOrderAnchor = 1f;
+        private const float BaseAliasRightEdgePadding = 11f;
 
         private const float NullExpressionPlaceholderAlpha = 0.25f;
         private const float AddAliasPlaceholderAlpha = 0.25f;
@@ -330,17 +377,26 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             private readonly RectTransform transform;
         }
 
-        private class AliasDescriptor(int index, InputField name, InputField expression, Button delete, Text equals, VariableAliasPanelHolder panel)
+        private class AliasDescriptor(int index, InputField name, InputField expression, Button delete, Text equals,
+            Button up, Button down, VariableAliasPanelHolder panel)
             : BaseAliasDescriptor(name, expression, equals, panel)
         {
             public int Index { get; init; } = index;
             public Button Delete { get; init; } = delete;
+            public Button Up { get; init; } = up;
+            public Button Down { get; init; } = down;
+
+            public void SetDownVisibility(bool visible)
+            {
+                Down.gameObject.SetActive(visible);
+            }
 
             public override void SetActive(bool active)
             {
                 base.SetActive(active);
                 Delete.gameObject.SetActive(active);
                 Equal.gameObject.SetActive(active);
+                Up?.gameObject.SetActive(active);
             }
 
             public override void Set(string name, string expression)
