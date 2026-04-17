@@ -170,7 +170,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             {
 
                 CreateButton(holderRT, "up", AssetUtil.RowDownArrowSprite,
-                    new Vector2(-AliasRightEdgePadding + AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
+                    new Vector2(-AliasRightEdgePadding + AliasOrderSeparation + AliasOrderIconSize / 2f, AliasHeight / 2f), AliasOrderIconSize,
                     AliasOrderAnchor, AliasOrderIconPadding, ReorderColor, () => Move(index, -1), out up, out var image);
                 up.colors = ReorderColorBlock;
 
@@ -341,7 +341,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const float AliasStartY = -AliasDescriptionHeight - AliasSeparation;
         private const float AliasHeight = 11f;
         private const float AliasLeftEdgePadding = 2f + AliasDeleteIconSize + AliasDeleteSeparation;
-        private const float AliasRightEdgePadding = BaseAliasRightEdgePadding + AliasOrderIconSize * 2f + AliasOrderSeparation;
+        private const float AliasRightEdgePadding = BaseAliasRightEdgePadding + AliasOrderIconSize * 2f + AliasOrderSeparation * 2f;
         private const float AliasCenterPadding = 4f;
         private const float AliasNameRealEstate = 0.4f;
         private const float AliasBeginScrollY = -130f;
@@ -356,7 +356,6 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         private const float BaseAliasRightEdgePadding = 11f;
         private const float ArbitraryNewAliasOffset = -7.5f;
 
-        private const float NullExpressionPlaceholderAlpha = 0.25f;
         private const float AddAliasPlaceholderAlpha = 0.25f;
 
         private const string DisallowedFirstCharacters = "0123456789";
