@@ -120,9 +120,17 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
 
         public Action OnDataRefresh;
 
-        public class Expression(string original)
+        public class Expression
         {
-            public bool InvalidExpression { get; set; } = false;
+            public Expression(string original)
+            {
+                this.original = original;
+                InvalidExpression = false;
+                lastOriginal = original;
+                Expand();
+            }
+
+            public bool InvalidExpression { get; set; }
             public string Original
             {
                 get => original;
@@ -139,7 +147,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
                     Expand();
                 }
             }
-            public string Expanded { get; private set; } = original;
+            public string Expanded { get; private set; }
 
             public bool TryEvaluate(LevelBase currentLevel, out object result)
             {
@@ -165,7 +173,14 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
 
             public void Expand()
             {
-                Expanded = VariableAliasManager.Instance.ExpandAliases(Original, onlyInBraces: false);
+                if (PluginConfig.CustomMethodsVariableAliasEnabled)
+                {
+                    Expanded = VariableAliasManager.Instance.ExpandAliases(Original, onlyInBraces: false);
+                }
+                else
+                {
+                    Expanded = Original;
+                }
             }
 
             public void SwapWith(Expression expression)
@@ -173,8 +188,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
                 (original, expression.original) = (expression.original, original);
             }
 
-            private string original = original;
-            private string lastOriginal = original;
+            private string original;
+            private string lastOriginal;
 
             public static implicit operator Expression(string original) => new(original);
         }
