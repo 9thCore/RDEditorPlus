@@ -14,6 +14,13 @@ namespace RDEditorPlus.Functionality.General
 
         public static void Register(params BaseOption[] instances) => Settings.AddRange(instances);
 
+        public class Separator(string name) : BaseOption(name)
+        {
+            public override string GetDisplayName() => Name;
+
+            public override void Setup(Transform parent, Vector2 offsetMin, Vector2 offsetMax, float anchorPosY) { }
+        }
+
         public class DropdownOption : SimpleOption
         {
             public DropdownOption(string name, List<string> options, UnityAction<int> onValueChanged) : base(name)
@@ -106,6 +113,8 @@ namespace RDEditorPlus.Functionality.General
 
         public abstract class SimpleOption(string name) : BaseOption(name)
         {
+            public override string GetDisplayName() => Name + ":";
+
             public RectTransform RectTransform { get; protected set; }
             public float ElementOffset { get; init; } = 0f;
 
@@ -126,6 +135,7 @@ namespace RDEditorPlus.Functionality.General
         public abstract class BaseOption(string name)
         {
             public string Name { get; init; } = name;
+            public abstract string GetDisplayName();
 
             public abstract void Setup(Transform parent, Vector2 offsetMin, Vector2 offsetMax, float anchorPosY);
         }

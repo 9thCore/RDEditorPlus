@@ -13,6 +13,13 @@ namespace RDEditorPlus.Patch
         {
             private static void Postfix(InspectorPanel_LevelSettings __instance)
             {
+                if (SettingsInspectorRegistry.Settings.Count == 0)
+                {
+                    return;
+                }
+
+                SettingsInspectorRegistry.Settings.Insert(0, new SettingsInspectorRegistry.Separator(MyPluginInfo.PLUGIN_NAME + " options"));
+
                 foreach (var registration in SettingsInspectorRegistry.Settings)
                 {
                     float anchorPosY = -__instance.generalHeight + VerticalSpacing + VerticalOffset;
@@ -22,7 +29,7 @@ namespace RDEditorPlus.Patch
                     var textGO = GameObject.Instantiate(__instance.totalHits.gameObject, __instance.general.transform);
 
                     var text = textGO.GetComponent<Text>();
-                    text.text = registration.Name + ":";
+                    text.text = registration.GetDisplayName();
                     text.raycastTarget = false;
 
                     var textRT = textGO.transform as RectTransform;
