@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using RDEditorPlus.ExtraData;
+using RDEditorPlus.Functionality.Audio;
 using RDEditorPlus.Functionality.LevelOptions.CustomClass;
 using RDEditorPlus.Functionality.LevelOptions.Mods;
 using System;
@@ -35,6 +36,7 @@ namespace RDEditorPlus
         public const string CATEGORY_OPTIMISATIONS = "Optimisation";
         public const string CATEGORY_LEVELOPTIONS = "LevelOptions";
         public const string CATEGORY_BUGFIXES = "BugFixes";
+        public const string CATEGORY_AUDIO = "Audio";
 
         public const string PATCH_SUB_ROWS_BASE_LEFT = "Patch a lot of things to allow multiple timeline rows for ";
         public const string PATCH_SUB_ROWS_BASE_RIGHT = ".\nMay cause incompatibilies with other mods, and is not guaranteed to be stable.";
@@ -129,6 +131,17 @@ namespace RDEditorPlus
         public const string PATCH_BUG_FIXES_WRONG_EVENT_LIST = "Patch a bug where, after an undo, level events are not properly reassigned to the correct event list, in the case of rows and sprites.\n" +
             "Will increase load time on undos, because it has more work to do.";
 
+        public const string PATCH_AUDIO = "Toggle for all audio features.\nIf disabled, none of the patches below will be applied.";
+        public const string PATCH_AUDIO_OTN_AUTOCOMPLETE = "Whether to autocomplete the One True Name of audio.\n" +
+            "Handles the offset and volume, too.\n" +
+            "If set to " + nameof(AutocompleteBehaviour.Disabled) + ", will not be enabled.\n" +
+            "If set to " + nameof(AutocompleteBehaviour.RequestFromWeb) + ", will request from " + AudioOneTrueNameAutocompletion.URL + ", the public list of One True Names, then save to a temporary file which is occassionally updated.\n" +
+            "If set to " + nameof(AutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + AudioOneTrueNameAutocompletion.PlayerSuppliedFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in CSV (comma-separated values) format.";
+        public const string PATCH_AUDIO_OTN_AUTOCOMPLETE_REFRESH_TIME = "How many days old the temporary download file (at \"BepInEx/plugins/RDEditorPlus/" + AudioOneTrueNameAutocompletion.TemporaryAutodownloadFile + "\") should be, before trying to request another.\n" +
+            "Only does something if " + nameof(audioOtnAutocompleteRefreshTime) + " is set to " + nameof(AutocompleteBehaviour.RequestFromWeb) + ".\n" +
+            "The file will only be requested once the editor is loaded, even if more than the specified amount of days have passed.\n" +
+            "The file will be re-downloaded if it does not already exist.";
+
         public static bool SubRowsEnabled => Instance.subRows.Value;
         public static bool SpriteSubRowsEnabled => Instance.spriteSubRows.Value;
         public static bool PatientSubRowsEnabled => Instance.patientSubRows.Value;
@@ -171,6 +184,10 @@ namespace RDEditorPlus
 
         public static bool BugFixesEnabled => Instance.bugFixes.Value;
         public static bool BugFixesWrongEventListEnabled => Instance.bugFixesWrongEventList.Value;
+
+        public static bool AudioEnabled => Instance.audio.Value;
+        public static AutocompleteBehaviour AudioOTNAutocompleteBehaviour => Instance.audioOtnAutocomplete.Value;
+        public static int AudioOTNAutocompleteRefreshTime => Instance.audioOtnAutocompleteRefreshTime.Value;
 
 #pragma warning disable 0649
         [Category(CATEGORY_SUBROWS)]
@@ -289,6 +306,16 @@ namespace RDEditorPlus
 
         [Config<bool>(PATCH_BUG_FIXES_WRONG_EVENT_LIST, false)]
         public readonly ConfigEntry<bool> bugFixesWrongEventList;
+
+        [Category(CATEGORY_AUDIO)]
+        [Config<bool>(PATCH_AUDIO, false)]
+        public readonly ConfigEntry<bool> audio;
+
+        [Config<AutocompleteBehaviour>(PATCH_AUDIO_OTN_AUTOCOMPLETE, AutocompleteBehaviour.Disabled)]
+        public readonly ConfigEntry<AutocompleteBehaviour> audioOtnAutocomplete;
+
+        [Config<int>(PATCH_AUDIO_OTN_AUTOCOMPLETE_REFRESH_TIME, 30)]
+        public readonly ConfigEntry<int> audioOtnAutocompleteRefreshTime;
 #pragma warning restore 0649
 
 
