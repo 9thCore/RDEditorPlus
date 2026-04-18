@@ -55,11 +55,11 @@ namespace RDEditorPlus
         public const string PATCH_CUSTOM_METHODS_TOGGLE = "Toggle for all custom method mod functionality.\nIf disabled, none of the patches below will be applied.";
         public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE = "Toggle for the additional custom method autocompletion.\n" +
             "If enabled, there will be more custom methods available for autocompletion, but they will have a deep red color and will not have descriptions.\n" +
-            "If set to " + nameof(CustomMethodAutocompleteBehaviour.Disabled) + ", will not be enabled.\n" +
-            "If set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ", will request from " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", the public database of known custom methods by the community, then save to a temporary file which is occassionally updated.\n" +
-            "If set to " + nameof(CustomMethodAutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in TSV (tab-separated values) format.";
+            "If set to " + nameof(AutocompleteBehaviour.Disabled) + ", will not be enabled.\n" +
+            "If set to " + nameof(AutocompleteBehaviour.RequestFromWeb) + ", will request from " + CustomMethodStorage.CustomMethodsSpreadsheetURL + ", the public database of known custom methods by the community, then save to a temporary file which is occassionally updated.\n" +
+            "If set to " + nameof(AutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in TSV (tab-separated values) format.";
         public const string PATCH_CUSTOM_METHODS_AUTOCOMPLETE_REFRESH_TIME = "How many days old the temporary download file (at \"BepInEx/plugins/RDEditorPlus/" + CustomMethodStorage.CustomMethodsSpreadsheetDownloadedFile + "\") should be, before trying to request another.\n" +
-            "Only does something if " + nameof(customMethodsAutocomplete) + " is set to " + nameof(CustomMethodAutocompleteBehaviour.RequestFromWeb) + ".\n" +
+            "Only does something if " + nameof(customMethodsAutocomplete) + " is set to " + nameof(AutocompleteBehaviour.RequestFromWeb) + ".\n" +
             "The file will only be requested once the editor is loaded, even if more than the specified amount of days have passed.\n" +
             "The file will be re-downloaded if it does not already exist.";
         public const string PATCH_CUSTOM_METHODS_VARIABLE_ALIAS = "Allow creating aliases for variables or expressions, to be used in other expressions.\n" +
@@ -140,7 +140,7 @@ namespace RDEditorPlus
         public static int PreviewScaleSubRowsMinimum => Instance.previewScaleMinimumSubRows.Value;
 
         public static bool CustomMethodsEnabled => Instance.customMethods.Value;
-        public static CustomMethodAutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
+        public static AutocompleteBehaviour CustomMethodsAutocomplete => Instance.customMethodsAutocomplete.Value;
         public static int CustomMethodsAutocompleteRefreshTime => Instance.customMethodsAutocompleteRefreshTime.Value;
         public static bool CustomMethodsVariableAliasEnabled => Instance.customMethodsVariableAlias.Value;
         public static bool CustomMethodsVariableDisplayEnabled => Instance.customMethodsVariableDisplay.Value;
@@ -206,8 +206,8 @@ namespace RDEditorPlus
         [Config<bool>(PATCH_CUSTOM_METHODS_TOGGLE, false)]
         public readonly ConfigEntry<bool> customMethods;
 
-        [Config<CustomMethodAutocompleteBehaviour>(PATCH_CUSTOM_METHODS_AUTOCOMPLETE, CustomMethodAutocompleteBehaviour.Disabled)]
-        public readonly ConfigEntry<CustomMethodAutocompleteBehaviour> customMethodsAutocomplete;
+        [Config<AutocompleteBehaviour>(PATCH_CUSTOM_METHODS_AUTOCOMPLETE, AutocompleteBehaviour.Disabled)]
+        public readonly ConfigEntry<AutocompleteBehaviour> customMethodsAutocomplete;
 
         [Config<int>(PATCH_CUSTOM_METHODS_AUTOCOMPLETE_REFRESH_TIME, 30)]
         public readonly ConfigEntry<int> customMethodsAutocompleteRefreshTime;
@@ -320,7 +320,7 @@ namespace RDEditorPlus
             KeepInSpecialRow
         }
 
-        public enum CustomMethodAutocompleteBehaviour
+        public enum AutocompleteBehaviour
         {
             Disabled,
             RequestFromWeb,

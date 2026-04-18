@@ -59,9 +59,9 @@ namespace RDEditorPlus.ExtraData
         {
             switch (PluginConfig.CustomMethodsAutocomplete)
             {
-                case PluginConfig.CustomMethodAutocompleteBehaviour.Disabled:
+                case PluginConfig.AutocompleteBehaviour.Disabled:
                     yield break;
-                case PluginConfig.CustomMethodAutocompleteBehaviour.RequestFromWeb:
+                case PluginConfig.AutocompleteBehaviour.RequestFromWeb:
                     string fullPath = Assembly.GetExecutingAssembly().Location;
                     string directory = Path.GetDirectoryName(fullPath);
                     string file = Path.Combine(directory, CustomMethodsSpreadsheetDownloadedFile);
@@ -102,7 +102,7 @@ namespace RDEditorPlus.ExtraData
                     }
 
                     yield break;
-                case PluginConfig.CustomMethodAutocompleteBehaviour.FetchFromFile:
+                case PluginConfig.AutocompleteBehaviour.FetchFromFile:
                     string fullPath2 = Assembly.GetExecutingAssembly().Location;
                     string directory2 = Path.GetDirectoryName(fullPath2);
                     string file2 = Path.Combine(directory2, CustomMethodsSpreadsheetFile);

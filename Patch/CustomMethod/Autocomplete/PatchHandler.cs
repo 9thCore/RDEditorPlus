@@ -2,6 +2,6 @@
 {
     internal class PatchHandler : BasePatchHandler<PatchHandler>
     {
-        protected override bool CanApply => PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsAutocomplete != PluginConfig.CustomMethodAutocompleteBehaviour.Disabled;
+        protected override bool CanApply => PluginConfig.CustomMethodsEnabled && PluginConfig.CustomMethodsAutocomplete != PluginConfig.AutocompleteBehaviour.Disabled;
     }
 }
