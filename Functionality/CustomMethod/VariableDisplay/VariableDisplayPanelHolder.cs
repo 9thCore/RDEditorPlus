@@ -154,7 +154,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
             this.creatorExpression = new ExpressionCreatorDescriptor(creatorExpression, this);
         }
 
-        private float lastPosition = 0f;
+        private float lastPosition = StartY;
 
         private readonly List<ExpressionDescriptor> expressions = [];
         private readonly ExpressionCreatorDescriptor creatorExpression;
