@@ -154,10 +154,11 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
                     result = currentLevel.EvalStringWithVariables(Expanded);
                     return true;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     result = default;
                     InvalidExpression = true;
+                    Plugin.LogError($"Could not evaluate expression '{Original}' because: {e}");
                     return false;
                 }
             }
