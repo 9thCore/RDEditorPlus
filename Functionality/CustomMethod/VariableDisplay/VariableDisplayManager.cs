@@ -21,6 +21,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
                     if (PluginConfig.CustomMethodsVariableAliasEnabled)
                     {
                         VariableAliasManager.Instance.OnDataRefresh += instance.OnAliasDataRefresh;
+                        VariableAliasManager.Instance.OnAliasChange += instance.OnAliasChange;
                     }
                 }
 
@@ -42,7 +43,21 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
             UpdateBlankPanel();
         }
 
-        public IEnumerable<Expression> Expressions => expressions;
+        public void UpdateExpression(int index, string expression)
+        {
+            expressions[index].Original = expression;
+            UpdateBlankPanel();
+        }
+
+        public void Swap(int index1, int index2)
+        {
+            expressions[index1].SwapWith(expressions[index2]);
+
+            int min = Math.Min(index1, index2);
+            int max = Math.Max(index1, index2);
+        }
+
+        public IList<Expression> Expressions => expressions;
 
         public bool HasExpressions() => expressions.Count > 0;
 
@@ -64,8 +79,12 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
             }
 
             UpdateBlankPanel();
-            OnAliasDataRefresh();
             OnDataRefresh?.Invoke();
+
+            if (PluginConfig.CustomMethodsVariableAliasEnabled)
+            {
+                OnAliasDataRefresh();
+            }
         }
 
         public bool TryConstructJSONData(out string data)
@@ -113,9 +132,9 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
                         return;
                     }
 
+                    InvalidExpression = false;
                     lastOriginal = original;
                     original = value;
-                    InvalidExpression = false;
                     Expand();
                 }
             }
@@ -147,6 +166,11 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
                 Expanded = VariableAliasManager.Instance.ExpandAliases(Original, onlyInBraces: false);
             }
 
+            public void SwapWith(Expression expression)
+            {
+                (original, expression.original) = (expression.original, original);
+            }
+
             private string original = original;
             private string lastOriginal = original;
 
@@ -160,13 +184,17 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
 
         private void OnAliasDataRefresh()
         {
-            if (!PluginConfig.CustomMethodsVariableAliasEnabled)
-            {
-                return;
-            }
-
             foreach (var expression in expressions)
             {
+                expression.Expand();
+            }
+        }
+
+        private void OnAliasChange()
+        {
+            foreach (var expression in expressions)
+            {
+                expression.InvalidExpression = false;
                 expression.Expand();
             }
         }

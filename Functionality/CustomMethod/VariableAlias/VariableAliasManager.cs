@@ -74,6 +74,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         {
             aliasData.RemoveAt(index);
             UpdateAliasExpansionsFrom(index + 1);
+
+            OnAliasChange?.Invoke();
         }
 
         public void Swap(int index1, int index2)
@@ -87,18 +89,24 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
             {
                 aliasData[i].UpdateExpandedExpression();
             }
+
+            OnAliasChange?.Invoke();
         }
 
         public void SetAlias(int index, string alias)
         {
             aliasData[index].Alias = alias;
             UpdateAliasExpansionsFrom(index + 1);
+
+            OnAliasChange?.Invoke();
         }
 
         public void SetExpression(int index, string expression)
         {
             aliasData[index].Expression = expression;
             UpdateAliasExpansionsFrom(index + 1);
+
+            OnAliasChange?.Invoke();
         }
 
         public bool AliasExists(string alias) => aliasData.Any(data => data.Alias == alias);
@@ -407,6 +415,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableAlias
         public record DisplayAliasData(string Alias, string Expression);
 
         public Action OnDataRefresh;
+        public Action OnAliasChange;
 
         public const string AliasKey = "variableAlias";
 
