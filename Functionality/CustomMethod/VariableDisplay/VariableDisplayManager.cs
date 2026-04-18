@@ -1,4 +1,5 @@
 ﻿using RDEditorPlus.Functionality.CustomMethod.VariableAlias;
+using RDLevelEditor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -179,7 +180,7 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
 
         private void UpdateBlankPanel()
         {
-            Plugin.LogWarn("TODO update blank panel");
+            scnEditor.instance.ipm.UpdateBlankPanel(onlyIfVisible: true);
         }
 
         private void OnAliasDataRefresh()
@@ -188,6 +189,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
             {
                 expression.Expand();
             }
+
+            UpdateBlankPanel();
         }
 
         private void OnAliasChange()
@@ -197,6 +200,8 @@ namespace RDEditorPlus.Functionality.CustomMethod.VariableDisplay
                 expression.InvalidExpression = false;
                 expression.Expand();
             }
+
+            UpdateBlankPanel();
         }
 
         private readonly List<Expression> expressions = [];
