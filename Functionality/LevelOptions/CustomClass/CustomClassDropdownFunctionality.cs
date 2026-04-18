@@ -1,18 +1,17 @@
-﻿using HarmonyLib;
+﻿using RDEditorPlus.Functionality.General;
 using RDEditorPlus.Util;
 using RDLevelEditor;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.UI;
 
-namespace RDEditorPlus.Patch.LevelOptions.CustomClass
+namespace RDEditorPlus.Functionality.LevelOptions.CustomClass
 {
-    internal static class Patch_InspectorPanel_LevelSettings
+    public static class CustomClassDropdownFunctionality
     {
-        static Patch_InspectorPanel_LevelSettings()
+        static CustomClassDropdownFunctionality()
         {
             string path = FileUtil.GetFilePathFromAssembly(Filename);
             if (!File.Exists(path))
@@ -36,45 +35,13 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
             allowedCustomClassesCount = allowedCustomClasses.Count;
         }
 
-        [HarmonyPatch(typeof(InspectorPanel_LevelSettings), nameof(InspectorPanel_LevelSettings.Awake))]
-        private static class Awake
+        public static void UpdateUI() => UpdateDropdownUI(scnEditor.instance.levelSettings.customClass);
+
+        public static void Register()
         {
-            private static void Postfix(InspectorPanel_LevelSettings __instance)
-            {
-                UnityUtil.CreateDropdown(__instance.general.transform, out var dropdown, out var dropdownRT);
-
-                dropdown.ClearOptions();
-                dropdown.AddOptions(allowedCustomClasses);
-                dropdown.onValueChanged.AddListener(OnSelectItem);
-
-                dropdownRT.anchorMin = Vector2.zero;
-                dropdownRT.anchorMax = Vector2.one;
-                dropdownRT.offsetMin = new Vector2(TextEndPoint, CutFactor);
-                dropdownRT.offsetMax = new Vector2(TotalWidth, 0f);
-                dropdownRT.AnchorPosY(-__instance.generalHeight + ExtraVerticalOffset);
-
-                var textGO = GameObject.Instantiate(__instance.totalHits.gameObject, __instance.general.transform);
-
-                var text = textGO.GetComponent<Text>();
-                text.text = "Custom Class:";
-
-                var textRT = textGO.transform as RectTransform;
-                textRT.anchorMin = Vector2.zero;
-                textRT.anchorMax = Vector2.one;
-                textRT.offsetMin = new Vector2(7f, CutFactor);
-                textRT.offsetMax = new Vector2(TotalWidth - TextEndPoint, 0f);
-                textRT.AnchorPosY(-__instance.generalHeight + ExtraVerticalOffset);
-
-                __instance.generalHeight += ExtraVerticalOffset;
-
-                Patch_InspectorPanel_LevelSettings.dropdown = dropdown;
-            }
-        }
-
-        [HarmonyPatch(typeof(InspectorPanel_LevelSettings), nameof(InspectorPanel_LevelSettings.UpdateUI))]
-        private static class UpdateUI
-        {
-            private static void Postfix() => UpdateDropdownUI(RDLevelData.current.settings.customClass);
+            option = new("Custom Class", allowedCustomClasses, OnSelectItem);
+            SettingsInspectorRegistry.Register(option);
+            SettingsInspectorRegistry.OnUpdateUI += UpdateUI;
         }
 
         private static void OnSelectItem(int index)
@@ -96,16 +63,16 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
                 };
             }
 
-            int oldValue = dropdown.value;
+            int oldValue = Dropdown.value;
             ResetDropdownToUsualOptionsIfNeeded();
-            dropdown.SetValueWithoutNotify(oldValue);
+            Dropdown.SetValueWithoutNotify(oldValue);
         }
 
         private static void UpdateDropdownUI(string customClass)
         {
             if (customClass.IsNullOrEmpty())
             {
-                dropdown.SetValueWithoutNotify(0);
+                Dropdown.SetValueWithoutNotify(0);
                 return;
             }
 
@@ -113,29 +80,30 @@ namespace RDEditorPlus.Patch.LevelOptions.CustomClass
             if (index != -1)
             {
                 ResetDropdownToUsualOptionsIfNeeded();
-                dropdown.SetValueWithoutNotify(index);
+                Dropdown.SetValueWithoutNotify(index);
                 return;
             }
 
-            dropdown.ClearOptions();
+            Dropdown.ClearOptions();
 
             var list = AllowedCustomClassesWithBadExtra(customClass);
-            dropdown.AddOptions(list);
-            dropdown.SetValueWithoutNotify(list.Count - 1);
+            Dropdown.AddOptions(list);
+            Dropdown.SetValueWithoutNotify(list.Count - 1);
         }
 
         private static void ResetDropdownToUsualOptionsIfNeeded()
         {
-            if (dropdown.options.Count == allowedCustomClassesCount)
+            if (Dropdown.options.Count == allowedCustomClassesCount)
             {
                 return;
             }
 
-            dropdown.ClearOptions();
-            dropdown.AddOptions(allowedCustomClasses);
+            Dropdown.ClearOptions();
+            Dropdown.AddOptions(allowedCustomClasses);
         }
 
-        private static Dropdown dropdown;
+        private static Dropdown Dropdown => option.Dropdown;
+        private static SettingsInspectorRegistry.DropdownOption option;
 
         private static readonly List<string> allowedCustomClasses;
         private static readonly int allowedCustomClassesCount;

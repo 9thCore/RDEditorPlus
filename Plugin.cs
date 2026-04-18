@@ -48,6 +48,7 @@ namespace RDEditorPlus
             PatchUtil.PatchNested(harmony, typeof(Patch_scnEditor));
             PatchUtil.PatchNested(harmony, typeof(Patch_RDLevelData));
             PatchUtil.PatchNested(harmony, typeof(Patch_Conditional));
+            PatchUtil.PatchNested(harmony, typeof(Patch_InspectorPanel_LevelSettings));
 
             var baseType = typeof(BasePatchHandler);
             foreach (var type in baseType.Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType) && !type.IsAbstract))
