@@ -136,7 +136,9 @@ namespace RDEditorPlus
             "Handles the offset and volume, too.\n" +
             "If set to " + nameof(AutocompleteBehaviour.Disabled) + ", will not be enabled.\n" +
             "If set to " + nameof(AutocompleteBehaviour.RequestFromWeb) + ", will request from " + AudioOneTrueNameAutocompletion.URL + ", the public list of One True Names, then save to a temporary file which is occassionally updated.\n" +
-            "If set to " + nameof(AutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + AudioOneTrueNameAutocompletion.PlayerSuppliedFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in CSV (comma-separated values) format.";
+            "If set to " + nameof(AutocompleteBehaviour.FetchFromFile) + ", will fetch from the file located at \"BepInEx/plugins/RDEditorPlus/" + AudioOneTrueNameAutocompletion.PlayerSuppliedFile + "\", assuming it exists. This file must be supplied by the user (the mod will not create it) and should be in CSV (comma-separated values) format.\n" +
+            "Each line should be in the format: '[name],[offset],[volume]' or '[name],[volume]' or '[name]', where the volume is a multiplier (e.g. 1.1 is equivalent to 110%).\n" +
+            "The offset is essentially discarded - it is read because the default file at the web URL contains an offset column.";
         public const string PATCH_AUDIO_OTN_AUTOCOMPLETE_REFRESH_TIME = "How many days old the temporary download file (at \"BepInEx/plugins/RDEditorPlus/" + AudioOneTrueNameAutocompletion.TemporaryAutodownloadFile + "\") should be, before trying to request another.\n" +
             "Only does something if " + nameof(audioOtnAutocompleteRefreshTime) + " is set to " + nameof(AutocompleteBehaviour.RequestFromWeb) + ".\n" +
             "The file will only be requested once the editor is loaded, even if more than the specified amount of days have passed.\n" +

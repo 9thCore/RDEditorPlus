@@ -2,7 +2,6 @@
 using RDEditorPlus.Functionality.General;
 using RDEditorPlus.Functionality.Mixins;
 using RDLevelEditor;
-using RhythmWeightlifter;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -96,6 +95,14 @@ namespace RDEditorPlus.Functionality.Audio
                     {
                         yield return Read(line, firstSeparator, secondSeparator);
                     }
+                    else
+                    {
+                        yield return Read(line, firstSeparator);
+                    }
+                }
+                else
+                {
+                    yield return Read(line);
                 }
 
                 timeout--;
@@ -107,25 +114,46 @@ namespace RDEditorPlus.Functionality.Audio
             }
         }
 
+        private IEnumerator Read(string line)
+        {
+            yield return ValidateAndAdd(line, offset: 0f, volume: 1f);
+        }
+
+        private IEnumerator Read(string line, int separator)
+        {
+            if (!float.TryParse(line.Substring(separator + 1), out var volume))
+            {
+                yield break;
+            }
+
+            string name = line.Substring(0, separator);
+            yield return ValidateAndAdd(name, offset: 0f, volume);
+        }
+
         private IEnumerator Read(string line, int firstSeparator, int secondSeparator)
         {
             if (float.TryParse(line.Substring(firstSeparator + 1, secondSeparator - firstSeparator - 1), out var offset)
                             && float.TryParse(line.Substring(secondSeparator + 1), out var volume))
             {
                 string name = line.Substring(0, firstSeparator);
-                string path = RDConstants.data.soundData.Get(name).folder + "/" + name;
-
-                var request = Resources.LoadAsync(path);
-                yield return request;
-
-                if (request.asset != null)
-                {
-                    AddAudio(name, offset, volume);
-                }
+                yield return ValidateAndAdd(name, offset, volume);
             }
         }
 
-        private void AddAudio(string name, float offset = 0f, float volume = 1f)
+        private IEnumerator ValidateAndAdd(string name, float offset, float volume)
+        {
+            string path = RDConstants.data.soundData.Get(name).folder + "/" + name;
+
+            var request = Resources.LoadAsync(path);
+            yield return request;
+
+            if (request.asset != null)
+            {
+                AddAudio(name, offset, volume);
+            }
+        }
+
+        private void AddAudio(string name, float offset, float volume)
         {
             audio.Add(new AudioData(name, (int)(1000 * offset), (int)(100 * volume)));
             options.Add(name);
