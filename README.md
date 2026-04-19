@@ -1,6 +1,6 @@
 # RDEditorPlus
 BepInEx 5 Rhythm Doctor mod that aims to expand the level editor with Quality of Life features.  
-This mod always targets the latest **Beta** branch (because it would essentially). To switch to it on Steam:  
+This mod always targets the latest **Beta** branch (because it would essentially mean I'd have to maintain two versions). To switch to it on Steam:  
 - Right-click on Rhythm Doctor in the game list  
 - Properties > Game Version & Betas  
 - Select the `beta` version  
@@ -31,6 +31,12 @@ Features:
 	- Any mods not in this list, but used by the current level, will not be editable at all as they will not appear in the UI
 - Add an optional vanilla bugfix that helps with the subrow system
 	- On undo, row and sprite events were not being properly reassigned to the correct event list, so they were treated as part of another row's list by the subrow system
+- Create aliases for variables or expressions, or use them as a pseudo-comment system if left empty
+	- Basically, software macros if you're familiar with programming, but with a bit of extra Quality of Life like automatically wrapping an expression in parenthesis to avoid issues with the order of operations
+		- The automatic wrapping does not happen if it's just a variable, in order to allow setting variable aliases
+- Set up what variables or expressions to display while having no event selected
+	- If none are set up for the current level, it defaults to vanilla behaviour
+- Fetch sound One True Name/internal name autocompletion data from an external source or a local file, to be used in sound-related events
 
 Installation:  
 - [Install BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html) (Any 5.4.* should work just fine, even latest)

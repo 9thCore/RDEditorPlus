@@ -1,5 +1,18 @@
-- Add a dropdown for the level custom class
-  - Custom class list can be customised with a file in the root mod folder
-- Add a selector for the level mods
-  - Mod list can be customised with a file in the root mod folder
-- Fix vanilla bug that was affecting the subrow system, but that is enable-able separately
+Fixes:
+- (Select/selectionMultiEdit) Fix NullReferenceException when selecting multiple Call Custom Method events before selecting just one
+- (SubRows/windowSubRows & Windows/windowsMore) Fix unable to scroll down to (+) button if having more than 4 windows
+- (Windows/windowsMore) Fix undo not working for creating and deleting windows
+- (Windows/windowsMore) Automatically create the required amount of windows if loading a level with 5+ windows that does not have the required mod data
+- (SubRows & Optimisation/optimisationsTimeline/RecullOnlyIfRequired) Fix reculling not triggering when the tab updates due to the SubRow system
+- (General) Fix spacing between elements added to the level settings panel
+
+Features:
+- (CustomMethods/customMethodsVariableAlias) New feature that allows you to rename variables and give names to expression, for ease of RDCode use
+  - This feature does not allow creating new, unique variables, so a vanilla client can still play the level just fine
+- (CustomMethods/customMethodsVariableDisplay) New feature that allows you to display arbitrary expressions in the blank inspector (when no event is selected)
+  - If no expressions are set, it will just do the default vanilla behaviour
+  - May be less performant because it has to evaluate the expressions every frame
+  - If an expression errors, it will not be displayed and will instead be output in log along with the exception
+- (Audio/audioOtnAutocomplete) New feature that offers autocompletion with internal audio files (their One True Names)
+  - Can autofetch from an external URL after a set amount of days or can collect from a local file
+  - Also automatically sets the volume if given (see config for format)
