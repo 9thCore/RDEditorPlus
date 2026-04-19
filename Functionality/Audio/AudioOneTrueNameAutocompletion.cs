@@ -81,6 +81,8 @@ namespace RDEditorPlus.Functionality.Audio
             const int MaxReadTimeout = 150;
             int timeout = MaxReadTimeout;
 
+            var audioManager = Singleton<AudioManager>.Instance;
+
             using StringReader stringReader = new(text);
 
             string line;
@@ -92,13 +94,7 @@ namespace RDEditorPlus.Functionality.Audio
                     int secondSeparator = line.IndexOf(',', firstSeparator + 1);
                     if (secondSeparator != -1)
                     {
-                        if (float.TryParse(line.Substring(firstSeparator + 1, secondSeparator - firstSeparator - 1), out var offset)
-                            && float.TryParse(line.Substring(secondSeparator + 1), out var volume))
-                        {
-                            string name = line.Substring(0, firstSeparator);
-                            audio.Add(new AudioData(name, (int)(1000 * offset), (int)(100 * volume)));
-                            options.Add(name);
-                        }
+                        yield return Read(line, firstSeparator, secondSeparator);
                     }
                 }
 
@@ -109,6 +105,30 @@ namespace RDEditorPlus.Functionality.Audio
                     yield return null;
                 }
             }
+        }
+
+        private IEnumerator Read(string line, int firstSeparator, int secondSeparator)
+        {
+            if (float.TryParse(line.Substring(firstSeparator + 1, secondSeparator - firstSeparator - 1), out var offset)
+                            && float.TryParse(line.Substring(secondSeparator + 1), out var volume))
+            {
+                string name = line.Substring(0, firstSeparator);
+                string path = RDConstants.data.soundData.Get(name).folder + "/" + name;
+
+                var request = Resources.LoadAsync(path);
+                yield return request;
+
+                if (request.asset != null)
+                {
+                    AddAudio(name, offset, volume);
+                }
+            }
+        }
+
+        private void AddAudio(string name, float offset = 0f, float volume = 1f)
+        {
+            audio.Add(new AudioData(name, (int)(1000 * offset), (int)(100 * volume)));
+            options.Add(name);
         }
 
         private void OnFilenameChanged(PropertyControl_Sound soundControl, InputField inputField, string text)
